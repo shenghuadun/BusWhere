@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:adsmogo="http://www.adsmogo.com"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <FrameLayout
+	    android:id="@+id/content_frame"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent" 
+	    android:layout_above="@+id/adsMogoView">
+    </FrameLayout>
+    
+
+    <!-- 显示广告的Layout -->
+    <com.gigi.av.GigiLayout
+        android:id="@id/adsMogoView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        adsmogo:appid="95645d068efe4d55854960e0d10f3978"/>
+    
+</RelativeLayout>

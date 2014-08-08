@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the theme applied to the application or activity -->
+    <style name="CustomActionBarTheme"
+           parent="@style/AppTheme">
+        <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="actionBarStyle">@style/MyActionBar</item>
+    </style>
+
+    <!-- ActionBar styles -->
+    <style name="MyActionBar"
+           parent="@style/Widget.Sherlock.Light.ActionBar">
+        <item name="android:background">#1BA12F</item>
+        <item name="background">#1BA12F</item>
+        
+        <item name="backgroundSplit">#1BA12F</item>
+        <item name="android:backgroundSplit">#1BA12F</item>
+        
+        
+    <!-- TabHost中的每一个Tab 通常继承 parent="@style/Widget"
+        <item name="android:actionBarTabStyle">@style/xxx_light_actionbar_tab</item>  
+        <item name="actionBarTabStyle">@style/xxx_light_actionbar_tab</item>  -->  
+    <!-- TabHost 可以理解为TabWidget
+        <item name="android:actionBarTabBarStyle">@style/xxx_light_actionbar_tabhost</item>  
+        <item name="actionBarTabBarStyle">@style/xxx_light_actionbar_tabhost</item>  -->   
+    <!-- Tab中的Text
+        <item name="android:actionBarTabTextStyle">@style/xxx_light_actionbar_tabtab_text</item>   
+        <item name="actionBarTabTextStyle">@style/xxx_light_actionbar_tabtab_text</item>  -->     
+    <!-- 整体的Actionbar  通常继承 parent="@style/Widget.Sherlock.Light.ActionBar.Solid"
+        <item name="android:actionBarStyle">@style/xxx_light_actionbar</item>  
+        <item name="actionBarStyle">@style/xxx_light_actionbar</item>  -->  
+    <!-- 这里通常指的是Actionbar上的MenuItem点击之后的背景效果
+        <item name="android:selectableItemBackground">@null</item>  
+        <item name="selectableItemBackground">@null</item>   -->  
+    <!-- ActionBar的每一个Item，特指MenuItem 通常继承 parent="Widget.Sherlock.Light.ActionButton" 
+        <item name="android:actionButtonStyle">@style/xxx_light_actionbar_item</item>  
+        <item name="actionButtonStyle">@style/xxx_light_actionbar_item</item>   -->  
+        
+    </style>
+</resources>
