@@ -4,99 +4,53 @@
     android:layout_height="match_parent"
     android:background="#fafafa" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/adsMogoView" >
-
+	<RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/adsMogoView" >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="@string/history"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/labelColor" />
-
-            <LinearLayout
-                android:id="@+id/tableRow0"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" >
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/tableRow1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" >
-            </LinearLayout>
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:layout_margin="10dp"
-                android:background="@color/frame" />
-
-            <LinearLayout 
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:text="@string/fav"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/labelColor" />
-            
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:text="(左划删除)"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#777" />
-			</LinearLayout>
-			
-            <RelativeLayout 
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-            
-	            <TextView
-	                android:id="@+id/textView4"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_centerInParent="true"
-	                android:text="无记录"
-	                android:textColor="#b0b0b0" />
-	            <com.greenidea.buswhere.ui.SlideToDeleteListView
-	                android:id="@+id/listView"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_margin="10dp"
-	                android:fadingEdge="none"
-	                android:focusableInTouchMode="true"
-	                android:scrollbarStyle="outsideOverlay" >
-	            </com.greenidea.buswhere.ui.SlideToDeleteListView>
+	        <LinearLayout
+	            android:id="@+id/tableRow0"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal"
+	            android:paddingLeft="10dp"
+	            android:paddingRight="10dp" >
+	        </LinearLayout>
+	
+	        <LinearLayout
+	            android:id="@+id/tableRow1"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal"
+	            android:paddingLeft="10dp"
+	            android:paddingRight="10dp" >
+	        </LinearLayout>
+	
+	         <LinearLayout 
+	             android:layout_width="match_parent"
+	             android:layout_height="wrap_content"
+	             android:orientation="horizontal">
+				
+	            <RelativeLayout 
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content">
 	            
-            </RelativeLayout>
+		            <com.greenidea.buswhere.ui.SlideToDeleteListView
+		                android:id="@+id/listView"
+		                android:layout_width="match_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_margin="10dp"
+		                android:fadingEdge="none"
+		                android:focusableInTouchMode="true"
+		                android:scrollbarStyle="outsideOverlay" >
+		            </com.greenidea.buswhere.ui.SlideToDeleteListView>
+	            </RelativeLayout>
+	        </LinearLayout>
         </LinearLayout>
-
     </RelativeLayout>
-
-    
 </RelativeLayout>

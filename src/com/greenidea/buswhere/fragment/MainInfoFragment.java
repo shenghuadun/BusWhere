@@ -9,10 +9,8 @@ import java.util.Map;
 
 import org.htmlparser.util.ParserException;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -21,14 +19,12 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +33,6 @@ import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.bean.FavStationBean;
-import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.ui.SlideToDeleteListView;
 import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
 import com.greenidea.buswhere.util.Constants;
@@ -45,11 +40,11 @@ import com.greenidea.buswhere.util.Util;
 
 public class MainInfoFragment extends Fragment implements OnItemEventListener
 {
-	private SharedPreferences prefHistory;
-	private SharedPreferences prefFav;
-	
 	private View contentView;
 
+	public SharedPreferences prefHistory;
+	public SharedPreferences prefFav;
+	
 	//查询历史
 	private LinearLayout row0, row1;
 	//常用站点
@@ -71,8 +66,8 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
 	{
 		contentView = inflater.inflate(R.layout.main_info, null);
 
-		prefHistory = getActivity().getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
-		prefFav = getActivity().getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
+		prefHistory = ((MainActivity)getActivity()).prefHistory;
+		prefFav = ((MainActivity)getActivity()).prefFav;
 		
 		findViews();
 		
@@ -82,22 +77,6 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
 		return contentView;
 	}
 	
-	@Override
-	public void onSaveInstanceState(Bundle outState) 
-	{
-		super.onSaveInstanceState(outState);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
-		
-	}
-
 	private void findViews()
 	{
 		row0 = (LinearLayout)contentView.findViewById(R.id.tableRow0);
@@ -179,7 +158,7 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
 		}
 	}
 
-	private void queryHis()
+	public void queryHis()
 	{
 		@SuppressWarnings("unchecked")
 		Map<String, Long> his = (Map<String, Long>)prefHistory.getAll();
@@ -247,15 +226,6 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
 				row1.addView(v);
 			}
 		}
-		else 
-		{
-			TextView empty = new TextView(getActivity().getApplicationContext());
-			
-			empty.setText("无记录");
-			empty.setTextColor(Color.parseColor("#B0B0B0"));
-			row0.setGravity(Gravity.CENTER);
-			row0.addView(empty);
-		}
 	}
 
 
@@ -263,7 +233,7 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
 	{
 		TextView result = (TextView) this.getActivity().getLayoutInflater().inflate(R.layout.block, null);
 		result.setText(text + "路");
-		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, dip2px(35));
+		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, Util.dip2px(35, getActivity().getResources()));
 		params.setMargins(5, 5, 5, 5);
 		params.weight = 1;
 		result.setLayoutParams(params);
@@ -402,16 +372,4 @@ public class MainInfoFragment extends Fragment implements OnItemEventListener
     		queryHis();
         };  
 	};
-	
-	
-
-	public int dip2px(float dipValue)
-	{
-		return Util.dip2px(dipValue, getResources());
-	}
-
-	public int px2dip(float pxValue)
-	{
-		return Util.px2dip(pxValue, getResources());
-	}
 }

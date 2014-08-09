@@ -143,6 +143,8 @@ public class BusLineView extends View implements OnTouchListener
 	 * 路线中的站点
 	 */
 	private List<BusStation> stations = new ArrayList<BusStation>();
+	//界面未显示出来时，每行显示几站不能确定，先用tmpStations将数据缓存，measured后，STATIONS_PER_LINE设置为正确值，再调用真正的设置stations逻辑
+	private List<BusStation> tmpStations = new ArrayList<BusStation>();
 
 	/**
 	 * 界面元素
@@ -169,6 +171,7 @@ public class BusLineView extends View implements OnTouchListener
 	private Point downPoint = new Point(-1, -1);
 	private Point upPoint = new Point(-1, -1);
 	
+	private boolean measured = false;
 	
 //	private OnStationLongClickListener onStationLongClickListener;
 	
@@ -662,12 +665,16 @@ public class BusLineView extends View implements OnTouchListener
 
 	public void setStations(List<BusStation> busStations )
 	{
-		stationViewItems.clear();
-		stations.clear();
-		
-		for(BusStation station : busStations)
+		tmpStations = busStations;
+		if(measured)
 		{
-			addStation(station);
+			stationViewItems.clear();
+			stations.clear();
+			
+			for(BusStation station : busStations)
+			{
+				addStation(station);
+			}
 		}
 	}
 	public List<BusStation> getStations()
@@ -862,7 +869,19 @@ public class BusLineView extends View implements OnTouchListener
 		setMeasuredDimension(measuredWidth, measuredHeight);
 		
 		//按照宽度设置每行的数量
-		STATIONS_PER_LINE = (measuredWidth - d2p(40))/d2p(STATION_WIDTH);
+		int newNum = (measuredWidth - d2p(40))/d2p(STATION_WIDTH);
+		
+		if(STATIONS_PER_LINE != newNum)
+		{
+			STATIONS_PER_LINE = newNum;
+			
+			measured = true;
+			
+			if(!tmpStations.isEmpty())
+			{
+				setStations(tmpStations);
+			}
+		}
 	}
 
 	private int measureHeight(int measureSpec)
