@@ -97,6 +97,13 @@ public class SlideToDeleteListView extends ScrollView
 		container.setOrientation(LinearLayout.VERTICAL);
 	}
 	
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+	{
+		this.setVisibility(View.INVISIBLE);
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		this.setVisibility(View.VISIBLE);
+	}
 	/**
 	 * 添加View作为列表项，可以向左滑动显示删除按钮
 	 * @param view
@@ -307,7 +314,7 @@ public class SlideToDeleteListView extends ScrollView
 		/**
 		 * 删除所有内容
 		 */
-		public void removeAllView()
+		public void removeAllViews()
 		{
 			SlideToDeleteListView.this.container.removeAllViews();
 			SlideToDeleteListView.this.children.clear();

@@ -23,10 +23,7 @@ public class MainActivity extends BaseActivity
 	private MainFragment mainFragment;
 	private MenuFragment menuFragment;
 	private BusLineFragment busLineFragment;
-	
-	public SharedPreferences prefHistory;
-	public SharedPreferences prefFav;
-	
+
 	public BusStation currentStation;
 	
 	public MainActivity() 
@@ -42,9 +39,6 @@ public class MainActivity extends BaseActivity
 		mainFragment = new MainFragment();
 		menuFragment = new MenuFragment();
 		busLineFragment = new BusLineFragment();
-
-		prefHistory = getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
-		prefFav = getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
 		
 		setContentView(R.layout.main);
 

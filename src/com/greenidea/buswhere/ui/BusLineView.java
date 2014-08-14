@@ -81,19 +81,19 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 下行背景色
 	 */
-	public static final int COLOR_BLOCK_DOWN = Color.parseColor("#D2F8E1");
+	public static final int COLOR_BLOCK_DOWN = Color.parseColor("#c5eaf8");
 	/**
 	 * 上行背景色
 	 */
-	public static final int COLOR_BLOCK_UP = Color.parseColor("#E2F5FD");
+	public static final int COLOR_BLOCK_UP = Color.parseColor("#e2f0b6");
 	/**
 	 * 选中颜色
 	 */
-	private static final int COLOR_BLOCK_SELECTED = Color.parseColor("#F6E8C0");
+	private static final int COLOR_BLOCK_SELECTED = Color.parseColor("#ffc641");
 	/**
 	 * 线路颜色
 	 */
-	private static final int COLOR_LINE = Color.parseColor("#C08BE3");
+	private static final int COLOR_LINE = Color.parseColor("#0099CC");
 
 
 	/**
@@ -103,8 +103,11 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 站名颜色
 	 */
-	private static final int COLOR_STATION_NAME = Color.parseColor("#222266");
-	private static final int COLOR_STATION_TIME = Color.parseColor("#666666");
+	private static final int COLOR_STATION_NAME = Color.parseColor("#157392");
+	/**
+	 * 时间颜色
+	 */
+	private static final int COLOR_STATION_TIME = Color.parseColor("#669900");
 
 	/**
 	 * 车站圆圈半径
@@ -362,7 +365,7 @@ public class BusLineView extends View implements OnTouchListener
 				// 画背景
 				int color = 0;
 				Bitmap back;
-				if ("0".equals(item.station.getDirection()))
+				if ("1".equals(item.station.getDirection()))
 				{
 					back = back_down;
 					color = COLOR_BLOCK_DOWN;

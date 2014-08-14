@@ -4,21 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.htmlparser.util.ParserException;
-
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +29,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
@@ -52,6 +48,7 @@ public class MainFragment extends Fragment implements OnItemEventListener
 	
 	private EditText lineNumInput;
 	private ImageView btnSearch;
+	
 	private ListView hintList;
 	
 	//查询历史
@@ -74,6 +71,9 @@ public class MainFragment extends Fragment implements OnItemEventListener
 	public void onAttach(Activity activity)
 	{
 		parent = (MainActivity) activity;
+
+		prefHistory = parent.getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
+		prefFav = parent.getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
 		super.onAttach(activity);
 	}
 
@@ -81,9 +81,6 @@ public class MainFragment extends Fragment implements OnItemEventListener
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
 		contentView = inflater.inflate(R.layout.main_info, null);
-
-		prefHistory = parent.prefHistory;
-		prefFav = parent.prefFav;
 		
 		findViews();
 		setListeners();
@@ -93,13 +90,21 @@ public class MainFragment extends Fragment implements OnItemEventListener
 	
 
 	@Override
-	public void onResume()
+	public void onSaveInstanceState(Bundle outState)
 	{
-		queryHis();
-		queryFav();
-		super.onResume();
+		
+		
+		super.onSaveInstanceState(outState);
 	}
 
+	@Override
+	public void onResume()
+	{
+    	queryHis();
+    	queryFav();
+		super.onResume();
+	}
+	
 	private void findViews()
 	{
 		lineNumInput = (EditText)findViewById(R.id.lineNum);
@@ -158,9 +163,6 @@ public class MainFragment extends Fragment implements OnItemEventListener
     			
     			//更新查询历史
 	    		prefHistory.edit().putLong(lineNumInput.getText().toString(), System.currentTimeMillis()).commit();
-	    		
-	    		//更新查询记录
-	    		queryHis();
 			}
 
 		});
@@ -171,17 +173,6 @@ public class MainFragment extends Fragment implements OnItemEventListener
 		
 	}
 	
-	private int getScreenX(Point downPoint)
-	{
-		return downPoint.x;
-	}
-
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-	}
-
 	/**
 	 * 查询常用车站
 	 */
@@ -191,12 +182,10 @@ public class MainFragment extends Fragment implements OnItemEventListener
 		Map<String, String> fav = (Map<String, String>)prefFav.getAll();
 
 		favStations.clear();
-		
-		if(fav != null && !fav.isEmpty())
+		if(fav != null)
 		{
 			Map<String, FavStationBean> map = new HashMap<String, FavStationBean>();
-			
-			favListView.helper.removeAllView();
+			favListView.helper.removeAllViews();
 			
 			//添加到页面
 			for(Map.Entry<String, String> entry : fav.entrySet())
@@ -205,11 +194,13 @@ public class MainFragment extends Fragment implements OnItemEventListener
 				map.put(bean.toString(), bean);
 				
 				LinearLayout layout = getFavBlock(bean);
+				
 				favListView.helper.addDeletableView(layout);
 			}
 
 			favStations = map;
 		}
+
 	}
 
 	private void queryHis()
@@ -357,37 +348,6 @@ public class MainFragment extends Fragment implements OnItemEventListener
 		return result;
 	}
 
-	private class BusLocatingThread extends Thread
-	{
-		private BusStation stationClicked ;
-		
-		public BusLocatingThread(BusStation stationClicked)
-		{
-			this.stationClicked = stationClicked;	
-			Log.d("stationClicked", stationClicked.toString());
-		}
-
-		@Override
-		public void run()
-		{
-			Util busUtil = Util.getInstance(parent.getApplicationContext());
-			List<BusPosition> positions = null;
-			try
-			{
-				// 查询公交车位置信息
-				positions = busUtil.getBusPosition(stationClicked);
-			}
-			catch (ParserException e)
-			{
-				e.printStackTrace();
-			}
-        	
-			Map param = new HashMap();
-			param.put("stationClicked", stationClicked);
-			param.put("positions", positions);
-		}
-	}
-	
 	private View findViewById(int id)
 	{
 		return contentView.findViewById(id);
