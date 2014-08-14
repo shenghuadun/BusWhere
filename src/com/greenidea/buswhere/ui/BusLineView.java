@@ -38,7 +38,7 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 界面中每行车站数
 	 */
-	public static int STATIONS_PER_LINE = 4;
+	public int STATIONS_PER_LINE = 4;
 
 	/**
 	 * 车站高度
@@ -56,7 +56,11 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 线与边界的距离
 	 */
-	public static final int LINE_MARGIN_BOTTOM = 15;
+	public static final int LINE_MARGIN_BOTTOM = 40;
+	/**
+	 * 小人与下边界的距离
+	 */
+	public static final int MAN_MARGIN_BOTTOM = 5;
 	/**
 	 * 待经过线路宽度
 	 */
@@ -143,8 +147,6 @@ public class BusLineView extends View implements OnTouchListener
 	 * 路线中的站点
 	 */
 	private List<BusStation> stations = new ArrayList<BusStation>();
-	//界面未显示出来时，每行显示几站不能确定，先用tmpStations将数据缓存，measured后，STATIONS_PER_LINE设置为正确值，再调用真正的设置stations逻辑
-	private List<BusStation> tmpStations = new ArrayList<BusStation>();
 
 	/**
 	 * 界面元素
@@ -184,7 +186,8 @@ public class BusLineView extends View implements OnTouchListener
 //	{
 //		this.onStationLongClickListener = onStationLongClickListener;
 //	}
-	
+
+
 	public void init(Context context)
 	{
 		bitMapVehicleLeft = BitmapFactory.decodeResource(getResources(), R.drawable.bus_left);
@@ -302,9 +305,10 @@ public class BusLineView extends View implements OnTouchListener
 
 	private void clickStation(BusStation station, BusStationViewItem viewItem)
 	{
+		resetStations();
 		viewItem.isSelected = true;
 		
-		if(null != station)
+		if(null != station && null != stationClickHandler)
 		{
 			Message msg = stationClickHandler.obtainMessage();
 			msg.obj = station;
@@ -385,13 +389,15 @@ public class BusLineView extends View implements OnTouchListener
 				}
 				
 
-				canvas.drawText(item.station.getStationName(), d2p(5), d2p(15), paintStationName);
+				canvas.drawText(item.station.getStationName(), d2p(3), d2p(30), paintStationName);
 				if(!item.positionInfoList.isEmpty())
 				{
 					for(int i=0; i<item.positionInfoList.size(); i++)
 					{
 						BusPosition pos = item.positionInfoList.get(i);
-						canvas.drawText(pos.getWhen(), d2p(5), d2p(30 + i*15), paintStationTime);
+						canvas.drawText(pos.getWhen(), d2p(STATION_WIDTH + 10) / 2,
+								stationViewItems.get(i).rect.bottom	- d2p(STATION_HEIGHT/2 -25 - i*12),
+								paintStationTime);
 					}
 				}
 
@@ -456,13 +462,13 @@ public class BusLineView extends View implements OnTouchListener
 				{
 					if (isItemInLTRRow(i))
 					{
-						canvas.drawBitmap(bitMapManRight, stationViewItems.get(i).rect.left + d2p(STATION_WIDTH) / 2 + d2p(STATION_RADIUS), stationViewItems.get(i).rect.bottom
-								- d2p(LINE_MARGIN_BOTTOM) - bitMapManRight.getHeight() / 2, null);
+						canvas.drawBitmap(bitMapManRight, stationViewItems.get(i).rect.left + d2p(STATION_WIDTH) / 2 + d2p(STATION_RADIUS), 
+								stationViewItems.get(i).rect.bottom	- d2p(MAN_MARGIN_BOTTOM) - bitMapManRight.getHeight(), null);
 					}
 					else
 					{
 						canvas.drawBitmap(bitMapManLeft, stationViewItems.get(i).rect.left + d2p(STATION_WIDTH) / 2 - bitMapManLeft.getWidth() - d2p(STATION_RADIUS),
-								stationViewItems.get(i).rect.bottom - d2p(LINE_MARGIN_BOTTOM) - bitMapManLeft.getHeight() / 2, null);
+								stationViewItems.get(i).rect.bottom - d2p(MAN_MARGIN_BOTTOM) - bitMapManLeft.getHeight(), null);
 					}
 				}
 			}
@@ -665,7 +671,6 @@ public class BusLineView extends View implements OnTouchListener
 
 	public void setStations(List<BusStation> busStations )
 	{
-		tmpStations = busStations;
 		if(measured)
 		{
 			stationViewItems.clear();
@@ -676,6 +681,12 @@ public class BusLineView extends View implements OnTouchListener
 				addStation(station);
 			}
 		}
+		//not measured, 暂存到stations， measure后会再次调用setStations
+		else
+		{
+			stations = busStations;
+		}
+
 	}
 	public List<BusStation> getStations()
 	{
@@ -704,6 +715,7 @@ public class BusLineView extends View implements OnTouchListener
 
 			if (-1 != stationClickedIndex)
 			{
+				resetStations();
 				BusStationViewItem stationViewClicked = stationViewItems.get(stationClickedIndex);
 				stationViewClicked.isWattingForPassing = true;
 				stationViewClicked.isTargetStation = true;
@@ -777,7 +789,7 @@ public class BusLineView extends View implements OnTouchListener
 	 * @param index
 	 * @return
 	 */
-	private static boolean isItemInLTRRow(int index)
+	private boolean isItemInLTRRow(int index)
 	{
 		return isLTRRow(getRow(index));
 	}
@@ -788,7 +800,7 @@ public class BusLineView extends View implements OnTouchListener
 	 * @param row
 	 * @return
 	 */
-	private static boolean isLTRRow(int row)
+	private boolean isLTRRow(int row)
 	{
 		return row % 2 == 0;
 	}
@@ -799,7 +811,7 @@ public class BusLineView extends View implements OnTouchListener
 	 * @param index
 	 * @return
 	 */
-	public static int getRow(int index)
+	public int getRow(int index)
 	{
 		return (int) Math.floor((index + 0.0) / STATIONS_PER_LINE);
 	}
@@ -810,7 +822,7 @@ public class BusLineView extends View implements OnTouchListener
 	 * @param index
 	 * @return
 	 */
-	public static int getIndexInRow(int index)
+	public int getIndexInRow(int index)
 	{
 		return index % STATIONS_PER_LINE;
 	}
@@ -877,9 +889,12 @@ public class BusLineView extends View implements OnTouchListener
 			
 			measured = true;
 			
-			if(!tmpStations.isEmpty())
+			if(!stations.isEmpty())
 			{
-				setStations(tmpStations);
+				List<BusStation> tmp = new ArrayList<BusStation>();
+				tmp.addAll(stations);
+				stations.clear();
+				setStations(tmp);
 			}
 		}
 	}

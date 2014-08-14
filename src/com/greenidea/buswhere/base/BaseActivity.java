@@ -35,7 +35,6 @@ public class BaseActivity extends SlidingFragmentActivity {
 		// customize the SlidingMenu
 		SlidingMenu sm = getSlidingMenu();
 		sm.setShadowWidthRes(R.dimen.shadow_width);
-//		sm.setShadowDrawable(R.drawable.shadow);
 		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		sm.setFadeDegree(0.35f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
@@ -59,7 +58,7 @@ public class BaseActivity extends SlidingFragmentActivity {
 		return true;
 	}
 	
-Dialog dialog;
+	Dialog dialog;
 	
 	private Handler adHandler = new Handler()
 	{

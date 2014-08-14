@@ -10,13 +10,4 @@
 	    android:layout_above="@+id/adsMogoView">
     </FrameLayout>
     
-
-    <!-- 显示广告的Layout -->
-    <com.gigi.av.GigiLayout
-        android:id="@id/adsMogoView"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        adsmogo:appid="95645d068efe4d55854960e0d10f3978"/>
-    
 </RelativeLayout>

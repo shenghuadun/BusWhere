@@ -68,7 +68,7 @@ public class Util
 		
 		//查询数据库中有没有
 		SQLiteDatabase db = helper.getWritableDatabase();
-		Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
+		Cursor cursor = db.query(Constants.TABLENAME_STATIONINFO, 
 				new String[]
 				{
 					BusStation.STATION_ID, 
@@ -164,9 +164,9 @@ public class Util
 		db.beginTransaction();
 		try 
 		{
-			String sql = "Delete from " + Constants.TABLENAME_LINEINFO +
+			String sql = "Delete from " + Constants.TABLENAME_STATIONINFO +
 					" where " + BusStation.LINE_ID + "=\"" + lineId + "\" and " + BusStation.DIRECTION + "=\"" + direction + "\";";
-			db.delete(Constants.TABLENAME_LINEINFO, BusStation.LINE_ID + "=? and " + BusStation.DIRECTION + "=?", new String[]{lineId, direction});
+			db.delete(Constants.TABLENAME_STATIONINFO, BusStation.LINE_ID + "=? and " + BusStation.DIRECTION + "=?", new String[]{lineId, direction});
 			
 			for(BusStation station : busStationList)
 			{
@@ -189,7 +189,7 @@ public class Util
 
 	private String toInsertSQLString(BusStation station) 
 	{
-		return "INSERT INTO " + Constants.TABLENAME_LINEINFO + " VALUES(\"" + 
+		return "INSERT INTO " + Constants.TABLENAME_STATIONINFO + " VALUES(\"" + 
 				station.getStationId() + "\", \"" + 
 				station.getStationName() + "\", \"" + 
 				station.getSeq() + "\", \"" + 

@@ -9,7 +9,6 @@
         android:background="#fafafa"
         android:fadingEdge="none"
         android:scrollbarStyle="outsideOverlay">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,8 +17,9 @@
             <com.greenidea.buswhere.ui.BusLineView
                 android:id="@+id/busLineView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="wrap_content" 
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

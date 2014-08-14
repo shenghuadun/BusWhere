@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/addFav" 
+        android:title="收藏" 
+        android:showAsAction="withText|always"></item>
+    <item android:id="@+id/deleteFav" 
+        android:title="取消收藏" 
+        android:showAsAction="withText|always"></item>
+    
+
+</menu>

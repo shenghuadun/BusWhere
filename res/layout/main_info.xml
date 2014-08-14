@@ -3,16 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fafafa" >
+    
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+    	android:layout_above="@+id/adsMogoView"
+        android:orientation="vertical" >
 
-	<RelativeLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_above="@+id/adsMogoView" >
+	    
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+            
+			<EditText
+			    android:id="@+id/lineNum"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:ems="10"
+			    android:inputType="number" >
+		
+			</EditText>
 
+			<ImageView
+			    android:id="@+id/btnSearch"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:src="@drawable/abs__ic_search" />
+            
+		</LinearLayout>
+	    
+		<RelativeLayout 
+		    android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+		    
+		    <ListView 
+		        android:id="@+id/hintList"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+		    </ListView>
+		    
 	        <LinearLayout
 	            android:id="@+id/tableRow0"
 	            android:layout_width="match_parent"
@@ -27,6 +60,7 @@
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:orientation="horizontal"
+	            android:layout_below="@id/tableRow0"
 	            android:paddingLeft="10dp"
 	            android:paddingRight="10dp" >
 	        </LinearLayout>
@@ -34,23 +68,26 @@
 	         <LinearLayout 
 	             android:layout_width="match_parent"
 	             android:layout_height="wrap_content"
+	             android:layout_below="@id/tableRow1"
 	             android:orientation="horizontal">
-				
-	            <RelativeLayout 
-	                android:layout_width="fill_parent"
-	                android:layout_height="wrap_content">
-	            
-		            <com.greenidea.buswhere.ui.SlideToDeleteListView
-		                android:id="@+id/listView"
-		                android:layout_width="match_parent"
-		                android:layout_height="wrap_content"
-		                android:layout_margin="10dp"
-		                android:fadingEdge="none"
-		                android:focusableInTouchMode="true"
-		                android:scrollbarStyle="outsideOverlay" >
-		            </com.greenidea.buswhere.ui.SlideToDeleteListView>
-	            </RelativeLayout>
+	            <com.greenidea.buswhere.ui.SlideToDeleteListView
+	                android:id="@+id/listView"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_margin="10dp"
+	                android:fadingEdge="none"
+	                android:focusableInTouchMode="true"
+	                android:scrollbarStyle="outsideOverlay" >
+	            </com.greenidea.buswhere.ui.SlideToDeleteListView>
 	        </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
+		</RelativeLayout>
+	</LinearLayout>
+    
+    <!-- 显示广告的Layout -->
+    <com.gigi.av.GigiLayout
+        android:id="@id/adsMogoView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        adsmogo:appid="95645d068efe4d55854960e0d10f3978"/>
 </RelativeLayout>
