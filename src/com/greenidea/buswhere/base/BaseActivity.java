@@ -60,27 +60,27 @@ public class BaseActivity extends SlidingFragmentActivity {
 	
 	Dialog dialog;
 	
-	private Handler adHandler = new Handler()
-	{
-        public void handleMessage(Message msg) 
-        {  
-        	//广告设置
-    		final GigiLayout adsMogoView = (GigiLayout) findViewById(R.id.adsMogoView);
-    		if(null != adsMogoView)
-    		{
-    			adsMogoView.setVisibility(View.INVISIBLE);
-    			adsMogoView.postDelayed(new Runnable()
-    			{
-    				
-    				@Override
-    				public void run()
-    				{
-    					adsMogoView.setVisibility(View.VISIBLE);				
-    				}
-    			}, 4000);
-    		}
-        }
-	};
+//	private Handler adHandler = new Handler()
+//	{
+//        public void handleMessage(Message msg) 
+//        {  
+//        	//广告设置
+//    		final GigiLayout adsMogoView = (GigiLayout) findViewById(R.id.adsMogoView);
+//    		if(null != adsMogoView)
+//    		{
+//    			adsMogoView.setVisibility(View.INVISIBLE);
+//    			adsMogoView.postDelayed(new Runnable()
+//    			{
+//    				
+//    				@Override
+//    				public void run()
+//    				{
+//    					adsMogoView.setVisibility(View.VISIBLE);				
+//    				}
+//    			}, 4000);
+//    		}
+//        }
+//	};
 	
 	public void showProcess()
 	{

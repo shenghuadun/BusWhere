@@ -7,6 +7,7 @@
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/adContainer1"
         android:background="#fafafa"
         android:fadingEdge="none"
         android:scrollbarStyle="outsideOverlay">
@@ -22,13 +23,14 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"/>
             
-            
-		    <!-- 显示广告的Layout -->
-		    <com.gigi.av.GigiLayout
-		        android:id="@+id/adsMogoView1"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        adsmogo:appid="95645d068efe4d55854960e0d10f3978"/>
         </LinearLayout>
     </ScrollView>
+    
+	<!-- 显示广告的Layout -->
+	<LinearLayout
+	    android:id="@id/adContainer1"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"/>
+	
 </RelativeLayout>

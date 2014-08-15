@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- the theme applied to the application or activity -->
     <style name="CustomActionBarTheme"
-           parent="@style/Theme.Sherlock">
+           parent="@style/Theme.Sherlock.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="actionBarStyle">@style/MyActionBar</item>
     </style>
 
     <!-- ActionBar styles -->
     <style name="MyActionBar"
-           parent="@style/Widget.Sherlock.Light.ActionBar">
+           parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
         <item name="android:background">#0099CC</item>
         <item name="background">#0099CC</item>
         
-        <item name="backgroundSplit">#0099CC</item>
         <item name="android:backgroundSplit">#0099CC</item>
-        
-        
+        <item name="backgroundSplit">#0099CC</item>
+    
+    <!--         -->  
     <!-- TabHost中的每一个Tab 通常继承 parent="@style/Widget"
         <item name="android:actionBarTabStyle">@style/xxx_light_actionbar_tab</item>  
         <item name="actionBarTabStyle">@style/xxx_light_actionbar_tab</item>  -->  

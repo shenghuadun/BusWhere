@@ -315,7 +315,7 @@ public class BusLineView extends View implements OnTouchListener
 		{
 			Message msg = stationClickHandler.obtainMessage();
 			msg.obj = station;
-			stationClickHandler.sendMessage(msg);
+			stationClickHandler.sendMessageDelayed(msg, 300);
 		}
 	}
 
