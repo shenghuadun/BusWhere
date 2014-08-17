@@ -11,6 +11,7 @@ import android.R.anim;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +21,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -28,8 +31,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +50,7 @@ import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
 import com.greenidea.buswhere.ui.SlideToDeleteListView;
 import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
+import com.greenidea.buswhere.util.BusDBHelper;
 import com.greenidea.buswhere.util.Constants;
 import com.greenidea.buswhere.util.Util;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -88,6 +94,10 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 		prefHistory = getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
 		prefFav = getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
+		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
+		{
+			BusDBHelper.copyDatabaseFile(this.getApplicationContext(), getDatabasePath("busdb").getParent());
+		}
 		
 		menuFragment = new MenuFragment();
 		busLineFragment = new BusLineFragment(this);
@@ -173,20 +183,58 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		favListView.helper.setOnItemEventListener(this);
 	}
 
-	private void updateHints(String string)
+	private void showHints(String string)
+	{
+		//特殊线路
+		if("".equals(string))
+		{
+			showSpecialLines();
+		}
+		else
+		{
+			showLinesByKey(string);
+		}
+	}
+	
+	private void showLinesByKey(String string)
 	{
 		
 	}
+
+	private void showSpecialLines()
+	{
+		hintList.setAdapter(adapter);
+	}
+
+	private ListAdapter adapter = new SimpleAdapter(context, data, resource, from, to)
 	
 	private void setListeners()
 	{
+		lineNumInput.setOnFocusChangeListener(new OnFocusChangeListener()
+		{
+			
+			@Override
+			public void onFocusChange(View v, boolean hasFocus)
+			{
+				if(hasFocus)
+				{
+					showSpecialLines();
+				}
+				else
+				{
+					hideHints();
+				}
+				
+			}
+		});
+		
 		lineNumInput.addTextChangedListener(new TextWatcher()
 		{
 			
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count)
 			{
-				updateHints(s.toString());
+				showHints(s.toString());
 			}
 
 			@Override
@@ -208,9 +256,6 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			@Override
 			public void onClick(View v)
 			{
-				String stationId = null;
-				String direction = null;
-				
 				queryBus(lineNumInput.getText().toString(), null, null);		
     			
     			//更新查询历史

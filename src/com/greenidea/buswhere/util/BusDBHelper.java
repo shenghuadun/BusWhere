@@ -76,27 +76,10 @@ public class BusDBHelper extends SQLiteOpenHelper
 	}
 	
 
-    private static void copyDatabaseFile(Context context, boolean isfored) 
+    public static void copyDatabaseFile(Context context, String dbPath) 
     {  
-        File dir = new File("/data/data/com.greenidea.buswhere/database");  
-        if (!dir.exists() || isfored) 
-        {  
-            try 
-            {  
-                dir.mkdir();  
-            } 
-            catch (Exception e) 
-            {  
-                e.printStackTrace();  
-            }  
-        }  
-          
-        File dest = new File(dir, "busdb.db");  
-        if(dest.exists() && !isfored)
-        {  
-            return ;  
-        }  
-          
+        File dest = new File(dbPath, "busdb.db");  
+        
         try 
         {  
             if(dest.exists())
