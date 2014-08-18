@@ -35,5 +35,9 @@ Icon
 .Spotlight-V100
 .Trashes
 
-bin/
+bin/*
 
+
+.gitignore~
+
+*.class
