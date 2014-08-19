@@ -15,13 +15,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+            
+	        <RelativeLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+	            android:paddingLeft="20dp"
+	            android:orientation="horizontal" >
+            
+				<ImageView
+				    android:id="@+id/group"
+				    android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+				    android:layout_centerVertical="true"
+            		android:paddingRight="10dp"
+				    android:src="@drawable/gj" />
+	                
+	            <TextView
+	                android:id="@+id/downAvilableTime"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:textColor="@color/workTime"
+	                android:layout_toRightOf="@id/group"
+	                android:text="TextView" />
+
+	            <TextView
+	                android:id="@+id/upAvilableTime"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:textColor="@color/workTime"
+	                android:layout_toRightOf="@id/group"
+	                android:layout_below="@id/downAvilableTime"
+	                android:text="TextView" />
+           </RelativeLayout>
 	
             <com.greenidea.buswhere.ui.BusLineView
                 android:id="@+id/busLineView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" 
                 android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="3dp"/>
+
             
         </LinearLayout>
     </ScrollView>
@@ -31,6 +65,7 @@
 	    android:id="@id/adContainer1"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
 	    android:layout_alignParentBottom="true"/>
 	
 </RelativeLayout>

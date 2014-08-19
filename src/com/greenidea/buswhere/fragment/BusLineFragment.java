@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobads.AdView;
@@ -38,6 +39,9 @@ public class BusLineFragment extends Fragment
 	private ScrollView scrollView;
 	private BusLineView busLineView;
 	
+	private TextView downAvilableTime;
+	private TextView upAvilableTime;
+	
 	private List<BusStation> busStations;
 
 	private OnFragmentDestroyListener onFragmentDestroyListener;
@@ -50,7 +54,7 @@ public class BusLineFragment extends Fragment
 	/**
 	 * 当前显示的线路
 	 */
-	private String lineId;
+	private BusLine currentLine;
 	
 	public BusLineFragment(MainActivity activity) 
 	{
@@ -79,6 +83,16 @@ public class BusLineFragment extends Fragment
 		scrollView = (ScrollView) contentView.findViewById(R.id.scrollView);
 		busLineView = (BusLineView) contentView.findViewById(R.id.busLineView);
 
+		downAvilableTime = (TextView) contentView.findViewById(R.id.downAvilableTime);
+		upAvilableTime = (TextView) contentView.findViewById(R.id.upAvilableTime);
+		
+		if(null != currentLine)
+		{
+			downAvilableTime.setText(currentLine.getDownAvilableTime());
+			upAvilableTime.setText(currentLine.getUpAvilableTime());
+		}
+		
+		
 		busLineView.setStationClickHandler(stationClickHandler);
 		
 		if(null != busStations)
@@ -113,7 +127,7 @@ public class BusLineFragment extends Fragment
 	{
 		busLineView.clickStation(index);
 		
-		scrollHandler.sendEmptyMessageDelayed((busLineView.getRow(index)) 
+		scrollHandler.sendEmptyMessageDelayed((busLineView.getRow(index + 1)) 
 				* Util.dip2px(BusLineView.STATION_HEIGHT, parent.getResources()) + 20, 200);
 	}
 
@@ -204,10 +218,6 @@ public class BusLineFragment extends Fragment
         }
 	};
 	
-	public String getCurrentLineId()
-	{
-		return lineId;
-	}
 	public void resetStations()
 	{
 		if(null != busLineView)
@@ -229,6 +239,25 @@ public class BusLineFragment extends Fragment
 		((LinearLayout)contentView.findViewById(R.id.adContainer1)).addView(adView);
 	}
 	
+	public BusLine getCurrentLine()
+	{
+		return currentLine;
+	}
+
+	public void setCurrentLine(BusLine currentLine)
+	{
+		this.currentLine = currentLine;
+
+		if(null != downAvilableTime)
+		{
+			downAvilableTime.setText(currentLine.getDownAvilableTime());
+		}
+		if(null != upAvilableTime)
+		{
+			upAvilableTime.setText(currentLine.getUpAvilableTime());
+		}
+	}
+
 	private AdViewListener adViewListener = new AdViewListener()
 	{
 		

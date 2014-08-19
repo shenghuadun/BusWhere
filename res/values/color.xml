@@ -5,4 +5,5 @@
     <color name="transparent">#00000000</color>
     
     <color name="actionbar">#52AA1C</color>
+    <color name="workTime">#085600</color>
 </resources>

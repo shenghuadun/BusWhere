@@ -663,6 +663,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 //        	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //        	imm.hideSoftInputFromWindow(lineIdInput.getWindowToken(), 0);
 
+    		busLineFragment.setCurrentLine(line);
     		busLineFragment.setStations(busStations, line);
     		
     		//查询常用车站
