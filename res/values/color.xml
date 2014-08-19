@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="descColor">#e17b03</color>
-    
-    <color name="delBtnPressed">#CC0000</color>
-    <color name="delBtn">#FF4444</color>
-    
-    <color name="frame">#D8D8D8</color>
-    <color name="labelColor">#4C8599</color>
     <color name="textColor">#2A2A2A</color>
     
     <color name="transparent">#00000000</color>
+    
+    <color name="actionbar">#52AA1C</color>
 </resources>

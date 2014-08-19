@@ -42,15 +42,15 @@ public class BaseActivity extends SlidingFragmentActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			toggle();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+//	@Override
+//	public boolean onOptionsItemSelected(MenuItem item) {
+//		switch (item.getItemId()) {
+//		case android.R.id.home:
+//			toggle();
+//			return true;
+//		}
+//		return super.onOptionsItemSelected(item);
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

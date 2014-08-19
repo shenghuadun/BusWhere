@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.htmlparser.util.ParserException;
+import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +20,8 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.baidu.mobads.AdView;
+import com.baidu.mobads.AdViewListener;
+import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
@@ -38,6 +41,12 @@ public class BusLineFragment extends Fragment
 	private List<BusStation> busStations;
 
 	private OnFragmentDestroyListener onFragmentDestroyListener;
+	
+	/**
+	 * 选中的站点
+	 */
+	public BusStation currentStation;
+	
 	/**
 	 * 当前显示的线路
 	 */
@@ -52,7 +61,7 @@ public class BusLineFragment extends Fragment
 	@Override
 	public void onDestroy()
 	{
-    	parent.currentStation = null;
+    	currentStation = null;
     	parent.invalidateOptionsMenu();
     	
     	if(null != onFragmentDestroyListener)
@@ -77,12 +86,12 @@ public class BusLineFragment extends Fragment
 			busLineView.setStations(busStations);
 		}
 		
-		addAdHandler.sendEmptyMessageDelayed(0, 3000);
+//		addAdView();
 		
 		return contentView;
 	}
 
-	public void setStations(List<BusStation> busStations)
+	public void setStations(List<BusStation> busStations, BusLine line)
 	{
 		scrollHandler.sendEmptyMessageDelayed(0, 200);
 		this.busStations = busStations;
@@ -91,6 +100,8 @@ public class BusLineFragment extends Fragment
 		{
 			busLineView.setStations(busStations);
 		}
+		parent.getSupportActionBar().setTitle(line.getLineName());
+        parent.getSupportActionBar().setSubtitle(line.getPrice());
 	}
 
 	public List<BusStation> getStations()
@@ -102,8 +113,8 @@ public class BusLineFragment extends Fragment
 	{
 		busLineView.clickStation(index);
 		
-		scrollHandler.sendEmptyMessageDelayed((busLineView.getRow(index)-3) 
-				* Util.dip2px(BusLineView.STATION_HEIGHT, parent.getResources()), 200);
+		scrollHandler.sendEmptyMessageDelayed((busLineView.getRow(index)) 
+				* Util.dip2px(BusLineView.STATION_HEIGHT, parent.getResources()) + 20, 200);
 	}
 
 	private Handler scrollHandler = new Handler()
@@ -122,7 +133,7 @@ public class BusLineFragment extends Fragment
         {  
         	BusStation stationClicked = (BusStation)msg.obj;
 
-        	parent.currentStation = stationClicked;
+        	currentStation = stationClicked;
         	parent.invalidateOptionsMenu();
 
         	parent.showProcess();
@@ -192,94 +203,7 @@ public class BusLineFragment extends Fragment
         	parent.hideProcess();
         }
 	};
-
-	private class QueryBusRunner implements Runnable
-	{
-		private String lineId;
-		private String stationId;
-		private String  direction;
-		
-		public QueryBusRunner(String lineId, String stationId, String direction)
-		{
-			this.lineId = lineId;
-			this.stationId = stationId;
-			this.direction = direction;
-		}
-		@Override
-		public void run()
-		{
-			List<BusStation> result = Util.getInstance(parent.getApplicationContext()).getBusStations(lineId, "1");
-			result.addAll(Util.getInstance(parent.getApplicationContext()).getBusStations(lineId, "0"));
-			
-			Message msg = lineInfoHandler.obtainMessage();
-			
-			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("stationList", result);
-			m.put("stationId", stationId);
-			m.put("direction", direction);
-			
-			msg.obj = m;
-			lineInfoHandler.sendMessageDelayed(msg, 1000);
-		}
-	}
 	
-	public void queryBus(String lineId, final String stationId, final String direction)
-	{
-		this.lineId = lineId;
-		if(!lineId.equals(""))
-		{
-			parent.showProcess();
-			
-			new Thread(new QueryBusRunner(lineId, stationId, direction)).start();		
-		}		
-	}
-
-	
-	private Handler lineInfoHandler = new Handler()
-	{
-        @SuppressWarnings("unchecked")
-		public void handleMessage(Message msg) 
-        {  
-			Map<String, Object> m = (Map<String, Object>) msg.obj;
-			
-			List<BusStation> busStations = (List<BusStation>) m.get("stationList");
-			
-			String stationId = (String) m.get("stationId");
-			String direction = (String) m.get("direction");
-
-			if(busStations.isEmpty())
-        	{
-        		Toast.makeText(parent.getApplicationContext(), "未查询到本路车", Toast.LENGTH_SHORT).show();
-        		return;
-        	}
-
-        	//隐藏输入法
-//        	lineIdInput.clearFocus();
-//        	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        	imm.hideSoftInputFromWindow(lineIdInput.getWindowToken(), 0);
-
-    		setStations(busStations);
-    		
-    		//查询常用车站
-    		if(null != stationId)
-    		{
-    			int index = -1;
-    			
-    			for(int i = 0; i< busStations.size(); i++)
-    			{
-    				BusStation station = busStations.get(i);
-    				if(station.getStationId().equals(stationId) 
-    						&& station.getDirection().equals(direction))
-    				{
-    					index = i;
-    				}
-    			}
-    			
-    			clickStation(index);
-    		}
-        };  
-	};
-
 	public String getCurrentLineId()
 	{
 		return lineId;
@@ -296,16 +220,82 @@ public class BusLineFragment extends Fragment
 	{
 		this.onFragmentDestroyListener = onFragmentDestroyListener;
 	}
-	
 
-	private Handler addAdHandler = new Handler()
+	private void addAdView()
 	{
+		AdView adView = new AdView(parent);
+		adView.setVisibility(View.GONE);
+		adView.setListener(adViewListener);
+		((LinearLayout)contentView.findViewById(R.id.adContainer1)).addView(adView);
+	}
+	
+	private AdViewListener adViewListener = new AdViewListener()
+	{
+		
 		@Override
-		public void handleMessage(Message msg)
+		public void onVideoStart()
 		{
-			AdView adView = new AdView(parent);
 			
-			((LinearLayout)parent.findViewById(R.id.adContainer1)).addView(adView);
+		}
+		
+		@Override
+		public void onVideoFinish()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoError()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickReplay()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickClose()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickAd()
+		{
+			
+		}
+		
+		@Override
+		public void onAdSwitch()
+		{
+			
+		}
+		
+		@Override
+		public void onAdShow(JSONObject arg0)
+		{
+			
+		}
+		
+		@Override
+		public void onAdReady(AdView arg0)
+		{
+			arg0.setVisibility(View.VISIBLE);
+		}
+		
+		@Override
+		public void onAdFailed(String arg0)
+		{
+			
+		}
+		
+		@Override
+		public void onAdClick(JSONObject arg0)
+		{
+			
 		}
 	};
 }

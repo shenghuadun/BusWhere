@@ -93,11 +93,14 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 线路颜色
 	 */
-	private static final int COLOR_LINE = Color.parseColor("#0099CC");
-
+	private static final int COLOR_LINE = Color.parseColor("#52AA1C");
+	/**
+	 * 点路线颜色
+	 */
+	private static final int COLOR_LINE_DASH = Color.parseColor("#291EEF");
 
 	/**
-	 * 带经过线路颜色
+	 * 待经过线路颜色
 	 */
 	private static final int COLOR_LINE_UNPASSED = Color.WHITE;
 	/**
@@ -168,7 +171,6 @@ public class BusLineView extends View implements OnTouchListener
 	
 	private Bitmap back_up;
 	private Bitmap back_down;
-	private Rect backRect;
 	
 	/**
 	 * 按下、抬起点
@@ -177,6 +179,7 @@ public class BusLineView extends View implements OnTouchListener
 	private Point upPoint = new Point(-1, -1);
 	
 	private boolean measured = false;
+	private int pendingClickStationIndex = -1;
 	
 //	private OnStationLongClickListener onStationLongClickListener;
 	
@@ -200,7 +203,6 @@ public class BusLineView extends View implements OnTouchListener
 
 		back_up = BitmapFactory.decodeResource(getResources(), R.drawable.back_up);
 		back_down = BitmapFactory.decodeResource(getResources(), R.drawable.back_down);
-		backRect = new Rect(0, 0, d2p(STATION_WIDTH - BLOCK_PADDING), d2p(STATION_HEIGHT - BLOCK_PADDING));
 		
 		paintLine = new Paint();
 		paintLine.setStyle(Paint.Style.STROKE);
@@ -217,7 +219,7 @@ public class BusLineView extends View implements OnTouchListener
 		paintLineUnpassedDynamic = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paintLineUnpassedDynamic.setStyle(Paint.Style.STROKE);
 		paintLineUnpassedDynamic.setStrokeWidth(d2p(STROKE_Unpassed_HEIGHT));
-		paintLineUnpassedDynamic.setColor(Color.parseColor("#B23D77"));
+		paintLineUnpassedDynamic.setColor(COLOR_LINE_DASH);
 
 		pathLineEffect = new CornerPathEffect(CORNER_RADIUS);
 
@@ -237,12 +239,12 @@ public class BusLineView extends View implements OnTouchListener
 
 		// 箭头路径
 		arrowPath = new Path();
-		arrowPath.moveTo(4, 0);
-		arrowPath.lineTo(0, -4);
-		arrowPath.lineTo(8, -4);
-		arrowPath.lineTo(12, 0);
-		arrowPath.lineTo(8, 4);
-		arrowPath.lineTo(0, 4);
+		arrowPath.moveTo(d2p(3), 0);
+		arrowPath.lineTo(0, d2p(-3));
+		arrowPath.lineTo(d2p(6), d2p(-3));
+		arrowPath.lineTo(d2p(9), 0);
+		arrowPath.lineTo(d2p(6), d2p(3));
+		arrowPath.lineTo(0, d2p(3));
 
 		this.setLongClickable(true);
 		this.setOnTouchListener(this);
@@ -321,7 +323,14 @@ public class BusLineView extends View implements OnTouchListener
 
 	public void clickStation(int index)
 	{
-		clickStation(this.stationViewItems.get(index).station, this.stationViewItems.get(index));
+		if(measured)
+		{
+			clickStation(this.stationViewItems.get(index).station, this.stationViewItems.get(index));
+		}
+		else
+		{
+			pendingClickStationIndex = index;
+		}
 	}
 	
 //	@Override
@@ -409,8 +418,7 @@ public class BusLineView extends View implements OnTouchListener
 			}
 
 			// 2.线路
-			getLinePath();
-			canvas.drawPath(pathLine, paintLine);
+			drawLinePath(canvas, paintLine);
 
 			// 3.待经过站点
 //					paintLineUnpassed.setStyle(Paint.Style.FILL);
@@ -497,36 +505,59 @@ public class BusLineView extends View implements OnTouchListener
 
 	/**
 	 * 根据当前已有的站点信息生成线路路径
+	 * @param paintLine2 
+	 * @param canvas 
 	 */
-	private void getLinePath()
+	private void drawLinePath(Canvas canvas, Paint paintLine)
 	{
-			int rows = (int) Math.ceil(stationViewItems.size() * 1.0 / STATIONS_PER_LINE);
+		int rows = (int) Math.ceil(stationViewItems.size() * 1.0 / STATIONS_PER_LINE);
+		for (int i = 0; i < rows; i++)
+		{
 			pathLine.reset();
-			// 移动到起点
-			pathLine.moveTo(getRowHead(stationViewItems, 0).rect.left - d2p(BLOCK_PADDING), d2p(STATION_HEIGHT - LINE_MARGIN_BOTTOM));
-			for (int i = 0; i < rows; i++)
+			
+			//第一行，移动到起点
+			if(i==0)
+			{
+				pathLine.moveTo(getRowHead(stationViewItems, i).rect.left - d2p(BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
+			}
+			else
 			{
 				// 从左到右
 				if (0 == i % 2)
 				{
-					pathLine.lineTo(getRowTail(stationViewItems, i).rect.right + d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
-					// 有下一行，向下画线
-					if (i < rows - 1)
-					{
-						pathLine.lineTo(getRowHead(stationViewItems, i + 1).rect.right + d2p(2*BLOCK_PADDING), d2p((i + 2) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
-					}
+					pathLine.moveTo(getRowHead(stationViewItems, i).rect.left - d2p(2*BLOCK_PADDING), d2p(i * STATION_HEIGHT));
+					pathLine.lineTo(getRowHead(stationViewItems, i).rect.left - d2p(2*BLOCK_PADDING), d2p((i+1) * STATION_HEIGHT  - LINE_MARGIN_BOTTOM));
 				}
 				else
 				{
-					pathLine.lineTo(getRowTail(stationViewItems, i).rect.left - d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
-					// 有下一行，向下画线
-					if (i < rows - 1)
-					{
-						pathLine.lineTo(getRowHead(stationViewItems, i + 1).rect.left - d2p(2*BLOCK_PADDING), d2p((i + 2) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
-					}
+					pathLine.moveTo(getRowHead(stationViewItems, i).rect.right + d2p(2*BLOCK_PADDING), d2p(i * STATION_HEIGHT));
+					pathLine.lineTo(getRowHead(stationViewItems, i).rect.right + d2p(2*BLOCK_PADDING), d2p((i+1) * STATION_HEIGHT  - LINE_MARGIN_BOTTOM));
 				}
 			}
+			
+			// 从左到右
+			if (0 == i % 2)
+			{
+				pathLine.lineTo(getRowTail(stationViewItems, i).rect.right + d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
+				// 有下一行，向下画线
+				if (i < rows - 1)
+				{
+					pathLine.lineTo(getRowHead(stationViewItems, i + 1).rect.right + d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT + 2*BLOCK_PADDING));
+				}
+			}
+			else
+			{
+				pathLine.lineTo(getRowTail(stationViewItems, i).rect.left - d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT - LINE_MARGIN_BOTTOM));
+				// 有下一行，向下画线
+				if (i < rows - 1)
+				{
+					pathLine.lineTo(getRowHead(stationViewItems, i + 1).rect.left - d2p(2*BLOCK_PADDING), d2p((i + 1) * STATION_HEIGHT + 2*BLOCK_PADDING));
+				}
+			}
+
 			paintLine.setPathEffect(pathLineEffect);
+			canvas.drawPath(pathLine, paintLine);
+		}
 	}
 
 	/**
@@ -672,6 +703,26 @@ public class BusLineView extends View implements OnTouchListener
 		this.setVisibility(VISIBLE);
 	}
 
+	private void onMeasureFinished()
+	{
+		measured = true;
+		
+		//measure前就设置了站点，需要重绘
+		if(!stations.isEmpty())
+		{
+			List<BusStation> tmp = new ArrayList<BusStation>();
+			tmp.addAll(stations);
+			stations.clear();
+			setStations(tmp);
+		}
+		
+		if(-1 != pendingClickStationIndex)
+		{
+			clickStation(pendingClickStationIndex);
+			pendingClickStationIndex = -1;
+		}
+	}
+	
 	public void setStations(List<BusStation> busStations )
 	{
 		if(measured)
@@ -691,6 +742,7 @@ public class BusLineView extends View implements OnTouchListener
 		}
 
 	}
+	
 	public List<BusStation> getStations()
 	{
 		return stations;
@@ -890,15 +942,7 @@ public class BusLineView extends View implements OnTouchListener
 		{
 			STATIONS_PER_LINE = newNum;
 			
-			measured = true;
-			
-			if(!stations.isEmpty())
-			{
-				List<BusStation> tmp = new ArrayList<BusStation>();
-				tmp.addAll(stations);
-				stations.clear();
-				setStations(tmp);
-			}
+			onMeasureFinished();
 		}
 	}
 
@@ -956,6 +1000,18 @@ public class BusLineView extends View implements OnTouchListener
 	{
 		final float scale = getResources().getDisplayMetrics().density;
 		return (int) (dipValue * scale + 0.5f);
+	}
+
+
+	public int getPendingClickStationIndex()
+	{
+		return pendingClickStationIndex;
+	}
+
+
+	public void setPendingClickStationIndex(int pendingClickStationIndex)
+	{
+		this.pendingClickStationIndex = pendingClickStationIndex;
 	}
 
 	// private int p2d(float pxValue)

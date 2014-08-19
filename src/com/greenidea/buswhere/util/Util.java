@@ -17,6 +17,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.gigi.buslocation.util.BusUtil;
@@ -152,6 +153,54 @@ public class Util
 		helper.close();
 		return result;
 	}
+	
+	/**
+	 * 查询指定关键字的线路
+	 * @param key 关键字
+	 * @return 
+	 */
+	public List<BusLine> queryLines(String key)
+	{
+		List<BusLine> result = new ArrayList<BusLine>();
+		
+		//空的时候不显示任何数据
+		if(!"".equals(key))
+		{
+			//查询数据库中有没有
+			SQLiteDatabase db = helper.getWritableDatabase();
+			Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
+					null,
+					BusLine.SEARCHKEY + " like '%" + key + "%'", 
+					null, null, null, BusLine.LINEID + " ASC");
+	
+			Log.d("", cursor.getCount() + "");
+			for (int i = 0; i < cursor.getCount(); i++)
+			{
+				cursor.moveToNext();
+				
+				BusLine line = new BusLine();
+				
+				line.setLineId(cursor.getString(cursor.getColumnIndex(BusLine.LINEID)));
+				line.setLineName(cursor.getString(cursor.getColumnIndex(BusLine.LINENAME)));
+				line.setMainStationsDesc(cursor.getString(cursor.getColumnIndex(BusLine.MAINSTATIONSDESC)));
+				line.setDownAvilableTime(cursor.getString(cursor.getColumnIndex(BusLine.DOWNAVILABLETIME)));
+				line.setDownDesc(cursor.getString(cursor.getColumnIndex(BusLine.DOWNDESC)));
+				line.setUpAvilableTime(cursor.getString(cursor.getColumnIndex(BusLine.UPAVILABLETIME)));
+				line.setUpDesc(cursor.getString(cursor.getColumnIndex(BusLine.UPDESC)));
+				line.setGroupName(cursor.getString(cursor.getColumnIndex(BusLine.GROUP_NAME)));
+				line.setPrice(cursor.getString(cursor.getColumnIndex(BusLine.PRICE)));
+				line.setSearchKey(cursor.getString(cursor.getColumnIndex(BusLine.SEARCHKEY)));
+				line.setTotalLength(cursor.getString(cursor.getColumnIndex(BusLine.TOTALLENGTH)));
+	
+				result.add(line);
+			}
+			
+			cursor.close();
+			db.close();
+			helper.close();
+		}
+		return result;
+	}
 
 	/**
 	 * 将公交线路信息保存
@@ -276,6 +325,44 @@ public class Util
 	{
 		final float scale = resource.getDisplayMetrics().density;
 		return (int) (pxValue / scale + 0.5f);
+	}
+
+	public BusLine getBusLine(String lineId)
+	{
+		BusLine result = new BusLine();
+	
+		//查询数据库中有没有
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
+				null,
+				BusLine.LINEID + " = '" + lineId + "'", 
+				null, null, null, null);
+	
+		Log.d("", cursor.getCount() + "");
+		
+		for (int i = 0; i < cursor.getCount(); i++)
+		{
+			cursor.moveToNext();
+			
+			result.setLineId(cursor.getString(cursor.getColumnIndex(BusLine.LINEID)));
+			result.setLineName(cursor.getString(cursor.getColumnIndex(BusLine.LINENAME)));
+			result.setMainStationsDesc(cursor.getString(cursor.getColumnIndex(BusLine.MAINSTATIONSDESC)));
+			result.setDownAvilableTime(cursor.getString(cursor.getColumnIndex(BusLine.DOWNAVILABLETIME)));
+			result.setDownDesc(cursor.getString(cursor.getColumnIndex(BusLine.DOWNDESC)));
+			result.setUpAvilableTime(cursor.getString(cursor.getColumnIndex(BusLine.UPAVILABLETIME)));
+			result.setUpDesc(cursor.getString(cursor.getColumnIndex(BusLine.UPDESC)));
+			result.setGroupName(cursor.getString(cursor.getColumnIndex(BusLine.GROUP_NAME)));
+			result.setPrice(cursor.getString(cursor.getColumnIndex(BusLine.PRICE)));
+			result.setSearchKey(cursor.getString(cursor.getColumnIndex(BusLine.SEARCHKEY)));
+			result.setTotalLength(cursor.getString(cursor.getColumnIndex(BusLine.TOTALLENGTH)));
+	
+			break;
+		}
+		
+		cursor.close();
+		db.close();
+		helper.close();
+		return result;
 	}
 
 

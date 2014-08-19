@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import android.R.anim;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,8 +22,8 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.animation.AlphaAnimation;
@@ -31,20 +33,22 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.baidu.mobads.AdSettings;
 import com.baidu.mobads.AdView;
+import com.baidu.mobads.AdViewListener;
+import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.FavStationBean;
+import com.greenidea.buswhere.component.HintAdapter;
 import com.greenidea.buswhere.fragment.BusLineFragment;
 import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
@@ -57,6 +61,8 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class MainActivity extends BaseActivity implements OnItemEventListener, OnFragmentDestroyListener
 {
+	private static int MAX_HIS_COUNT = 10;
+	
 	public SharedPreferences prefHistory;
 	public SharedPreferences prefFav;
 	
@@ -68,8 +74,8 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	private ListView hintList;
 	
 	//查询历史
-	private LinearLayout row0, row1;
-	private RelativeLayout container;
+	private LinearLayout hisLayout;
+	private RelativeLayout staticContainer;
 	
 	//常用站点
 	private SlideToDeleteListView favListView;
@@ -77,11 +83,85 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	
 	private MenuFragment menuFragment;
 	private BusLineFragment busLineFragment;
+	
+	private Fragment currentVisibleFragment;
 
-	public BusStation currentStation;
+	private HintAdapter hintAdapter;
 
 	//更新收藏站点时，画面会短暂漏出删除按钮，添加本动画来隐藏这个问题
 	private AlphaAnimation faddinAnimation ;
+	
+	private AdView adView;
+	private AdViewListener adViewListener = new AdViewListener()
+	{
+		
+		@Override
+		public void onVideoStart()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoFinish()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoError()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickReplay()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickClose()
+		{
+			
+		}
+		
+		@Override
+		public void onVideoClickAd()
+		{
+			
+		}
+		
+		@Override
+		public void onAdSwitch()
+		{
+			
+		}
+		
+		@Override
+		public void onAdShow(JSONObject arg0)
+		{
+			
+		}
+		
+		@Override
+		public void onAdReady(AdView arg0)
+		{
+			findViewById(R.id.adContainer).setVisibility(View.VISIBLE);
+		}
+		
+		@Override
+		public void onAdFailed(String arg0)
+		{
+			
+		}
+		
+		@Override
+		public void onAdClick(JSONObject arg0)
+		{
+			
+		}
+	};
+	
 	public MainActivity() 
 	{
 		super(R.string.app_name);
@@ -94,16 +174,20 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 		prefHistory = getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
 		prefFav = getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
+		
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
 		{
 			BusDBHelper.copyDatabaseFile(this.getApplicationContext(), getDatabasePath("busdb").getParent());
+			getPreferences(Context.MODE_PRIVATE).edit().putBoolean("initiallizedDB", true).commit();
 		}
+
+		setContentView(R.layout.main);
 		
 		menuFragment = new MenuFragment();
 		busLineFragment = new BusLineFragment(this);
 		busLineFragment.setOnFragmentDestroyListener(this);
 
-		setContentView(R.layout.main);
+		hintAdapter = new HintAdapter(this);
 		
 		// set the Behind View
 		setBehindContentView(R.layout.menu);
@@ -114,12 +198,49 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		.commit();
 		
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+
+		//广告初始化
+//		AdView.setAppSid(MainActivity.this, "f8a1fa59");
+//		AdView.setAppSec(MainActivity.this, "f8a1fa59_13b50d6f");
+		AdSettings.setCity("青岛");
+
+		adView = new AdView(MainActivity.this);
+		adView.setListener(adViewListener);
+		((RelativeLayout)findViewById(R.id.adContainer)).addView(adView);
+		
+		ImageView del = new ImageView(this);
+		del.setImageResource(R.drawable.ic_action_remove);
+//		del.setBackgroundColor(Color.parseColor("#33333333"));
+		del.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				((RelativeLayout)findViewById(R.id.adContainer)).removeAllViews();
+			}
+		});
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		del.setLayoutParams(params );
+		((RelativeLayout)findViewById(R.id.adContainer)).addView(del);
+		findViewById(R.id.adContainer).setVisibility(View.GONE);
 		
 		findViews();
 		setListeners();
 
+		//动画
+		initFaddinAnimation();
+		
+		//历史记录和收藏
+		queryHis();
+		queryFav();
+	}
+
+	private void initFaddinAnimation()
+	{
 		faddinAnimation = new AlphaAnimation(0, 1);
-		faddinAnimation.setDuration(1000);
+		faddinAnimation.setDuration(200);
 		faddinAnimation.setAnimationListener(new AnimationListener()
 		{
 			
@@ -136,95 +257,78 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			@Override
 			public void onAnimationEnd(Animation animation)
 			{
-				container.setVisibility(View.VISIBLE);
+				staticContainer.setVisibility(View.VISIBLE);
 			}
 		});
-		
-		queryHis();
-		queryFav();
-		
-		addAd();
 	}
 	
-	private void addAd()
-	{
-		addAdHandler.sendEmptyMessageDelayed(0, 5000);
-	}
-
-	private Handler addAdHandler = new Handler()
-	{
-		@Override
-		public void handleMessage(Message msg)
-		{
-			AdView adView = new AdView(MainActivity.this);
-			
-			((LinearLayout)findViewById(R.id.adContainer)).addView(adView);
-		}
-	};
-	
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-	}
-
 	private void findViews()
 	{
 		lineNumInput = (EditText)findViewById(R.id.lineNum);
 		btnSearch = (ImageView)findViewById(R.id.btnSearch);
 		hintList = (ListView)findViewById(R.id.hintList);
+		hintList.setAdapter(hintAdapter);
 		
-		container = (RelativeLayout) findViewById(R.id.container);
+		staticContainer = (RelativeLayout) findViewById(R.id.staticContainer);
 		
-		row0 = (LinearLayout)findViewById(R.id.tableRow0);
-		row1 = (LinearLayout)findViewById(R.id.tableRow1);
+		hisLayout = (LinearLayout)findViewById(R.id.hisLayout);
 		
 		favListView = (SlideToDeleteListView)findViewById(R.id.listView);
 		favListView.helper.setOnItemEventListener(this);
 	}
 
-	private void showHints(String string)
+	private void hideHints()
+	{
+		hintList.setVisibility(View.GONE);
+		staticContainer.setVisibility(View.VISIBLE);
+	}
+	
+	private void showHints(String key)
 	{
 		//特殊线路
-		if("".equals(string))
+		if(key.startsWith("0"))
 		{
 			showSpecialLines();
 		}
 		else
 		{
-			showLinesByKey(string);
+			showLinesByKey(key);
 		}
 	}
 	
-	private void showLinesByKey(String string)
+	private void showLinesByKey(String key)
 	{
-		
+		hintAdapter.refreshLines(key);
+		hintList.setVisibility(View.VISIBLE);
+		staticContainer.setVisibility(View.GONE);
+		hintAdapter.notifyDataSetChanged();
 	}
 
 	private void showSpecialLines()
 	{
-		hintList.setAdapter(adapter);
+		hintAdapter.refreshLines("special");
+		hintList.setVisibility(View.VISIBLE);
+		staticContainer.setVisibility(View.GONE);
+		hintAdapter.notifyDataSetChanged();
 	}
-
-	private ListAdapter adapter = new SimpleAdapter(context, data, resource, from, to)
 	
 	private void setListeners()
 	{
 		lineNumInput.setOnFocusChangeListener(new OnFocusChangeListener()
 		{
-			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus)
 			{
 				if(hasFocus)
 				{
-					showSpecialLines();
+					lineNumInput.selectAll();
+					
+//					adView.setVisibility(View.GONE);
 				}
 				else
 				{
-					hideHints();
+//					adView.setVisibility(View.VISIBLE);
 				}
-				
 			}
 		});
 		
@@ -257,9 +361,6 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			public void onClick(View v)
 			{
 				queryBus(lineNumInput.getText().toString(), null, null);		
-    			
-    			//更新查询历史
-	    		prefHistory.edit().putLong(lineNumInput.getText().toString(), System.currentTimeMillis()).commit();
 			}
 
 		});
@@ -270,7 +371,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	 */
 	private void queryFav()
 	{
-		container.setVisibility(View.INVISIBLE);
+		staticContainer.setVisibility(View.INVISIBLE);
 		
 		@SuppressWarnings("unchecked")
 		Map<String, String> fav = (Map<String, String>)prefFav.getAll();
@@ -294,7 +395,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 			favStations = map;
 		}
-		container.startAnimation(faddinAnimation);
+		staticContainer.startAnimation(faddinAnimation);
 
 	}
 
@@ -315,10 +416,8 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 				} 
 			});
 			
-			row0.removeAllViews();
-			row1.removeAllViews();
-
-			row0.setGravity(Gravity.LEFT);
+			hisLayout.removeAllViews();
+			hisLayout.setGravity(Gravity.LEFT);
 			
 			Editor edit = prefHistory.edit();
 			edit.clear();
@@ -330,62 +429,39 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 				
 				edit.putLong(entry.getKey(), entry.getValue());
 
-				TextView layout = getHisBlock(entry.getKey(), row0.getWidth());
-				switch (i/4)
+				TextView layout = getHisBlock(entry.getKey(), hisLayout.getWidth());
+				
+				hisLayout.addView(layout);
+				
+				//超过最大数量后，直接取消添加
+				if(i > MAX_HIS_COUNT)
 				{
-				case 0:
-					row0.addView(layout);
-					break;
-				case 1:
-					row1.addView(layout);
-					break;
-
-				default:
 					break;
 				}
 			}
 			
 			edit.commit();
-			
-			//有可能一行不满四个，需要添加占位view
-			while(row0.getChildCount() < 4)
-			{
-				View v = new TextView(getApplicationContext());
-				LayoutParams p = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
-				p.weight = 1;
-				v.setLayoutParams(p);
-				row0.addView(v);
-			}
-
-			while(row1.getChildCount() < 4)
-			{
-				View v = new TextView(getApplicationContext());
-				LayoutParams p = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
-				p.weight = 1;
-				v.setLayoutParams(p);
-				row1.addView(v);
-			}
 		}
 	}
 
-
 	private TextView getHisBlock(final String text, int parentWidth)
 	{
-		TextView result = (TextView) getLayoutInflater().inflate(R.layout.block, null);
-		result.setText(text + "路");
-		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, Util.dip2px(35, getResources()));
-		params.setMargins(5, 5, 5, 5);
-		params.weight = 1;
-		result.setLayoutParams(params);
-		result.setGravity(Gravity.CENTER);
+		String lineName = text.split("@")[0];
+		String lineId = text.split("@")[1];
 		
+		TextView result = (TextView) getLayoutInflater().inflate(R.layout.block, null);
+		result.setText(lineName);
+		result.setTag(lineId);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		params.setMargins(5, 5, 5, 5);
+		result.setLayoutParams(params);
+		result.setBackgroundResource(R.drawable.hisitembk);
 		result.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				lineNumInput.setText(text);
-				btnSearch.performClick();
+				queryBus((String) v.getTag(), null, null);
 			}
 		});
 		
@@ -394,31 +470,6 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		return result;
 	}
 
-	/**
-	 * 删除常用车站
-	 */
-	@Override
-	public void onItemDelete(View item)
-	{
-		FavStationBean bean = (FavStationBean)item.getTag();
-		
-		deleteFavStation(bean);
-	}
-
-	/**
-	 * 选中常用车站
-	 */
-	@Override
-	public void onItemSelectd(View item)
-	{
-		FavStationBean bean = (FavStationBean)item.getTag();
-		
-		if(bean != null)
-		{
-			queryBus(bean.getLineId(), bean.getStationId(), bean.getDirection());
-		}
-	}
-	
 	private LinearLayout getFavBlock(FavStationBean station)
 	{
 		LinearLayout result = new LinearLayout(getApplicationContext());
@@ -445,6 +496,51 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		
 		return result;
 	}
+
+	public void setTitle()
+	{
+		getSupportActionBar().setTitle(R.string.app_name);
+		getSupportActionBar().setSubtitle(null);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			if(hintList.getVisibility() == View.VISIBLE)
+			{
+				hideHints();
+				
+				return true;
+			}
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	/**
+	 * 选中常用车站
+	 */
+	@Override
+	public void onItemSelectd(View item)
+	{
+		FavStationBean bean = (FavStationBean)item.getTag();
+		
+		if(bean != null)
+		{
+			queryBus(bean.getLineId(), bean.getStationId(), bean.getDirection());
+		}
+	}
+	/**
+	 * 删除常用车站
+	 */
+	@Override
+	public void onItemDelete(View item)
+	{
+		FavStationBean bean = (FavStationBean)item.getTag();
+		
+		deleteFavStation(bean);
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) 
@@ -456,12 +552,12 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)
 	{
-		if(null == currentStation)
+		if(null == busLineFragment.currentStation)
 		{
 			menu.findItem(R.id.addFav).setVisible(false);
 			menu.findItem(R.id.deleteFav).setVisible(false);
 		}
-		else if(isAlreadyFaved(currentStation))
+		else if(isAlreadyFaved(busLineFragment.currentStation))
 		{
 			menu.findItem(R.id.addFav).setVisible(false);
 			menu.findItem(R.id.deleteFav).setVisible(true);
@@ -481,14 +577,32 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		switch (item.getItemId())
 		{
 		case android.R.id.home:
-			toggle();
+			if(null == currentVisibleFragment)
+			{
+				toggle();
+			}
+			else
+			{
+				new Thread(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+		                Instrumentation inst = new Instrumentation();  
+		                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK); 
+					}
+				}).start();
+				
+				currentVisibleFragment = null;
+			}
 			break;
 		case R.id.addFav:
-			addToFav(currentStation);
+			addToFav(busLineFragment.currentStation);
 			break;
 			
 		case R.id.deleteFav:
-			deleteFavStation(currentStation);
+			deleteFavStation(busLineFragment.currentStation);
 			queryFav();
 			break;
 			
@@ -500,39 +614,123 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		return true;
 	}
 
-	public void setStations(List<BusStation> busStations)
-	{
-		busLineFragment.setStations(busStations);
-	}
-
-	private void showBusLineView()
+	private void showBusLine()
 	{
 		getSupportFragmentManager()
 		.beginTransaction()
+		.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
 		.replace(R.id.content_frame, busLineFragment)
-		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
 		.addToBackStack(null)
 		.commit();
 		
+		currentVisibleFragment = busLineFragment;
+		
 		//立即切换fragment
 		getSupportFragmentManager().executePendingTransactions();
+		
+		hideHints();
 	}
 
+	
+	private Handler lineInfoHandler = new Handler()
+	{
+        @SuppressWarnings("unchecked")
+		public void handleMessage(Message msg) 
+        {  
+			Map<String, Object> m = (Map<String, Object>) msg.obj;
+			
+			BusLine line = (BusLine) m.get("line");
+			List<BusStation> busStations = (List<BusStation>) m.get("stationList");
+			
+			String stationId = (String) m.get("stationId");
+			String direction = (String) m.get("direction");
+
+			if(busStations.isEmpty())
+        	{
+        		Toast.makeText(getApplicationContext(), "未查询到本路车", Toast.LENGTH_SHORT).show();
+        		hideProcess();
+        		hideHints();
+        		return;
+        	}
+
+    		showBusLine();
+
+			//更新查询历史
+    		prefHistory.edit().putLong(line.getLineName() + "@" + line.getLineId(), System.currentTimeMillis()).commit();
+    		
+        	//隐藏输入法
+//        	lineIdInput.clearFocus();
+//        	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        	imm.hideSoftInputFromWindow(lineIdInput.getWindowToken(), 0);
+
+    		busLineFragment.setStations(busStations, line);
+    		
+    		//查询常用车站
+    		if(null != stationId)
+    		{
+    			int index = -1;
+    			
+    			for(int i = 0; i< busStations.size(); i++)
+    			{
+    				BusStation station = busStations.get(i);
+    				if(station.getStationId().equals(stationId) 
+    						&& station.getDirection().equals(direction))
+    				{
+    					index = i;
+    				}
+    			}
+    			
+    			busLineFragment.clickStation(index);
+    		}
+        };  
+	};
+
+	private class QueryBusRunner implements Runnable
+	{
+		private String lineId;
+		private String stationId;
+		private String  direction;
+		
+		public QueryBusRunner(String lineId, String stationId, String direction)
+		{
+			this.lineId = lineId;
+			this.stationId = stationId;
+			this.direction = direction;
+		}
+		@Override
+		public void run()
+		{
+			BusLine line = Util.getInstance(getApplicationContext()).getBusLine(lineId);
+			
+			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
+			result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
+			
+			Message msg = lineInfoHandler.obtainMessage();
+			
+			Map<String, Object> m = new HashMap<String, Object>();
+			m.put("stationList", result);
+			m.put("stationId", stationId);
+			m.put("direction", direction);
+			m.put("line", line);
+			
+			msg.obj = m;
+			lineInfoHandler.sendMessageDelayed(msg, 1000);
+		}
+	}
 	public void queryBus(String lineId, String stationId, String direction)
 	{
-		showBusLineView();
-		if(!lineId.equals(busLineFragment.getCurrentLineId()) || stationId != null)
-		{
-			busLineFragment.queryBus(lineId, stationId, direction);
-		}
+		showProcess();
+		
+		new Thread(new QueryBusRunner(lineId, stationId, direction)).start();		
 		
 		busLineFragment.resetStations();
 	}
-
+	
 	public boolean isAlreadyFaved(BusStation station)
 	{
 		return favStations.containsKey(new FavStationBean(station).toString());
 	}
+	
 	/**
 	 * 添加到常用车站
 	 * @param station
@@ -568,6 +766,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			return false;
 		}
 	}
+	
 	public void deleteFavStation(BusStation station)
 	{
 		deleteFavStation(new FavStationBean(station));
@@ -586,6 +785,8 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			queryFav();
 			queryHis();
 		}
+		
+		setTitle();
 	}
 
 }

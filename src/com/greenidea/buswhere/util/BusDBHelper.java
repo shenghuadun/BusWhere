@@ -30,6 +30,16 @@ public class BusDBHelper extends SQLiteOpenHelper
     		BusLine.UPDESC + " TEXT" +
     		");";
 	
+
+
+
+//CREATE TABLE line AS SELECT route_id lineid, route_name lineName, route_id searchKey,
+//landmark mainstationsdesc, line1 downDesc, line2 upDesc, worktime downAvilableTime,
+//worktime1 upAvilableTime, len totalLength, price price,  group_name groupName FROM qdbus.routes
+//where status = 1;
+//	
+//update MAIN.[line] set searchkey = 'special' where lineName like '隧道%' or lineName like '世园%'  or  lineName like '高新快线%';
+	
 //	CREATE TABLE line (
 //			lineId TEXT not null, 
 //			lineName TEXT not null, 
@@ -78,10 +88,14 @@ public class BusDBHelper extends SQLiteOpenHelper
 
     public static void copyDatabaseFile(Context context, String dbPath) 
     {  
-        File dest = new File(dbPath, "busdb.db");  
+        File dest = new File(dbPath, "BUSDB"); 
         
         try 
         {  
+        	if(!new File(dbPath).exists())
+        	{
+        		new File(dbPath).mkdir();
+        	}
             if(dest.exists())
             {  
                 dest.delete();  
