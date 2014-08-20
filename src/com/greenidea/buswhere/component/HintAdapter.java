@@ -31,8 +31,8 @@ public class HintAdapter extends BaseAdapter
     	this.context = context;
         mInflater = LayoutInflater.from(context);
 
-        gj = BitmapFactory.decodeResource(context.getResources(), R.drawable.bus_left);
-        jy = BitmapFactory.decodeResource(context.getResources(), R.drawable.bus_right);
+        gj = BitmapFactory.decodeResource(context.getResources(), R.drawable.gj);
+        jy = BitmapFactory.decodeResource(context.getResources(), R.drawable.jy);
     }
     
     /**

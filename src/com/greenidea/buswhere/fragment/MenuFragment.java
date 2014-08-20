@@ -58,7 +58,7 @@ public class MenuFragment extends Fragment
 	    
 	    menu = new Menu();
 	    menu.fragId = 3;
-	    menu.iconId = R.drawable.about;
+	    menu.iconId = R.drawable.ic_action_about;
 	    menu.nameId = R.string.menu_about;
 	    menu.isBottomMenu = true;
 	    menuList.add(menu);
