@@ -1,6 +1,7 @@
 package com.greenidea.buswhere.base;
 
 import android.app.Dialog;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +16,7 @@ import com.gigi.av.GigiLayout;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.util.Util;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class BaseActivity extends SlidingFragmentActivity {
@@ -40,6 +42,15 @@ public class BaseActivity extends SlidingFragmentActivity {
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		
+		sm.setBehindScrollScale(0.0f);
+		sm.setBehindCanvasTransformer(new CanvasTransformer() {
+			@Override
+			public void transformCanvas(Canvas canvas, float percentOpen) {
+				float scale = (float) (percentOpen*0.25 + 0.75);
+				canvas.scale(scale, scale, canvas.getWidth()/2, canvas.getHeight()/2);
+			}
+		});
 	}
 
 //	@Override

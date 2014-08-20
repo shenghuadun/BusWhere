@@ -30,6 +30,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -51,6 +52,7 @@ import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.component.HintAdapter;
 import com.greenidea.buswhere.fragment.BusLineFragment;
 import com.greenidea.buswhere.fragment.MenuFragment;
+import com.greenidea.buswhere.fragment.StationFragment;
 import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
 import com.greenidea.buswhere.ui.SlideToDeleteListView;
 import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
@@ -83,6 +85,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	
 	private MenuFragment menuFragment;
 	private BusLineFragment busLineFragment;
+	private StationFragment stationFragment;
 	
 	private Fragment currentVisibleFragment;
 
@@ -147,6 +150,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 		public void onAdReady(AdView arg0)
 		{
 			findViewById(R.id.adContainer).setVisibility(View.VISIBLE);
+			findViewById(R.id.adContainer).startAnimation(faddinAnimation);
 		}
 		
 		@Override
@@ -183,22 +187,39 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 		setContentView(R.layout.main);
 		
-		menuFragment = new MenuFragment();
+		menuFragment = new MenuFragment(this);
 		busLineFragment = new BusLineFragment(this);
 		busLineFragment.setOnFragmentDestroyListener(this);
+		
+		stationFragment = new StationFragment(this);
+		stationFragment.setOnFragmentDestroyListener(this);
 
 		hintAdapter = new HintAdapter(this);
 		
 		// set the Behind View
-		setBehindContentView(R.layout.menu);
+		
+		FrameLayout f = new FrameLayout(this);
+		f.setId(190871026);
+		setBehindContentView(f);
 		getSupportFragmentManager()
 		.beginTransaction()
 		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
-		.replace(R.id.menu_frame, menuFragment)
+		.replace(190871026, menuFragment)
 		.commit();
 		
 		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 
+		initAd();
+		
+		findViews();
+		setListeners();
+
+		//动画
+		initFaddinAnimation();
+	}
+
+	private void initAd()
+	{
 		//广告初始化
 //		AdView.setAppSid(MainActivity.this, "f8a1fa59");
 //		AdView.setAppSec(MainActivity.this, "f8a1fa59_13b50d6f");
@@ -206,7 +227,8 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 		adView = new AdView(MainActivity.this);
 		adView.setListener(adViewListener);
-		((RelativeLayout)findViewById(R.id.adContainer)).addView(adView);
+		final RelativeLayout adContainer = (RelativeLayout)findViewById(R.id.adContainer);
+		adContainer.addView(adView);
 		
 		ImageView del = new ImageView(this);
 		del.setImageResource(R.drawable.ic_action_remove);
@@ -217,25 +239,35 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 			@Override
 			public void onClick(View v)
 			{
-				((RelativeLayout)findViewById(R.id.adContainer)).removeAllViews();
+				adContainer.removeAllViews();
 			}
 		});
+		
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		del.setLayoutParams(params );
-		((RelativeLayout)findViewById(R.id.adContainer)).addView(del);
-		findViewById(R.id.adContainer).setVisibility(View.GONE);
-		
-		findViews();
-		setListeners();
-
-		//动画
-		initFaddinAnimation();
-		
-		//历史记录和收藏
-		queryHis();
-		queryFav();
+		adContainer.addView(del);
+		findViewById(R.id.adContainer).setVisibility(View.GONE);		
 	}
+
+	@Override
+	protected void onResume()
+	{
+		initHandler.sendEmptyMessageDelayed(0, 500);
+		super.onResume();
+	}
+	
+	private Handler initHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			//历史记录和收藏
+			queryHis();
+			queryFav();
+		}
+	};
+	
 
 	private void initFaddinAnimation()
 	{
@@ -504,7 +536,7 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 	}
 	
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)
+	public boolean onKeyUp(int keyCode, KeyEvent event)
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
@@ -514,8 +546,18 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 				
 				return true;
 			}
+			else if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && !getSlidingMenu().isMenuShowing())
+			{
+				showMenu();
+				return true;
+			}
+			else if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && getSlidingMenu().isMenuShowing())
+			{
+				finish();
+				return true;
+			}
 		}
-		return super.onKeyDown(keyCode, event);
+		return super.onKeyUp(keyCode, event);
 	}
 
 	/**
@@ -616,21 +658,43 @@ public class MainActivity extends BaseActivity implements OnItemEventListener, O
 
 	private void showBusLine()
 	{
-		getSupportFragmentManager()
-		.beginTransaction()
-		.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
-		.replace(R.id.content_frame, busLineFragment)
-		.addToBackStack(null)
-		.commit();
+		showFragment(1);
 		
 		currentVisibleFragment = busLineFragment;
-		
-		//立即切换fragment
-		getSupportFragmentManager().executePendingTransactions();
 		
 		hideHints();
 	}
 
+	public void showFragment(int which)
+	{
+		switch (which)
+		{
+		case 1:
+			getSupportFragmentManager()
+			.beginTransaction()
+			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
+			.replace(R.id.content_frame, busLineFragment)
+			.addToBackStack(null)
+			.commit();
+
+			//立即切换fragment
+			getSupportFragmentManager().executePendingTransactions();
+			break;
+
+		case 2:
+			getSupportFragmentManager()
+			.beginTransaction()
+			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
+			.replace(R.id.content_frame, stationFragment)
+			.addToBackStack(null)
+			.commit();
+			break;
+
+		default:
+			showContent();
+			break;
+		}
+	}
 	
 	private Handler lineInfoHandler = new Handler()
 	{

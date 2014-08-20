@@ -8,6 +8,8 @@
     <string name="history">查询记录：</string>
     <string name="fav">常用车站：</string>
     
-    <string name="menu_notify">定时提醒</string>
-    <string name="menu_fav">添加到常用车站</string>
+    
+    <string name="menu_line">公交线路查询</string>
+    <string name="menu_station">车站多线路查询</string>
+    <string name="menu_about">关于</string>
 </resources>
