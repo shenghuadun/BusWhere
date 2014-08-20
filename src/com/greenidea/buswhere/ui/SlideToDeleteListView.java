@@ -776,6 +776,12 @@ public class SlideToDeleteListView extends ScrollView
 						Log.d("offset", offset+"--");
 					}
 					ev.setLocation(ev.getX() + offset, ev.getY());
+					
+					//已经移动到最右侧
+					if(this.getScrollX() == 0)
+					{
+						return true;
+					}
 				}
 				
 				if(this.alphaEffectEnabled)
@@ -790,9 +796,13 @@ public class SlideToDeleteListView extends ScrollView
 				Rect rect = new Rect();
 				this.getHitRect(rect);
 				
-				//抬起点还在视图上、没有显示删除按钮、未长距离滑动，才认为是选中动作
+				//抬起点还在视图上
 				boolean isSelect =rect.contains((int)ev.getX(), (int)ev.getY());
+				//没有显示删除按钮
 				isSelect = isSelect && this.getScrollX() == 0;
+				//未向右滑动
+				isSelect = isSelect && down_x - ev.getX() > -5;
+				//未长距离滑动
 				isSelect = isSelect && !isScrolling;
 				
 				onItemTouchListener.onItemTouch(parent, isSelect);
