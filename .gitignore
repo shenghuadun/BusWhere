@@ -41,3 +41,11 @@ bin/*
 .gitignore~
 
 *.class
+
+*.project
+*.amateras
+*.project
+gen/com/actionbarsherlock/R.java
+gen/com/greenidea/buswhere/BuildConfig.java
+gen/com/greenidea/buswhere/R.java
+gen/com/jeremyfeinstein/slidingmenu/lib/R.java

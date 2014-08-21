@@ -7,55 +7,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 import android.R.anim;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.baidu.mobads.AdSettings;
-import com.baidu.mobads.AdView;
-import com.baidu.mobads.AdViewListener;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.FavStationBean;
-import com.greenidea.buswhere.component.HintAdapter;
+import com.greenidea.buswhere.bean.HisLineBean;
 import com.greenidea.buswhere.fragment.BusLineFragment;
+import com.greenidea.buswhere.fragment.MainFragment;
 import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.fragment.StationFragment;
-import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
-import com.greenidea.buswhere.ui.SlideToDeleteListView;
-import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
 import com.greenidea.buswhere.util.BusDBHelper;
 import com.greenidea.buswhere.util.Constants;
 import com.greenidea.buswhere.util.Util;
@@ -69,9 +42,13 @@ public class MainActivity extends BaseActivity
 	public SharedPreferences prefFav;
 
 	private MenuFragment menuFragment;
+	private MainFragment mainFragment;
 	private BusLineFragment busLineFragment;
 	private StationFragment stationFragment;
+
+	private Map<String, FavStationBean> favStations = new HashMap<String, FavStationBean>();
 	
+	private List<HisLineBean> hisStations = new ArrayList<HisLineBean>();
 	
 	public MainActivity() 
 	{
@@ -95,16 +72,26 @@ public class MainActivity extends BaseActivity
 		setContentView(R.layout.main);
 		
 		menuFragment = new MenuFragment(this);
+		mainFragment = new MainFragment(this);
 		busLineFragment = new BusLineFragment(this);
-		
 		stationFragment = new StationFragment(this);
 
+		queryFav();
+		queryHis();
+		
+
+		getSupportFragmentManager()
+		.beginTransaction()
+		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
+		.replace(R.id.content_frame, mainFragment)
+		.addToBackStack(null)
+		.commit();
 		
 		// set the Behind View
-		
 		FrameLayout f = new FrameLayout(this);
 		f.setId(190871026);
 		setBehindContentView(f);
+		
 		getSupportFragmentManager()
 		.beginTransaction()
 		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
@@ -138,39 +125,26 @@ public class MainActivity extends BaseActivity
 	/**
 	 * 查询常用车站
 	 */
+	@SuppressWarnings("unchecked")
 	public void queryFav()
 	{
-		staticContainer.setVisibility(View.INVISIBLE);
-		
-		@SuppressWarnings("unchecked")
 		Map<String, String> fav = (Map<String, String>)prefFav.getAll();
 
 		favStations.clear();
 		if(fav != null)
 		{
-			Map<String, FavStationBean> map = new HashMap<String, FavStationBean>();
-			favListView.helper.removeAllViews();
-			
 			//添加到页面
 			for(Map.Entry<String, String> entry : fav.entrySet())
 			{
 				FavStationBean bean = FavStationBean.fromString(entry.getValue());
-				map.put(bean.toString(), bean);
-				
-				LinearLayout layout = getFavBlock(bean);
-				
-				favListView.helper.addDeletableView(layout);
+				favStations.put(bean.toString(), bean);
 			}
-
-			favStations = map;
 		}
-		staticContainer.startAnimation(faddinAnimation);
-
 	}
 
+	@SuppressWarnings("unchecked")
 	private void queryHis()
 	{
-		@SuppressWarnings("unchecked")
 		Map<String, Long> his = (Map<String, Long>)prefHistory.getAll();
 		
 		if(his != null && !his.isEmpty())
@@ -184,23 +158,12 @@ public class MainActivity extends BaseActivity
 					return mapping2.getValue().compareTo(mapping1.getValue()); 
 				} 
 			});
-			
-			hisLayout.removeAllViews();
-			hisLayout.setGravity(Gravity.LEFT);
-			
-			Editor edit = prefHistory.edit();
-			edit.clear();
-			
-			//添加到页面
+
 			for(int i=0; i<mappingList.size(); i++)
 			{
 				Map.Entry<String, Long> entry = mappingList.get(i);
 				
-				edit.putLong(entry.getKey(), entry.getValue());
-
-				TextView layout = getHisBlock(entry.getKey(), hisLayout.getWidth());
-				
-				hisLayout.addView(layout);
+				hisStations.add(HisLineBean.from(entry.getKey()));
 				
 				//超过最大数量后，直接取消添加
 				if(i > MAX_HIS_COUNT)
@@ -209,7 +172,6 @@ public class MainActivity extends BaseActivity
 				}
 			}
 			
-			edit.commit();
 		}
 	}
 
@@ -224,13 +186,7 @@ public class MainActivity extends BaseActivity
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
-			if(hintList.getVisibility() == View.VISIBLE)
-			{
-				hideHints();
-				
-				return true;
-			}
-			else if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && !getSlidingMenu().isMenuShowing())
+			if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && !getSlidingMenu().isMenuShowing())
 			{
 				showMenu();
 				return true;
@@ -251,23 +207,16 @@ public class MainActivity extends BaseActivity
 		switch (item.getItemId())
 		{
 		case android.R.id.home:
-			if(null == currentVisibleFragment)
+			new Thread(new Runnable()
 			{
-				toggle();
-			}
-			else
-			{
-				new Thread(new Runnable()
+				
+				@Override
+				public void run()
 				{
-					
-					@Override
-					public void run()
-					{
-		                Instrumentation inst = new Instrumentation();  
-		                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK); 
-					}
-				}).start();
-			}
+	                Instrumentation inst = new Instrumentation();  
+	                inst.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK); 
+				}
+			}).start();
 			
 			return true;
 		default: break;
@@ -279,8 +228,6 @@ public class MainActivity extends BaseActivity
 	private void showBusLine()
 	{
 		showFragment(1);
-		
-		hideHints();
 	}
 
 	public void showFragment(int which)
@@ -314,7 +261,7 @@ public class MainActivity extends BaseActivity
 		}
 	}
 	
-	private Handler lineInfoHandler = new Handler()
+	private Handler lineStationInfoHandler = new Handler()
 	{
         @SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) 
@@ -331,14 +278,17 @@ public class MainActivity extends BaseActivity
         	{
         		Toast.makeText(getApplicationContext(), "未查询到本路车", Toast.LENGTH_SHORT).show();
         		hideProcess();
-        		hideHints();
         		return;
         	}
 
     		showBusLine();
 
 			//更新查询历史
-    		prefHistory.edit().putLong(line.getLineName() + "@" + line.getLineId(), System.currentTimeMillis()).commit();
+    		HisLineBean bean = new HisLineBean();
+    		bean.setId(line.getLineId());
+    		bean.setName(line.getLineName());
+    		bean.setGroup(line.getGroupName());
+    		prefHistory.edit().putLong(bean.toString(), System.currentTimeMillis()).commit();
     		
         	//隐藏输入法
 //        	lineIdInput.clearFocus();
@@ -388,7 +338,7 @@ public class MainActivity extends BaseActivity
 			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
 			result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
 			
-			Message msg = lineInfoHandler.obtainMessage();
+			Message msg = lineStationInfoHandler.obtainMessage();
 			
 			Map<String, Object> m = new HashMap<String, Object>();
 			m.put("stationList", result);
@@ -397,7 +347,7 @@ public class MainActivity extends BaseActivity
 			m.put("line", line);
 			
 			msg.obj = m;
-			lineInfoHandler.sendMessageDelayed(msg, 1000);
+			lineStationInfoHandler.sendMessageDelayed(msg, 1000);
 		}
 	}
 	public void queryBus(String lineId, String stationId, String direction)
@@ -436,7 +386,7 @@ public class MainActivity extends BaseActivity
 		}
 	}
 
-	private boolean deleteFavStation(FavStationBean bean)
+	public boolean deleteFavStation(FavStationBean bean)
 	{
 		if(prefFav.edit().remove(bean.toString()).commit())
 		{
@@ -458,5 +408,25 @@ public class MainActivity extends BaseActivity
 	public int getFavStationNum()
 	{
 		return prefFav.getAll().size();
+	}
+
+	public Map<String, FavStationBean> getFavStations()
+	{
+		return favStations;
+	}
+
+	public void setFavStations(Map<String, FavStationBean> favStations)
+	{
+		this.favStations = favStations;
+	}
+
+	public List<HisLineBean> getHisStations()
+	{
+		return hisStations;
+	}
+
+	public void setHisStations(List<HisLineBean> hisStations)
+	{
+		this.hisStations = hisStations;
 	}
 }

@@ -19,7 +19,6 @@ import android.widget.TextView;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.bean.StationLinesBean;
-import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
 import com.greenidea.buswhere.util.Constants;
 
 public class StationFragment extends Fragment implements OnClickListener
@@ -36,7 +35,6 @@ public class StationFragment extends Fragment implements OnClickListener
 	 */
 	public StationLinesBean selectedStation;
 	
-	private OnFragmentDestroyListener onFragmentDestroyListener;
 	public StationFragment(MainActivity parent) {
 		setRetainInstance(true);
 		
@@ -78,31 +76,10 @@ public class StationFragment extends Fragment implements OnClickListener
 	}
 
 	@Override
-	public void onResume()
-	{
-		parent.setCurrentVisibleFragment(this);
-
-    	parent.invalidateOptionsMenu();
-		super.onResume();
-	}
-
-	@Override
 	public void onDestroy()
 	{
-    	parent.invalidateOptionsMenu();
-    	
-    	if(null != onFragmentDestroyListener)
-    	{
-    		onFragmentDestroyListener.onFragmentDestroy(this);
-    	}
-    	
     	selectedStation = null;
 		super.onDestroy();
-	}
-
-	public void setOnFragmentDestroyListener(OnFragmentDestroyListener onFragmentDestroyListener)
-	{
-		this.onFragmentDestroyListener = onFragmentDestroyListener;
 	}
 
 	@Override
