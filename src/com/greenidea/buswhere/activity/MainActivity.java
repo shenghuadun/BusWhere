@@ -76,10 +76,6 @@ public class MainActivity extends BaseActivity
 		busLineFragment = new BusLineFragment(this);
 		stationFragment = new StationFragment(this);
 
-		queryFav();
-		queryHis();
-		
-
 		getSupportFragmentManager()
 		.beginTransaction()
 		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
@@ -288,6 +284,7 @@ public class MainActivity extends BaseActivity
     		bean.setId(line.getLineId());
     		bean.setName(line.getLineName());
     		bean.setGroup(line.getGroupName());
+    		bean.setTime(String.valueOf(System.currentTimeMillis()));
     		prefHistory.edit().putLong(bean.toString(), System.currentTimeMillis()).commit();
     		
         	//隐藏输入法

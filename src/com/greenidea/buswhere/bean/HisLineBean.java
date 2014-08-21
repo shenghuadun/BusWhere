@@ -5,6 +5,7 @@ public class HisLineBean
 	private String id;
 	private String name;
 	private String group;
+	private String time;
 	public String getId()
 	{
 		return id;
@@ -29,6 +30,15 @@ public class HisLineBean
 	{
 		this.group = group;
 	}
+
+	public String getTime()
+	{
+		return time;
+	}
+	public void setTime(String time)
+	{
+		this.time = time;
+	}
 	
 	public static HisLineBean from(String string)
 	{
@@ -38,14 +48,14 @@ public class HisLineBean
 		bean.setId(temp[0]);
 		bean.setName(temp[1]);
 		bean.setGroup(temp[2]);
+		bean.setTime(temp[3]);
 		
 		return bean;
 	}
 	@Override
 	public String toString()
 	{
-		return id + "@" + name + "@" + group;
+		return id + "@" + name + "@" + group + "@" + time;
 	}
-	
 	
 }

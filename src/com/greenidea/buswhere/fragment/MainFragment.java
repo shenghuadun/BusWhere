@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -144,6 +146,13 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		
 		hintAdapter = new HintAdapter(parent);
 		
+		return root;
+	}
+
+	@Override
+	public void onResume()
+	{
+
 		findViews();
 		setListeners();
 
@@ -152,9 +161,23 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		//动画
 		initFaddinAnimation();
 		
-		return root;
+		queryHandler.sendEmptyMessageDelayed(0, 500);
+		
+		super.onResume();
 	}
-
+	
+	private Handler queryHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			prepareHisStations();
+			prepareFavStations();
+		}
+		
+	};
+	
+	
 	private void initFaddinAnimation()
 	{
 		faddinAnimation = new AlphaAnimation(0, 1);
@@ -340,8 +363,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 			
 			hisLayout.addView(layout);
 		}
-//		edit.putLong(entry.getKey(), entry.getValue());
-//		edit.commit();
 	}
 
 	private TextView getHisBlock(HisLineBean hisLine, int parentWidth)

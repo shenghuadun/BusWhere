@@ -95,7 +95,7 @@ public class BusLineFragment extends BaseFragment
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
-		inflater.inflate(R.menu.station_menu, menu);
+		inflater.inflate(R.menu.busline_menu, menu);
 	}
 
 	@Override
@@ -133,8 +133,6 @@ public class BusLineFragment extends BaseFragment
 				break;
 		}
 
-		parent.invalidateOptionsMenu();
-		
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -182,7 +180,6 @@ public class BusLineFragment extends BaseFragment
         	BusStation stationClicked = (BusStation)msg.obj;
 
         	currentStation = stationClicked;
-        	parent.invalidateOptionsMenu();
 
         	parent.showProcess();
         	
