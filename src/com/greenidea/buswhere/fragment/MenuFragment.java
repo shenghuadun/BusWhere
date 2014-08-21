@@ -66,7 +66,6 @@ public class MenuFragment extends Fragment
 	    for(Menu m : menuList)
 	    {
 	    	RelativeLayout convertView = (RelativeLayout) inflater.inflate(R.layout.menuitem, null);
-	
 		    convertView.setTag(m);
 		    ((ImageView)convertView.findViewById(R.id.icon)).setImageResource(m.iconId);
 		    ((TextView)convertView.findViewById(R.id.menuName)).setText(m.nameId);

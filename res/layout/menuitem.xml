@@ -8,7 +8,7 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-	    android:paddingBottom="7dp"
+	    android:paddingBottom="8dp"
 	    android:paddingTop="7dp">
 	    <ImageView
 	        android:id="@+id/icon"

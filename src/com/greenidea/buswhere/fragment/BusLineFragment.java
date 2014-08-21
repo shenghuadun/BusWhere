@@ -5,36 +5,33 @@ import java.util.List;
 import java.util.Map;
 
 import org.htmlparser.util.ParserException;
-import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.mobads.AdView;
-import com.baidu.mobads.AdViewListener;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
-import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
+import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
 
-public class BusLineFragment extends Fragment
+public class BusLineFragment extends BaseFragment
 {
 	private View contentView;
-	private MainActivity parent;
 	
 	private ScrollView scrollView;
 	private BusLineView busLineView;
@@ -44,8 +41,6 @@ public class BusLineFragment extends Fragment
 	
 	private List<BusStation> busStations;
 
-	private OnFragmentDestroyListener onFragmentDestroyListener;
-	
 	/**
 	 * 选中的站点
 	 */
@@ -58,20 +53,14 @@ public class BusLineFragment extends Fragment
 	
 	public BusLineFragment(MainActivity activity) 
 	{
-		setRetainInstance(true);
-		parent = activity;
+		super(activity);
 	}
 
 	@Override
 	public void onDestroy()
 	{
     	currentStation = null;
-    	parent.invalidateOptionsMenu();
     	
-    	if(null != onFragmentDestroyListener)
-    	{
-    		onFragmentDestroyListener.onFragmentDestroy(this);
-    	}
 		super.onDestroy();
 	}
 
@@ -100,9 +89,53 @@ public class BusLineFragment extends Fragment
 			busLineView.setStations(busStations);
 		}
 		
-//		addAdView();
-		
 		return contentView;
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
+		inflater.inflate(R.menu.station_menu, menu);
+	}
+
+	@Override
+	public void onPrepareOptionsMenu(Menu menu)
+	{
+		if(null == currentStation)
+		{
+			menu.findItem(R.id.addFav).setVisible(false);
+			menu.findItem(R.id.deleteFav).setVisible(false);
+		}
+		else if(parent.isAlreadyFaved(currentStation))
+		{
+			menu.findItem(R.id.addFav).setVisible(false);
+			menu.findItem(R.id.deleteFav).setVisible(true);
+		}
+		else
+		{
+			menu.findItem(R.id.addFav).setVisible(true);
+			menu.findItem(R.id.deleteFav).setVisible(false);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+			case R.id.addFav:
+				parent.addToFav(currentStation);
+				break;
+				
+			case R.id.deleteFav:
+				parent.deleteFavStation(currentStation);
+				parent.queryFav();
+				break;
+		}
+
+		parent.invalidateOptionsMenu();
+		
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void setStations(List<BusStation> busStations, BusLine line)
@@ -114,6 +147,7 @@ public class BusLineFragment extends Fragment
 		{
 			busLineView.setStations(busStations);
 		}
+		
 		parent.getSupportActionBar().setTitle(line.getLineName());
         parent.getSupportActionBar().setSubtitle(line.getPrice());
 	}
@@ -226,19 +260,6 @@ public class BusLineFragment extends Fragment
 		}
 	}
 
-	public void setOnFragmentDestroyListener(OnFragmentDestroyListener onFragmentDestroyListener)
-	{
-		this.onFragmentDestroyListener = onFragmentDestroyListener;
-	}
-
-	private void addAdView()
-	{
-		AdView adView = new AdView(parent);
-		adView.setVisibility(View.GONE);
-		adView.setListener(adViewListener);
-		((LinearLayout)contentView.findViewById(R.id.adContainer1)).addView(adView);
-	}
-	
 	public BusLine getCurrentLine()
 	{
 		return currentLine;
@@ -257,74 +278,4 @@ public class BusLineFragment extends Fragment
 			upAvilableTime.setText(currentLine.getUpAvilableTime());
 		}
 	}
-
-	private AdViewListener adViewListener = new AdViewListener()
-	{
-		
-		@Override
-		public void onVideoStart()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoFinish()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoError()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickReplay()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickClose()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickAd()
-		{
-			
-		}
-		
-		@Override
-		public void onAdSwitch()
-		{
-			
-		}
-		
-		@Override
-		public void onAdShow(JSONObject arg0)
-		{
-			
-		}
-		
-		@Override
-		public void onAdReady(AdView arg0)
-		{
-			arg0.setVisibility(View.VISIBLE);
-		}
-		
-		@Override
-		public void onAdFailed(String arg0)
-		{
-			
-		}
-		
-		@Override
-		public void onAdClick(JSONObject arg0)
-		{
-			
-		}
-	};
 }

@@ -7,9 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -22,7 +19,7 @@ import com.greenidea.buswhere.bean.StationLinesBean;
 import com.greenidea.buswhere.interfaces.OnFragmentDestroyListener;
 import com.greenidea.buswhere.util.Constants;
 
-public class StationFragment extends Fragment implements OnClickListener
+public class StationAddFragment extends Fragment implements OnClickListener
 {
 
 	private LinearLayout root;
@@ -34,10 +31,10 @@ public class StationFragment extends Fragment implements OnClickListener
 	/**
 	 * 选中的车站
 	 */
-	public StationLinesBean selectedStation;
+	public StationLinesBean selectStation;
 	
 	private OnFragmentDestroyListener onFragmentDestroyListener;
-	public StationFragment(MainActivity parent) {
+	public StationAddFragment(MainActivity parent) {
 		setRetainInstance(true);
 		
 		this.parent = parent;
@@ -46,34 +43,12 @@ public class StationFragment extends Fragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		root =  (LinearLayout) inflater.inflate(R.layout.stationfragment, null);
+		root =  (LinearLayout) inflater.inflate(R.layout.stationaddfragment, null);
 		
-		parent.getSupportActionBar().setTitle(R.string.menu_station);
+		parent.getSupportActionBar().setTitle(R.string.title_station_add);
         
 		prefStationLines = parent.getSharedPreferences(Constants.PREF_STATION_LINES, Context.MODE_PRIVATE);
 		
-		@SuppressWarnings("unchecked")
-		Map<String, String> stations = (Map<String, String>)prefStationLines.getAll();
-		
-		if(stations != null && !stations.isEmpty())
-		{
-			for(Map.Entry<String, String> entry : stations.entrySet())
-			{
-				String stationName = entry.getKey();
-				StationLinesBean bean = StationLinesBean.from(entry.getValue());
-				
-				TextView stationView = new TextView(parent);
-				
-//				LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-				
-				stationView.setPadding(parent.dip2px(5), parent.dip2px(7), parent.dip2px(5), parent.dip2px(8));
-				stationView.setTag(bean);
-				stationView.setOnClickListener(this);
-				
-				root.addView(stationView);
-			}
-		}
-
 		return root;
 	}
 
@@ -96,7 +71,7 @@ public class StationFragment extends Fragment implements OnClickListener
     		onFragmentDestroyListener.onFragmentDestroy(this);
     	}
     	
-    	selectedStation = null;
+    	selectStation = null;
 		super.onDestroy();
 	}
 
@@ -109,31 +84,6 @@ public class StationFragment extends Fragment implements OnClickListener
 	public void onClick(View v)
 	{
 		StationLinesBean bean = (StationLinesBean) v.getTag();
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-	{
-		inflater.inflate(R.menu.station_menu, menu);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu)
-	{
-		if(null == selectedStation)
-		{
-			menu.findItem(R.id.deleteStation).setVisible(false);
-		}
-		else
-		{
-			menu.findItem(R.id.deleteStation).setVisible(true);
-		}
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
-		return super.onOptionsItemSelected(item);
 	}
 
 	

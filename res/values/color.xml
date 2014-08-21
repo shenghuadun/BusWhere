@@ -4,6 +4,9 @@
     
     <color name="transparent">#00000000</color>
     
-    <color name="actionbar">#52AA1C</color>
+    <color name="actionbar">#1F7B23</color>
     <color name="workTime">#085600</color>
+    
+    <color name="menuBack">#F6F6F6</color>
+    
 </resources>
