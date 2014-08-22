@@ -71,17 +71,10 @@ public class MainActivity extends BaseActivity
 
 		setContentView(R.layout.main);
 		
-		menuFragment = new MenuFragment(this);
-		mainFragment = new MainFragment(this);
-		busLineFragment = new BusLineFragment(this);
-		stationFragment = new StationFragment(this);
-
-		getSupportFragmentManager()
-		.beginTransaction()
-		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
-		.replace(R.id.content_frame, mainFragment)
-		.addToBackStack(null)
-		.commit();
+		menuFragment = new MenuFragment();
+		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
+		busLineFragment = new BusLineFragment();
+		stationFragment = new StationFragment();
 		
 		// set the Behind View
 		FrameLayout f = new FrameLayout(this);
@@ -182,18 +175,34 @@ public class MainActivity extends BaseActivity
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
-			if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && !getSlidingMenu().isMenuShowing())
+			//删除当前fragment
+			if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() != 0 )
 			{
-				showMenu();
-				return true;
+				return super.onKeyUp(keyCode, event);
 			}
-			else if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() == 0 && getSlidingMenu().isMenuShowing())
+			//当前显示的是mainFragment
+			else
 			{
-				finish();
+				boolean consumed = mainFragment.onBackPressed();
+
+				if(!consumed)
+				{
+					if(!getSlidingMenu().isMenuShowing())
+					{
+						showMenu();
+					}
+					else
+					{
+						finish();
+					}
+				}
 				return true;
 			}
 		}
-		return super.onKeyUp(keyCode, event);
+		else
+		{
+			return super.onKeyUp(keyCode, event);
+		}
 	}
 
 
@@ -387,12 +396,12 @@ public class MainActivity extends BaseActivity
 	{
 		if(prefFav.edit().remove(bean.toString()).commit())
 		{
-			Toast.makeText(getApplicationContext(), "已删除", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "已取消", Toast.LENGTH_SHORT).show();
 			return true;
 		}
 		else
 		{
-			Toast.makeText(getApplicationContext(), "删除失败", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "取消失败", Toast.LENGTH_SHORT).show();
 			return false;
 		}
 	}

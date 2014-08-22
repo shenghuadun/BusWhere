@@ -134,11 +134,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		}
 	};
 	
-	public MainFragment(MainActivity activity) 
-	{
-		super(activity);
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
@@ -440,5 +435,19 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		FavStationBean bean = (FavStationBean)item.getTag();
 		
 		parent.deleteFavStation(bean);
+	}
+
+	/**
+	 * 返回按钮按下时，隐藏提示
+	 * @return
+	 */
+	public boolean onBackPressed()
+	{
+		if(hintList.getVisibility() == View.VISIBLE)
+		{
+			hideHints();
+			return true;
+		}
+		return false;
 	}
 }

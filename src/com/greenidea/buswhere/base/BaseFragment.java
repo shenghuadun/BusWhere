@@ -1,5 +1,6 @@
 package com.greenidea.buswhere.base;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,18 +11,19 @@ public class BaseFragment extends SherlockFragment
 {
 	protected MainActivity parent;
 	
-	public BaseFragment(MainActivity activity) 
-	{
-		setRetainInstance(true);
-		parent = activity;
-	}
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+	}
+
+	@Override
+	public void onAttach(Activity activity)
+	{
+		parent = (MainActivity) activity;
+		super.onAttach(activity);
 	}
 
 	@Override

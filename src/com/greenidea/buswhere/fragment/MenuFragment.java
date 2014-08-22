@@ -18,8 +18,9 @@ import android.widget.TextView;
 
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
+import com.greenidea.buswhere.base.BaseFragment;
 
-public class MenuFragment extends Fragment
+public class MenuFragment extends BaseFragment
 {
 
 	private RelativeLayout menuView;
@@ -27,15 +28,8 @@ public class MenuFragment extends Fragment
 	private LinearLayout topContainer;
 	private LinearLayout bottomContainer;
 	
-	private MainActivity parent;
-	
 	private List<Menu> menuList = new ArrayList<MenuFragment.Menu>();
 	
-	public MenuFragment(MainActivity parent) {
-		setRetainInstance(true);
-		
-		this.parent = parent;
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

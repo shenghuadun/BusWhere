@@ -24,7 +24,6 @@ import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
@@ -51,11 +50,6 @@ public class BusLineFragment extends BaseFragment
 	 */
 	private BusLine currentLine;
 	
-	public BusLineFragment(MainActivity activity) 
-	{
-		super(activity);
-	}
-
 	@Override
 	public void onDestroy()
 	{
@@ -129,10 +123,12 @@ public class BusLineFragment extends BaseFragment
 				
 			case R.id.deleteFav:
 				parent.deleteFavStation(currentStation);
-				parent.queryFav();
 				break;
 		}
 
+		parent.queryFav();
+		parent.invalidateOptionsMenu();
+		
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -181,6 +177,7 @@ public class BusLineFragment extends BaseFragment
 
         	currentStation = stationClicked;
 
+        	parent.invalidateOptionsMenu();
         	parent.showProcess();
         	
         	new BusLocatingThread(stationClicked).start();
