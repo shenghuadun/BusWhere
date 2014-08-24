@@ -1,7 +1,5 @@
 package com.greenidea.buswhere.fragment;
 
-import java.util.Map;
-
 import org.json.JSONObject;
 
 import android.graphics.Color;
@@ -31,7 +29,6 @@ import com.baidu.mobads.AdSettings;
 import com.baidu.mobads.AdView;
 import com.baidu.mobads.AdViewListener;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
@@ -134,6 +131,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		}
 	};
 	
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
@@ -166,6 +164,11 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		@Override
 		public void handleMessage(Message msg)
 		{
+			if(parent.getFavStations().isEmpty() && parent.getHisStations().isEmpty())
+			{
+				parent.queryHisAndFav();
+			}
+			
 			prepareHisStations();
 			prepareFavStations();
 		}
@@ -199,11 +202,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	}
 	private void initAd()
 	{
-		//广告初始化
-//		AdView.setAppSid(MainActivity.this, "f8a1fa59");
-//		AdView.setAppSec(MainActivity.this, "f8a1fa59_13b50d6f");
 		AdSettings.setCity("青岛");
-
 		adView = new AdView(parent);
 		adView.setListener(adViewListener);
 		final RelativeLayout adContainer = (RelativeLayout)findViewById(R.id.adContainer);
@@ -217,7 +216,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 			@Override
 			public void onClick(View v)
 			{
-				adContainer.removeAllViews();
+				adContainer.setVisibility(View.GONE);
 			}
 		});
 		
@@ -282,6 +281,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	{
 		lineNumInput.setOnFocusChangeListener(new OnFocusChangeListener()
 		{
+			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus)
 			{
@@ -304,7 +304,9 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count)
 			{
-				showHints(s.toString());
+				Message msg = queryHintsHandler.obtainMessage();
+				msg.obj = s.toString();
+				queryHintsHandler.sendMessageDelayed(msg, 300);
 			}
 
 			@Override
@@ -332,22 +334,37 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		});
 	}
 	
-	private void prepareFavStations()
+	private Handler queryHintsHandler = new Handler()
+	{
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			//此时数据还未改变，认为用户输入好了
+			if(lineNumInput.getText().toString().equals(msg.obj))
+			{
+				showHints((String) msg.obj);
+			}
+		}
+		
+	};
+	
+	public void prepareFavStations()
 	{
 		staticContainer.setVisibility(View.INVISIBLE);
 
 		favListView.helper.removeAllViews();
 
-		for(Map.Entry<String, FavStationBean>  entry : parent.getFavStations().entrySet())
+		for(FavStationBean  bean : parent.getFavStations())
 		{
-			LinearLayout layout = getFavBlock(entry.getValue());
+			LinearLayout layout = getFavBlock(bean);
 			
 			favListView.helper.addDeletableView(layout);
 		}
 		staticContainer.startAnimation(faddinAnimation);
 	}
 	
-	private void prepareHisStations()
+	public void prepareHisStations()
 	{
 		hisLayout.removeAllViews();
 		hisLayout.setGravity(Gravity.LEFT);
@@ -362,8 +379,8 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 
 	private TextView getHisBlock(HisLineBean hisLine, int parentWidth)
 	{
-		String lineName = hisLine.getName();
-		String lineId = hisLine.getId();
+		String lineName = hisLine.getLineName();
+		String lineId = hisLine.getLineId();
 		
 		TextView result = (TextView) parent.getLayoutInflater().inflate(R.layout.block, null);
 		result.setText(lineName);

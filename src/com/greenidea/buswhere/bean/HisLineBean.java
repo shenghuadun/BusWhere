@@ -2,25 +2,32 @@ package com.greenidea.buswhere.bean;
 
 public class HisLineBean
 {
-	private String id;
-	private String name;
+	private String lineId;
+	private String lineName;
 	private String group;
 	private String time;
-	public String getId()
+	
+	public static final String LINEID = "lineId";
+	public static final String LINENAME = "lineName";
+	public static final String GROUP = "groupName";
+	public static final String TIME = "time";
+	
+	
+	public String getLineId()
 	{
-		return id;
+		return lineId;
 	}
-	public void setId(String id)
+	public void setLineId(String lineId)
 	{
-		this.id = id;
+		this.lineId = lineId;
 	}
-	public String getName()
+	public String getLineName()
 	{
-		return name;
+		return lineName;
 	}
-	public void setName(String name)
+	public void setLineName(String lineName)
 	{
-		this.name = name;
+		this.lineName = lineName;
 	}
 	public String getGroup()
 	{
@@ -45,8 +52,8 @@ public class HisLineBean
 		String[] temp = string.split("@");
 		
 		HisLineBean bean = new HisLineBean();
-		bean.setId(temp[0]);
-		bean.setName(temp[1]);
+		bean.setLineId(temp[0]);
+		bean.setLineName(temp[1]);
 		bean.setGroup(temp[2]);
 		bean.setTime(temp[3]);
 		
@@ -55,7 +62,7 @@ public class HisLineBean
 	@Override
 	public String toString()
 	{
-		return id + "@" + name + "@" + group + "@" + time;
+		return lineId + "@" + lineName + "@" + group + "@" + time;
 	}
 	
 }

@@ -16,7 +16,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.StationLinesBean;
 import com.greenidea.buswhere.util.Constants;
@@ -24,6 +23,7 @@ import com.greenidea.buswhere.util.Constants;
 
 public class StationFragment extends BaseFragment implements OnClickListener
 {
+	public static final int FRAGMENT_INDEX = 2;
 
 	private LinearLayout root;
 	

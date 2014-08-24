@@ -30,6 +30,8 @@ import com.greenidea.buswhere.util.Util;
 
 public class BusLineFragment extends BaseFragment
 {
+	public static final int FRAGMENT_INDEX = 1;
+	
 	private View contentView;
 	
 	private ScrollView scrollView;
@@ -126,9 +128,7 @@ public class BusLineFragment extends BaseFragment
 				break;
 		}
 
-		parent.queryFav();
 		parent.invalidateOptionsMenu();
-		
 		return super.onOptionsItemSelected(item);
 	}
 

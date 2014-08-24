@@ -1,7 +1,5 @@
 package com.greenidea.buswhere.bean;
 
-import javax.xml.transform.Templates;
-
 import com.gigi.buslocation.bean.BusStation;
 
 public class FavStationBean
@@ -10,6 +8,15 @@ public class FavStationBean
 	private String stationName;
 	private String stationId;
 	private String direction;
+	private String time;
+	
+
+	public static final String LINEID = "lineId";
+	public static final String STATIONAME = "stationName";
+	public static final String STATIONID = "stationId";
+	public static final String DIRECTION = "direction";
+	public static final String TIME = "time";
+	
 	
 	public FavStationBean(BusStation station)
 	{
@@ -17,6 +24,8 @@ public class FavStationBean
 		stationName = station.getStationName();
 		stationId = station.getStationId();
 		direction = station.getDirection();
+		
+		time = String.valueOf(System.currentTimeMillis());
 	}
 
 	public FavStationBean()
@@ -28,7 +37,7 @@ public class FavStationBean
 		return 	this.getLineId()+ "@_@" + 
 				this.getStationName() + "@_@" + 
 				this.getStationId() + "@_@" + 
-				this.getDirection();
+				this.getDirection() + "@_@" + this.getTime();
 	}
 	
 	public static FavStationBean fromString(String string)
@@ -41,6 +50,7 @@ public class FavStationBean
 		bean.stationName = tmp[1];
 		bean.stationId = tmp[2];
 		bean.direction = tmp[3];
+		bean.time = tmp[4];
 		
 		return bean;
 	}
@@ -83,6 +93,16 @@ public class FavStationBean
 	public void setDirection(String direction)
 	{
 		this.direction = direction;
+	}
+
+	public String getTime()
+	{
+		return time;
+	}
+
+	public void setTime(String time)
+	{
+		this.time = time;
 	}
 
 	

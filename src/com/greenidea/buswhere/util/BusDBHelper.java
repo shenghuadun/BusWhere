@@ -9,28 +9,31 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
+import com.greenidea.buswhere.bean.FavStationBean;
+import com.greenidea.buswhere.bean.HisLineBean;
 
 public class BusDBHelper extends SQLiteOpenHelper
 {
-	//线路表
-	public static final String LINE_TABLE_CREATE ="CREATE TABLE " + 
-    		Constants.TABLENAME_LINEINFO +
+	//查询历史
+	public static final String HIS_TABLE_CREATE ="CREATE TABLE " + 
+    		Constants.TABLENAME_HIS +
     		" (" +
-    		BusLine.LINEID + " TEXT not null, " +
-    		BusLine.LINENAME + " TEXT not null, " +
-    		BusLine.MAINSTATIONSDESC + " TEXT, " +
-    		BusLine.SEARCHKEY + " TEXT, " +
-    		BusLine.PRICE + " TEXT, " +
-    		BusLine.TOTALLENGTH + " TEXT, " +
-    		BusLine.DOWNAVILABLETIME + " TEXT, " +
-    		BusLine.DOWNDESC + " TEXT, " +
-    		BusLine.UPAVILABLETIME + " TEXT, " +
-    		BusLine.UPDESC + " TEXT" +
+    		HisLineBean.LINEID + " TEXT not null, " +
+    		HisLineBean.LINENAME + " TEXT not null, " +
+    		HisLineBean.GROUP + " TEXT not null, " +
+    		HisLineBean.TIME + " TEXT not null" +
     		");";
-	
-
+	//收藏
+	public static final String FAV_TABLE_CREATE ="CREATE TABLE " + 
+			Constants.TABLENAME_FAV +
+			" (" +
+			FavStationBean.LINEID + " TEXT not null, " +
+			FavStationBean.STATIONID + " TEXT not null, " +
+			FavStationBean.STATIONAME + " TEXT not null, " +
+			FavStationBean.DIRECTION + " TEXT not null, " +
+			FavStationBean.TIME + " TEXT not null" +
+			");";
 
 
 //CREATE TABLE line AS SELECT route_id lineid, route_name lineName, route_id searchKey,
@@ -75,7 +78,8 @@ public class BusDBHelper extends SQLiteOpenHelper
 	public void onCreate(SQLiteDatabase db)
 	{
 		Log.d("", "创建数据库");
-//		db.execSQL(LINE_TABLE_CREATE);
+		db.execSQL(HIS_TABLE_CREATE);
+		db.execSQL(FAV_TABLE_CREATE);
 		db.execSQL(STATION_TABLE_CREATE);
 	}
 

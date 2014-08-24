@@ -11,22 +11,27 @@ import java.util.List;
 import org.apache.http.ParseException;
 import org.htmlparser.util.ParserException;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.gigi.buslocation.util.BusUtil;
+import com.greenidea.buswhere.bean.FavStationBean;
+import com.greenidea.buswhere.bean.HisLineBean;
 
 
 public class Util
 {
 	private static Util instance = new Util();
 	
+	private Context context;
 	private static BusDBHelper helper;
 	
 	private Util()
@@ -47,6 +52,7 @@ public class Util
 		{
 			helper = new BusDBHelper(context);
 		}
+		instance.context = context;
 		return instance;
 	}
 	
@@ -54,7 +60,7 @@ public class Util
 	 * 查询指定路线和方向的公交站信息
 	 * @param lineId 路线
 	 * @param direction 方向
-	 * @return 
+	 * @return null表示无法联网，空列表表示未查询到此路车信息
 	 */
 	public List<BusStation> getBusStations(String lineId, String direction)
 	{
@@ -140,13 +146,14 @@ public class Util
 			try
 			{
 				result = BusUtil.getInstance().getBusStations(lineId, direction);
+				saveLineInfoToDB(result, lineId, direction);
 			}
 			catch (ParserException e)
 			{
 				Log.e("BusUtil.getBusStations", "无法联网获取公交线路信息" + e.getMessage());
+				return null;
 			}
 			
-			saveLineInfoToDB(result, lineId, direction);
 		}
 		cursor.close();
 		db.close();
@@ -171,7 +178,7 @@ public class Util
 			Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
 					null,
 					BusLine.SEARCHKEY + " like '%" + key + "%'", 
-					null, null, null, BusLine.LINEID + " ASC");
+					null, null, null, BusLine.LINENAME + " ASC");
 	
 			Log.d("", cursor.getCount() + "");
 			for (int i = 0; i < cursor.getCount(); i++)
@@ -365,5 +372,148 @@ public class Util
 		return result;
 	}
 
+	/**
+	 * 查询历史记录
+	 * @param key
+	 * @return
+	 */
+	public List<HisLineBean> queryHis()
+	{
+		List<HisLineBean> result = new ArrayList<HisLineBean>();
+		
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_HIS, 
+				null,
+				null, 
+				null, null, null, HisLineBean.TIME + " DESC");
 
+		Log.d("历史记录个数", cursor.getCount() + "");
+		for (int i = 0; i < cursor.getCount(); i++)
+		{
+			cursor.moveToNext();
+			
+			HisLineBean hisBean = new HisLineBean();
+			
+			hisBean.setLineId(cursor.getString(cursor.getColumnIndex(HisLineBean.LINEID)));
+			hisBean.setLineName(cursor.getString(cursor.getColumnIndex(HisLineBean.LINENAME)));
+			hisBean.setGroup(cursor.getString(cursor.getColumnIndex(HisLineBean.GROUP)));
+			hisBean.setTime(cursor.getString(cursor.getColumnIndex(HisLineBean.TIME)));
+
+			result.add(hisBean);
+		}
+		
+		cursor.close();
+		db.close();
+		helper.close();
+		return result;
+	}
+
+	/**
+	 * 保存查询历史
+	 * @return
+	 */
+	public boolean saveHis(HisLineBean bean)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		
+		//将之前本线路记录删除
+		db.delete(Constants.TABLENAME_HIS, HisLineBean.LINEID + "=?", new String[]{bean.getLineId()});
+		
+		//删除多余的记录
+		String sql = "delete from " + Constants.TABLENAME_HIS + " where " + HisLineBean.TIME + " not in( select " 
+				+ HisLineBean.TIME + " from " +  Constants.TABLENAME_HIS + " order by " + HisLineBean.TIME 
+				+ " limit " + String.valueOf(Constants.MAX_HIS_COUNT) + ");";
+		db.execSQL(sql);
+		
+		//保存本记录
+		ContentValues values = new ContentValues();
+		values.put(HisLineBean.LINEID, bean.getLineId());
+		values.put(HisLineBean.LINENAME, bean.getLineName());
+		values.put(HisLineBean.GROUP, bean.getGroup());
+		values.put(HisLineBean.TIME, bean.getTime());
+		long rowid = db.insert(Constants.TABLENAME_HIS, null, values);
+		db.close();
+		helper.close();
+		return rowid != -1;
+	}
+	
+
+	
+	/**
+	 * 查询收藏站点
+	 * @return
+	 */
+	public List<FavStationBean> queryFav()
+	{
+		List<FavStationBean> result = new ArrayList<FavStationBean>();
+		
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_FAV, 
+				null,
+				null, 
+				null, null, null, HisLineBean.TIME + " DESC");
+
+		Log.d("收藏记录个数", cursor.getCount() + "");
+		for (int i = 0; i < cursor.getCount(); i++)
+		{
+			cursor.moveToNext();
+			
+			FavStationBean hisBean = new FavStationBean();
+			
+			hisBean.setLineId(cursor.getString(cursor.getColumnIndex(FavStationBean.LINEID)));
+			hisBean.setStationId(cursor.getString(cursor.getColumnIndex(FavStationBean.STATIONID)));
+			hisBean.setStationName(cursor.getString(cursor.getColumnIndex(FavStationBean.STATIONAME)));
+			hisBean.setDirection(cursor.getString(cursor.getColumnIndex(FavStationBean.DIRECTION)));
+			hisBean.setTime(cursor.getString(cursor.getColumnIndex(FavStationBean.TIME)));
+
+			result.add(hisBean);
+		}
+		
+		cursor.close();
+		db.close();
+		helper.close();
+		return result;
+	}
+
+	/**
+	 * 保存收藏
+	 * @return
+	 */
+	public boolean saveFav(FavStationBean bean)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		
+		//保存本记录
+		ContentValues values = new ContentValues();
+		values.put(FavStationBean.LINEID, bean.getLineId());
+		values.put(FavStationBean.STATIONID, bean.getStationId());
+		values.put(FavStationBean.STATIONAME, bean.getStationName());
+		values.put(FavStationBean.DIRECTION, bean.getDirection());
+		values.put(FavStationBean.TIME, bean.getTime());
+		long rowid = db.insert(Constants.TABLENAME_FAV, null, values);
+		db.close();
+		helper.close();
+		return rowid != -1;
+	}
+
+	/**
+	 * 删除收藏
+	 * @param bean
+	 * @return
+	 */
+	public boolean deleteFav(FavStationBean bean)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		
+		//将之前本线路记录删除
+		int rows = db.delete(Constants.TABLENAME_FAV, 
+				FavStationBean.LINEID + "=? and " + 
+				FavStationBean.STATIONID + "=? and " + 
+				FavStationBean.DIRECTION + "=?" , new String[]{bean.getLineId(), bean.getStationId(), bean.getDirection()});
+		
+		//保存本记录
+		db.close();
+		helper.close();
+		return rows != 0;
+	}
 }

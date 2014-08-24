@@ -36,17 +36,12 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class MainActivity extends BaseActivity
 {
-	private static int MAX_HIS_COUNT = 10;
-	
-	public SharedPreferences prefHistory;
-	public SharedPreferences prefFav;
-
 	private MenuFragment menuFragment;
 	private MainFragment mainFragment;
 	private BusLineFragment busLineFragment;
 	private StationFragment stationFragment;
 
-	private Map<String, FavStationBean> favStations = new HashMap<String, FavStationBean>();
+	private List<FavStationBean> favStations = new ArrayList<FavStationBean>();
 	
 	private List<HisLineBean> hisStations = new ArrayList<HisLineBean>();
 	
@@ -60,9 +55,6 @@ public class MainActivity extends BaseActivity
 	{
 		super.onCreate(savedInstanceState);
 
-		prefHistory = getSharedPreferences(Constants.PREF_HISTORY, Context.MODE_PRIVATE);
-		prefFav = getSharedPreferences(Constants.PREF_FAVORITE, Context.MODE_PRIVATE);
-		
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
 		{
 			BusDBHelper.copyDatabaseFile(this.getApplicationContext(), getDatabasePath("busdb").getParent());
@@ -73,8 +65,6 @@ public class MainActivity extends BaseActivity
 		
 		menuFragment = new MenuFragment();
 		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
-		busLineFragment = new BusLineFragment();
-		stationFragment = new StationFragment();
 		
 		// set the Behind View
 		FrameLayout f = new FrameLayout(this);
@@ -87,81 +77,30 @@ public class MainActivity extends BaseActivity
 		.replace(190871026, menuFragment)
 		.commit();
 		
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-	}
-
-
-	@Override
-	protected void onResume()
-	{
-		initHandler.sendEmptyMessageDelayed(0, 500);
-		super.onResume();
 	}
 	
-	private Handler initHandler = new Handler()
+	public void queryHisAndFav()
 	{
-		@Override
-		public void handleMessage(Message msg)
-		{
-			//历史记录和收藏
-			queryHis();
-			queryFav();
-		}
-	};
-	
-
+		//历史记录和收藏
+		hisStations = queryHisStations();
+		favStations = queryFavStations();
+	}
 	
 	/**
 	 * 查询常用车站
 	 */
-	@SuppressWarnings("unchecked")
-	public void queryFav()
+	private List<FavStationBean> queryFavStations()
 	{
-		Map<String, String> fav = (Map<String, String>)prefFav.getAll();
+		List<FavStationBean> result = Util.getInstance(this).queryFav();
 
-		favStations.clear();
-		if(fav != null)
-		{
-			//添加到页面
-			for(Map.Entry<String, String> entry : fav.entrySet())
-			{
-				FavStationBean bean = FavStationBean.fromString(entry.getValue());
-				favStations.put(bean.toString(), bean);
-			}
-		}
+		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void queryHis()
+	private List<HisLineBean> queryHisStations()
 	{
-		Map<String, Long> his = (Map<String, Long>)prefHistory.getAll();
-		
-		if(his != null && !his.isEmpty())
-		{
-			//按时间排序
-			ArrayList<Map.Entry<String, Long>> mappingList = new ArrayList<Map.Entry<String, Long>>(his.entrySet()); 
-			Collections.sort(mappingList, new Comparator<Map.Entry<String, Long>>()
-			{ 
-				public int compare(Map.Entry<String, Long> mapping1,Map.Entry<String, Long> mapping2)
-				{ 
-					return mapping2.getValue().compareTo(mapping1.getValue()); 
-				} 
-			});
+		List<HisLineBean> result = Util.getInstance(this).queryHis();
 
-			for(int i=0; i<mappingList.size(); i++)
-			{
-				Map.Entry<String, Long> entry = mappingList.get(i);
-				
-				hisStations.add(HisLineBean.from(entry.getKey()));
-				
-				//超过最大数量后，直接取消添加
-				if(i > MAX_HIS_COUNT)
-				{
-					break;
-				}
-			}
-			
-		}
+		return result;
 	}
 
 	public void setTitle()
@@ -178,9 +117,16 @@ public class MainActivity extends BaseActivity
 			//删除当前fragment
 			if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() != 0 )
 			{
+				//如果露出main的话，需要重新加载收藏和历史
+				if(getSupportFragmentManager().getBackStackEntryCount() == 1)
+				{
+					mainFragment.prepareFavStations();
+					mainFragment.prepareHisStations();
+				}
+				
 				return super.onKeyUp(keyCode, event);
 			}
-			//当前显示的是mainFragment
+			//当前显示的已经是mainFragment
 			else
 			{
 				boolean consumed = mainFragment.onBackPressed();
@@ -230,16 +176,15 @@ public class MainActivity extends BaseActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void showBusLine()
-	{
-		showFragment(1);
-	}
-
 	public void showFragment(int which)
 	{
 		switch (which)
 		{
-		case 1:
+		case BusLineFragment.FRAGMENT_INDEX:
+			if(null == busLineFragment)
+			{
+				busLineFragment = new BusLineFragment();
+			}
 			getSupportFragmentManager()
 			.beginTransaction()
 			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
@@ -251,7 +196,11 @@ public class MainActivity extends BaseActivity
 			getSupportFragmentManager().executePendingTransactions();
 			break;
 
-		case 2:
+		case StationFragment.FRAGMENT_INDEX:
+			if(null == stationFragment)
+			{
+				stationFragment = new StationFragment();
+			}
 			getSupportFragmentManager()
 			.beginTransaction()
 			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
@@ -261,7 +210,6 @@ public class MainActivity extends BaseActivity
 			break;
 
 		default:
-			showContent();
 			break;
 		}
 	}
@@ -279,22 +227,29 @@ public class MainActivity extends BaseActivity
 			String stationId = (String) m.get("stationId");
 			String direction = (String) m.get("direction");
 
-			if(busStations.isEmpty())
-        	{
-        		Toast.makeText(getApplicationContext(), "未查询到本路车", Toast.LENGTH_SHORT).show();
+			if(busStations == null)
+			{
+        		Toast.makeText(MainActivity.this, "网络不给力哦亲~", Toast.LENGTH_LONG).show();
+        		hideProcess();
+        		return;
+        	}
+			else if(busStations.isEmpty())
+			{
+        		Toast.makeText(MainActivity.this, "未查询到本路车", Toast.LENGTH_LONG).show();
         		hideProcess();
         		return;
         	}
 
-    		showBusLine();
+			showFragment(BusLineFragment.FRAGMENT_INDEX);
 
 			//更新查询历史
     		HisLineBean bean = new HisLineBean();
-    		bean.setId(line.getLineId());
-    		bean.setName(line.getLineName());
+    		bean.setLineId(line.getLineId());
+    		bean.setLineName(line.getLineName());
     		bean.setGroup(line.getGroupName());
     		bean.setTime(String.valueOf(System.currentTimeMillis()));
-    		prefHistory.edit().putLong(bean.toString(), System.currentTimeMillis()).commit();
+
+    		addNewHis(bean);
     		
         	//隐藏输入法
 //        	lineIdInput.clearFocus();
@@ -304,7 +259,7 @@ public class MainActivity extends BaseActivity
     		busLineFragment.setCurrentLine(line);
     		busLineFragment.setStations(busStations, line);
     		
-    		//查询常用车站
+    		//查询的是收藏车站
     		if(null != stationId)
     		{
     			int index = -1;
@@ -321,53 +276,44 @@ public class MainActivity extends BaseActivity
     			
     			busLineFragment.clickStation(index);
     		}
-        };  
+        }
+
+		private void addNewHis(HisLineBean bean)
+		{
+			hisStations.add(0, bean);
+    		Util.getInstance(MainActivity.this).saveHis(bean);
+		};  
 	};
 
-	private class QueryBusRunner implements Runnable
-	{
-		private String lineId;
-		private String stationId;
-		private String  direction;
-		
-		public QueryBusRunner(String lineId, String stationId, String direction)
-		{
-			this.lineId = lineId;
-			this.stationId = stationId;
-			this.direction = direction;
-		}
-		@Override
-		public void run()
-		{
-			BusLine line = Util.getInstance(getApplicationContext()).getBusLine(lineId);
-			
-			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
-			result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
-			
-			Message msg = lineStationInfoHandler.obtainMessage();
-			
-			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("stationList", result);
-			m.put("stationId", stationId);
-			m.put("direction", direction);
-			m.put("line", line);
-			
-			msg.obj = m;
-			lineStationInfoHandler.sendMessageDelayed(msg, 1000);
-		}
-	}
 	public void queryBus(String lineId, String stationId, String direction)
 	{
 		showProcess();
 		
-		new Thread(new QueryBusRunner(lineId, stationId, direction)).start();		
+		new Thread(new QueryStationsRunner(lineId, stationId, direction)).start();		
 		
-		busLineFragment.resetStations();
+		//第一次查询时，busLineFragment还未生成
+		if(null != busLineFragment)
+		{
+			busLineFragment.resetStations();
+		}
 	}
 	
+	/**
+	 * 判断车站是否已经收藏过
+	 * @param station
+	 * @return
+	 */
 	public boolean isAlreadyFaved(BusStation station)
 	{
-		return favStations.containsKey(new FavStationBean(station).toString());
+		for(FavStationBean bean : favStations)
+		{
+			if(bean.getLineId().equals(station.getLineId()) && bean.getStationId().equals(station.getStationId()))
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -376,15 +322,20 @@ public class MainActivity extends BaseActivity
 	 */
 	public void addToFav(BusStation station)
 	{
-		String s = new FavStationBean(station).toString();
-		if(getFavStationNum() >= Constants.MAXFAVNUM)
+		FavStationBean favBean = new FavStationBean(station);
+		addToFav(favBean);
+	}
+	
+	public void addToFav(FavStationBean favBean)
+	{
+		if(getFavStationNum() >= Constants.MAX_FAV_NUM)
 		{
 			Toast.makeText(getApplicationContext(), "常用站点过多，请删除后再收藏", Toast.LENGTH_SHORT).show();
 		}
-		else if(prefFav.edit().putString(s, s).commit())
+		else if(Util.getInstance(this).saveFav(favBean))
 		{
+			favStations.add(0, favBean);
 			Toast.makeText(getApplicationContext(), "已收藏", Toast.LENGTH_SHORT).show();
-			queryFav();
 		}
 		else 
 		{
@@ -394,8 +345,18 @@ public class MainActivity extends BaseActivity
 
 	public boolean deleteFavStation(FavStationBean bean)
 	{
-		if(prefFav.edit().remove(bean.toString()).commit())
+		if(Util.getInstance(this).deleteFav(bean))
 		{
+			for(FavStationBean fsb : favStations)
+			{
+				if(fsb.getLineId().equals(bean.getLineId()) 
+						&& fsb.getStationId().equals(bean.getStationId()) 
+						&& fsb.getDirection().equals(bean.getDirection()))
+				{
+					favStations.remove(fsb);
+				}
+			}
+			
 			Toast.makeText(getApplicationContext(), "已取消", Toast.LENGTH_SHORT).show();
 			return true;
 		}
@@ -413,15 +374,15 @@ public class MainActivity extends BaseActivity
 
 	public int getFavStationNum()
 	{
-		return prefFav.getAll().size();
+		return favStations.size();
 	}
 
-	public Map<String, FavStationBean> getFavStations()
+	public List<FavStationBean> getFavStations()
 	{
 		return favStations;
 	}
 
-	public void setFavStations(Map<String, FavStationBean> favStations)
+	public void setFavStations(List<FavStationBean> favStations)
 	{
 		this.favStations = favStations;
 	}
@@ -435,4 +396,41 @@ public class MainActivity extends BaseActivity
 	{
 		this.hisStations = hisStations;
 	}
+	
+	private class QueryStationsRunner implements Runnable
+	{
+		private String lineId;
+		private String stationId;
+		private String  direction;
+		
+		public QueryStationsRunner(String lineId, String stationId, String direction)
+		{
+			this.lineId = lineId;
+			this.stationId = stationId;
+			this.direction = direction;
+		}
+		@Override
+		public void run()
+		{
+			BusLine line = Util.getInstance(getApplicationContext()).getBusLine(lineId);
+			
+			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
+			if(null != result)
+			{
+				result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
+			}
+			
+			Message msg = lineStationInfoHandler.obtainMessage();
+			
+			Map<String, Object> m = new HashMap<String, Object>();
+			m.put("stationList", result);
+			m.put("stationId", stationId);
+			m.put("direction", direction);
+			m.put("line", line);
+			
+			msg.obj = m;
+			lineStationInfoHandler.sendMessageDelayed(msg, 1000);
+		}
+	}
+	
 }
