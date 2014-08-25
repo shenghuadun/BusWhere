@@ -9,6 +9,7 @@ import org.htmlparser.util.ParserException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -197,6 +198,8 @@ public class BusLineFragment extends BaseFragment
 		@Override
 		public void run()
 		{
+			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+			
 			Util busUtil = Util.getInstance(parent.getApplicationContext());
 			List<BusPosition> positions = null;
 			try

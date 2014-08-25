@@ -14,6 +14,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
+import android.os.StrictMode;
 import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -53,6 +55,18 @@ public class MainActivity extends BaseActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
+		
+//			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//				 .detectAll()  // or .detectAll() for all detectable problems
+//		         .penaltyLog()
+//		         .build());
+//			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//		         .detectAll()
+//		         .penaltyLog()
+//		         .penaltyDeath()
+//		         .build());
+			         
+	         
 		super.onCreate(savedInstanceState);
 
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
@@ -280,6 +294,16 @@ public class MainActivity extends BaseActivity
 
 		private void addNewHis(HisLineBean bean)
 		{
+			//如果本线路已经有了，先删除它
+			for(HisLineBean his : hisStations)
+			{
+				if(his.getLineId().equals(bean.getLineId()))
+				{
+					hisStations.remove(his);
+					break;
+				}
+			}
+			//放在第一位
 			hisStations.add(0, bean);
     		Util.getInstance(MainActivity.this).saveHis(bean);
 		};  
@@ -412,6 +436,8 @@ public class MainActivity extends BaseActivity
 		@Override
 		public void run()
 		{
+			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+			
 			BusLine line = Util.getInstance(getApplicationContext()).getBusLine(lineId);
 			
 			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");

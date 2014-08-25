@@ -202,29 +202,32 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	}
 	private void initAd()
 	{
-		AdSettings.setCity("青岛");
-		adView = new AdView(parent);
-		adView.setListener(adViewListener);
-		final RelativeLayout adContainer = (RelativeLayout)findViewById(R.id.adContainer);
-		adContainer.addView(adView);
-		
-		ImageView del = new ImageView(parent);
-		del.setImageResource(R.drawable.ic_action_remove);
-		del.setOnClickListener(new OnClickListener()
+		if(null == adView)
 		{
+			AdSettings.setCity("青岛");
+			adView = new AdView(parent);
+			adView.setListener(adViewListener);
+			final RelativeLayout adContainer = (RelativeLayout)findViewById(R.id.adContainer);
+			adContainer.addView(adView);
 			
-			@Override
-			public void onClick(View v)
+			ImageView del = new ImageView(parent);
+			del.setImageResource(R.drawable.ic_action_remove);
+			del.setOnClickListener(new OnClickListener()
 			{
-				adContainer.setVisibility(View.GONE);
-			}
-		});
-		
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		del.setLayoutParams(params );
-		adContainer.addView(del);
-		findViewById(R.id.adContainer).setVisibility(View.GONE);		
+				
+				@Override
+				public void onClick(View v)
+				{
+					adContainer.setVisibility(View.GONE);
+				}
+			});
+			
+			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+			params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			del.setLayoutParams(params );
+			adContainer.addView(del);
+			findViewById(R.id.adContainer).setVisibility(View.GONE);	
+		}
 	}
 
 	private void findViews()
