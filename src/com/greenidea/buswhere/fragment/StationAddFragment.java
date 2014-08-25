@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
-import com.greenidea.buswhere.bean.StationLinesBean;
+import com.greenidea.buswhere.bean.MultiLineStation;
 import com.greenidea.buswhere.util.Constants;
 
 public class StationAddFragment extends Fragment implements OnClickListener
@@ -22,12 +22,10 @@ public class StationAddFragment extends Fragment implements OnClickListener
 	
 	private MainActivity parent;
 
-	public SharedPreferences prefStationLines;
-	
 	/**
 	 * 选中的车站
 	 */
-	public StationLinesBean selectStation;
+	public MultiLineStation selectStation;
 	
 	public StationAddFragment(MainActivity parent) {
 		setRetainInstance(true);
@@ -42,8 +40,6 @@ public class StationAddFragment extends Fragment implements OnClickListener
 		
 		parent.getSupportActionBar().setTitle(R.string.title_station_add);
         
-		prefStationLines = parent.getSharedPreferences(Constants.PREF_STATION_LINES, Context.MODE_PRIVATE);
-		
 		return root;
 	}
 
@@ -58,7 +54,7 @@ public class StationAddFragment extends Fragment implements OnClickListener
 	@Override
 	public void onClick(View v)
 	{
-		StationLinesBean bean = (StationLinesBean) v.getTag();
+		MultiLineStation bean = (MultiLineStation) v.getTag();
 	}
 
 	

@@ -12,6 +12,7 @@ import android.util.Log;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
+import com.greenidea.buswhere.bean.MultiLineStation;
 
 public class BusDBHelper extends SQLiteOpenHelper
 {
@@ -67,7 +68,17 @@ public class BusDBHelper extends SQLiteOpenHelper
     		BusStation.SEGMENT_ID + " TEXT, " +
     		BusStation.STATUS_DATE + " TEXT not null" +
     		");";
-    
+
+	//多路线站点表
+    private static final String MULTI_LINE_STATION_TABLE_CREATE ="CREATE TABLE " + 
+    		Constants.TABLENAME_MULTI_LINE_STATION +
+    		" (" +
+    		MultiLineStation.STATIONNAME + " TEXT not null, " +
+    		MultiLineStation.STATIONID + " TEXT not null, " +
+    		MultiLineStation.LINEID + " TEXT, " +
+    		MultiLineStation.LINENAME + " TEXT not null, " +
+    		MultiLineStation.TIME + " TEXT" +
+    		");";
 
 	public BusDBHelper(Context context)
 	{
@@ -81,6 +92,7 @@ public class BusDBHelper extends SQLiteOpenHelper
 		db.execSQL(HIS_TABLE_CREATE);
 		db.execSQL(FAV_TABLE_CREATE);
 		db.execSQL(STATION_TABLE_CREATE);
+		db.execSQL(MULTI_LINE_STATION_TABLE_CREATE);
 	}
 
 	@Override

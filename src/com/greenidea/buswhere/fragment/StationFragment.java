@@ -1,9 +1,11 @@
 package com.greenidea.buswhere.fragment;
 
+import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +19,9 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseFragment;
-import com.greenidea.buswhere.bean.StationLinesBean;
+import com.greenidea.buswhere.bean.MultiLineStation;
 import com.greenidea.buswhere.util.Constants;
+import com.greenidea.buswhere.util.Util;
 
 
 public class StationFragment extends BaseFragment implements OnClickListener
@@ -27,41 +30,43 @@ public class StationFragment extends BaseFragment implements OnClickListener
 
 	private LinearLayout root;
 	
-	public SharedPreferences prefStationLines;
-	
 	/**
 	 * 选中的车站
 	 */
-	public StationLinesBean selectedStation;
+	public MultiLineStation selectedStation;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	{
 		root =  (LinearLayout) inflater.inflate(R.layout.stationfragment, null);
 		
 		parent.getSupportActionBar().setTitle(R.string.menu_station);
+		parent.getSupportActionBar().setSubtitle(null);
         
-		prefStationLines = parent.getSharedPreferences(Constants.PREF_STATION_LINES, Context.MODE_PRIVATE);
-		
-		@SuppressWarnings("unchecked")
-		Map<String, String> stations = (Map<String, String>)prefStationLines.getAll();
-		
-		if(stations != null && !stations.isEmpty())
+		Map<String, List<MultiLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
+		if(!multiLineStations.isEmpty())
 		{
-			for(Map.Entry<String, String> entry : stations.entrySet())
+			for(Map.Entry<String, List<MultiLineStation>> entry : multiLineStations.entrySet())
 			{
 				String stationName = entry.getKey();
-				StationLinesBean bean = StationLinesBean.from(entry.getValue());
+				List<MultiLineStation> list = entry.getValue();
 				
-				TextView stationView = new TextView(parent);
+				LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.multi_line_station_item, null);
+				TextView stationNameView = (TextView) layout.findViewById(R.id.stationName);
+				stationNameView.setText(stationName);
 				
-//				LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-				
-				stationView.setPadding(parent.dip2px(5), parent.dip2px(7), parent.dip2px(5), parent.dip2px(8));
-				stationView.setTag(bean);
-				stationView.setOnClickListener(this);
-				
-				root.addView(stationView);
+				for(MultiLineStation item : list)
+				{
+					TextView line = new TextView(parent);
+//					LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+					line.setPadding(parent.dip2px(5), parent.dip2px(7), parent.dip2px(5), parent.dip2px(8));
+					line.setTag(item);
+					line.setOnClickListener(this);
+					line.setText(item.getLineName());
+					line.setBackgroundColor(Color.parseColor("#BBBBBB"));
+					layout.addView(line);
+				}
+				root.addView(layout);
 			}
 		}
 
@@ -78,7 +83,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	@Override
 	public void onClick(View v)
 	{
-		StationLinesBean bean = (StationLinesBean) v.getTag();
+		MultiLineStation bean = (MultiLineStation) v.getTag();
 	}
 
 	@Override

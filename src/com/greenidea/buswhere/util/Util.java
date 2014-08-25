@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.ParseException;
 import org.htmlparser.util.ParserException;
@@ -17,7 +19,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
@@ -25,6 +26,7 @@ import com.gigi.buslocation.bean.BusStation;
 import com.gigi.buslocation.util.BusUtil;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
+import com.greenidea.buswhere.bean.MultiLineStation;
 
 
 public class Util
@@ -515,5 +517,78 @@ public class Util
 		db.close();
 		helper.close();
 		return rows != 0;
+	}
+	
+
+	/**
+	 * 查询多线路站点
+	 * @return 以站名为key的map
+	 */
+	public Map<String, List<MultiLineStation>> queryMultiLineStations()
+	{
+		Map<String, List<MultiLineStation>> result = new HashMap<String, List<MultiLineStation>>();
+		
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_MULTI_LINE_STATION, 
+				null,
+				null, 
+				null, null, null, MultiLineStation.STATIONNAME + " DESC ," + MultiLineStation.TIME + " DESC ," + MultiLineStation.LINEID + " DESC");
+
+		Log.d("记录个数", cursor.getCount() + "");
+
+		String stationName = null;
+		for (int i = 0; i < cursor.getCount(); i++)
+		{
+			List<MultiLineStation> oneStation = new ArrayList<MultiLineStation>();
+			cursor.moveToNext();
+			
+			MultiLineStation station = new MultiLineStation();
+			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.STATIONNAME)));
+			station.setStationId(cursor.getString(cursor.getColumnIndex(MultiLineStation.STATIONID)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.LINEID)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.LINENAME)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.DIRECTION)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.TIME)));
+
+			if(stationName == null)
+			{
+				stationName = station.getStationName();
+			}
+			else if(stationName != station.getStationName())
+			{
+				result.put(stationName, oneStation);
+				oneStation = new ArrayList<MultiLineStation>();
+				stationName = station.getStationName();
+			}
+			oneStation.add(station);
+		}
+
+		List<MultiLineStation> oneStation = new ArrayList<MultiLineStation>();
+		
+		MultiLineStation station = new MultiLineStation();
+		station.setStationName("高邮湖");
+		station.setStationId("100");
+		station.setLineId("227");
+		station.setLineName("227路");
+		station.setDirection("0");
+		station.setTime("100");
+		oneStation.add(station);
+		
+		station = new MultiLineStation();
+		station.setStationName("高邮湖");
+		station.setStationId("101");
+		station.setLineId("226");
+		station.setLineName("226路");
+		station.setDirection("0");
+		station.setTime("100");
+		oneStation.add(station);
+		
+		result.put("高邮湖", oneStation);
+		
+		
+		cursor.close();
+		db.close();
+		helper.close();
+		return result;
 	}
 }

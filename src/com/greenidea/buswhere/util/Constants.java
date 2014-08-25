@@ -7,11 +7,11 @@ public class Constants
 	public static final int MAX_HIS_COUNT = 10;
 	
 
-	//车站多路线查询
-	public static final String PREF_STATION_LINES = "pref_station_lines";
 	public static final String TABLENAME_HIS = "histroy";
 	public static final String TABLENAME_FAV = "favorite";
 
 	public static String TABLENAME_STATIONINFO = "station";
 	public static String TABLENAME_LINEINFO = "line";
+	
+	public static final String TABLENAME_MULTI_LINE_STATION = "multiLineStation";
 }
