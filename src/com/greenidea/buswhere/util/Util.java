@@ -177,7 +177,7 @@ public class Util
 			SQLiteDatabase db = helper.getWritableDatabase();
 			Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
 					null,
-					BusLine.SEARCHKEY + " like '%" + key + "%'", 
+					BusLine.SEARCHKEY + " like '" + key + "%'", 
 					null, null, null, BusLine.LINENAME + " ASC");
 	
 			Log.d("", cursor.getCount() + "");

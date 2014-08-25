@@ -71,8 +71,10 @@ public class MainActivity extends BaseActivity
 
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
 		{
+			showProcess();
 			BusDBHelper.copyDatabaseFile(this.getApplicationContext(), getDatabasePath("busdb").getParent());
 			getPreferences(Context.MODE_PRIVATE).edit().putBoolean("initiallizedDB", true).commit();
+			hideProcess();
 		}
 
 		setContentView(R.layout.main);
@@ -450,7 +452,7 @@ public class MainActivity extends BaseActivity
 			
 			Map<String, Object> m = new HashMap<String, Object>();
 			m.put("stationList", result);
-			m.put("stationId", stationId);
+			m.put("stationId", stationId); 
 			m.put("direction", direction);
 			m.put("line", line);
 			

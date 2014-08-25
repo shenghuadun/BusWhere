@@ -24,7 +24,13 @@ public class HintAdapter extends BaseAdapter
     private LayoutInflater mInflater;
     private Bitmap gj;
     private Bitmap jy;
-    private List<BusLine> lineList = new ArrayList<BusLine>();
+    private List<BusLine> hintList = new ArrayList<BusLine>();
+    
+
+	/**
+	 * 所有线路信息
+	 */
+	private List<BusLine> allBusLines = null;
 
     public HintAdapter(MainActivity context) 
     {
@@ -33,6 +39,8 @@ public class HintAdapter extends BaseAdapter
 
         gj = BitmapFactory.decodeResource(context.getResources(), R.drawable.gj);
         jy = BitmapFactory.decodeResource(context.getResources(), R.drawable.jy);
+        
+        allBusLines = Util.getInstance(context).queryLines("%");
     }
     
     /**
@@ -41,12 +49,21 @@ public class HintAdapter extends BaseAdapter
      */
     public void refreshLines(String key)
     {
-    	lineList = Util.getInstance(context).queryLines(key);
+    	hintList.clear();
+    	
+    	int size = allBusLines.size();
+    	for(int i=0; i<size; i++)
+    	{
+    		if(allBusLines.get(i).getSearchKey().startsWith(key))
+    		{
+    			hintList.add(allBusLines.get(i));
+    		}
+    	}
     }
 
     public int getCount() 
     {
-        return lineList.size();
+        return hintList.size();
     }
 
     public Object getItem(int position) 
@@ -89,7 +106,7 @@ public class HintAdapter extends BaseAdapter
         {
             holder = (ViewHolder) convertView.getTag();
         }
-        BusLine line = lineList.get(position);
+        BusLine line = hintList.get(position);
         holder.icon.setImageBitmap(line.getGroupName().equals("gj") ? gj : jy);
         holder.lineName.setText(line.getLineName());
         holder.lineDesc.setText(line.getDownDesc());

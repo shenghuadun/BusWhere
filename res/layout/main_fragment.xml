@@ -55,7 +55,7 @@
 				android:scrollbars="horizontal">
 				 <LinearLayout
 				     android:id="@+id/hisLayout"
-				     android:layout_width="match_parent"
+				     android:layout_width="wrap_content"
 				     android:layout_height="wrap_content"
 				     android:layout_marginBottom="10dp"
 				     android:orientation="horizontal">
@@ -71,7 +71,7 @@
 			        android:id="@+id/listView"
 			        android:layout_width="match_parent"
 			        android:layout_height="wrap_content"
-			        android:fadingEdge="none"
+			        android:overScrollMode="never"
 			        android:focusableInTouchMode="true"
 			        android:scrollbarStyle="outsideOverlay" >
 			    </com.greenidea.buswhere.ui.SlideToDeleteListView>
@@ -80,9 +80,10 @@
 		
 	    <ListView 
 	        android:id="@+id/hintList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
 		    android:layout_marginTop="5dp"
+		    android:background="#fff"
 		    android:visibility="gone"
 		    android:overScrollMode="never"
             android:layout_below="@id/inputContainer">

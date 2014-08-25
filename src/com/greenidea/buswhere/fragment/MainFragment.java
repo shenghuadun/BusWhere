@@ -1,5 +1,8 @@
 package com.greenidea.buswhere.fragment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONObject;
 
 import android.graphics.Color;
@@ -28,6 +31,7 @@ import android.widget.TextView;
 import com.baidu.mobads.AdSettings;
 import com.baidu.mobads.AdView;
 import com.baidu.mobads.AdViewListener;
+import com.gigi.buslocation.bean.BusLine;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.FavStationBean;
@@ -130,7 +134,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 			
 		}
 	};
-	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -262,6 +265,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		{
 			showLinesByKey(key);
 		}
+		staticContainer.setVisibility(View.GONE);
 	}
 	
 	private void showLinesByKey(String key)
@@ -344,7 +348,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		public void handleMessage(Message msg)
 		{
 			//此时数据还未改变，认为用户输入好了
-			if(lineNumInput.getText().toString().equals(msg.obj))
+			if(lineNumInput.getText().toString().equals(msg.obj) && !lineNumInput.getText().toString().equals(""))
 			{
 				showHints((String) msg.obj);
 			}
@@ -466,6 +470,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		if(hintList.getVisibility() == View.VISIBLE)
 		{
 			hideHints();
+			lineNumInput.setText("");
 			return true;
 		}
 		return false;

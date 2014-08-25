@@ -40,17 +40,16 @@ public class BaseActivity extends SlidingFragmentActivity {
 		sm.setBehindOffsetRes(R.dimen.slidingmenu_offset);
 		sm.setFadeDegree(0.35f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
 		sm.setBehindScrollScale(0.0f);
-		sm.setBehindCanvasTransformer(new CanvasTransformer() {
-			@Override
-			public void transformCanvas(Canvas canvas, float percentOpen) {
-				float scale = (float) (percentOpen*0.25 + 0.75);
-				canvas.scale(scale, scale, canvas.getWidth()/2, canvas.getHeight()/2);
-			}
-		});
+//		sm.setBehindCanvasTransformer(new CanvasTransformer() {
+//			@Override
+//			public void transformCanvas(Canvas canvas, float percentOpen) {
+//				float scale = (float) (percentOpen*0.25 + 0.75);
+//				canvas.scale(scale, scale, canvas.getWidth()/2, canvas.getHeight()/2);
+//			}
+//		});
+		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 //	@Override
