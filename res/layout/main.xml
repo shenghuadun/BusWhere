@@ -7,7 +7,7 @@
 	
     <fragment class="com.greenidea.buswhere.fragment.MainFragment"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent" 
+	    android:layout_height="wrap_content" 
 	    android:id="@+id/mainFragment"
         />
     
@@ -18,5 +18,14 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content" >
     </FrameLayout>
+    
+    <!-- 显示广告的Layout -->
+    <com.greenidea.av.GreenideaLayout
+        android:id="@+id/adsMogoView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        adsmogo:appid="95645d068efe4d55854960e0d10f3978" />
     
 </RelativeLayout>

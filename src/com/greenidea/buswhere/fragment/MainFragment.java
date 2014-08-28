@@ -1,10 +1,5 @@
 package com.greenidea.buswhere.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONObject;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,10 +23,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.baidu.mobads.AdSettings;
-import com.baidu.mobads.AdView;
-import com.baidu.mobads.AdViewListener;
-import com.gigi.buslocation.bean.BusLine;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.FavStationBean;
@@ -61,79 +52,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	private HintAdapter hintAdapter;
 	//更新收藏站点时，画面会短暂漏出删除按钮，添加本动画来隐藏这个问题
 	private AlphaAnimation faddinAnimation ;
-
-	private AdView adView;
-	
-	private AdViewListener adViewListener = new AdViewListener()
-	{
-		
-		@Override
-		public void onVideoStart()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoFinish()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoError()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickReplay()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickClose()
-		{
-			
-		}
-		
-		@Override
-		public void onVideoClickAd()
-		{
-			
-		}
-		
-		@Override
-		public void onAdSwitch()
-		{
-			
-		}
-		
-		@Override
-		public void onAdShow(JSONObject arg0)
-		{
-			
-		}
-		
-		@Override
-		public void onAdReady(AdView arg0)
-		{
-			findViewById(R.id.adContainer).setVisibility(View.VISIBLE);
-			findViewById(R.id.adContainer).startAnimation(faddinAnimation);
-		}
-		
-		@Override
-		public void onAdFailed(String arg0)
-		{
-			
-		}
-		
-		@Override
-		public void onAdClick(JSONObject arg0)
-		{
-			
-		}
-	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -152,8 +70,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		findViews();
 		setListeners();
 
-		initAd();
-		
 		//动画
 		initFaddinAnimation();
 		
@@ -202,35 +118,6 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 				staticContainer.setVisibility(View.VISIBLE);
 			}
 		});
-	}
-	private void initAd()
-	{
-		if(null == adView)
-		{
-			AdSettings.setCity("青岛");
-			adView = new AdView(parent);
-			adView.setListener(adViewListener);
-			final RelativeLayout adContainer = (RelativeLayout)findViewById(R.id.adContainer);
-			adContainer.addView(adView);
-			
-			ImageView del = new ImageView(parent);
-			del.setImageResource(R.drawable.ic_action_remove);
-			del.setOnClickListener(new OnClickListener()
-			{
-				
-				@Override
-				public void onClick(View v)
-				{
-					adContainer.setVisibility(View.GONE);
-				}
-			});
-			
-			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-			params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-			del.setLayoutParams(params );
-			adContainer.addView(del);
-			findViewById(R.id.adContainer).setVisibility(View.GONE);	
-		}
 	}
 
 	private void findViews()
