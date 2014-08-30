@@ -1,5 +1,6 @@
 package com.greenidea.buswhere.fragment;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.greenidea.buswhere.util.Util;
 
 public class BusLineFragment extends BaseFragment
 {
+	private static final String TAG = "BusLineFragment";
 	public static final int FRAGMENT_INDEX = 1;
 	
 	private View contentView;
@@ -56,9 +58,17 @@ public class BusLineFragment extends BaseFragment
 	@Override
 	public void onDestroy()
 	{
-    	currentStation = null;
-    	
 		super.onDestroy();
+		
+    	currentStation = null;
+		Log.d(TAG, "onDestroy");
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		Log.d(TAG, "onCreate");
 	}
 
 	@Override
@@ -85,10 +95,54 @@ public class BusLineFragment extends BaseFragment
 		{
 			busLineView.setStations(busStations);
 		}
-		
+
+		Log.d(TAG, "onCreateView");
 		return contentView;
 	}
 	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
+
+		Log.d(TAG, "onActivityCreated");
+		if(null != savedInstanceState)
+		{
+			BusLine line = (BusLine) savedInstanceState.get("currentLine");
+			if(null != line)
+			{
+	    		setCurrentLine(line);
+	    		setStations((List<BusStation>) savedInstanceState.get("busStations"), line);
+			}
+
+			currentStation = (BusStation) savedInstanceState.get("currentStation");
+			if(null != currentLine)
+			{
+				clickStation(currentStation);
+			}
+		}
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+
+		if(null != busStations)
+		{
+			outState.putSerializable("busStations", (Serializable) busStations);
+		}
+		if(null != currentStation)
+		{
+			outState.putSerializable("currentStation", currentStation);
+		}
+		if(null != busStations)
+		{
+			outState.putSerializable("currentLine", currentLine);
+		}
+		
+		Log.d(TAG, "onSaveInstanceState");
+	}
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
@@ -152,12 +206,32 @@ public class BusLineFragment extends BaseFragment
 		return busLineView.getStations();
 	}
 
+	public void clickStation(BusStation station)
+	{
+		int index = -1;
+		
+		for(int i = 0; i< busStations.size(); i++)
+		{
+			BusStation bs = busStations.get(i);
+			if(station.getStationId().equals(bs.getStationId()) 
+					&& station.getDirection().equals(bs.getDirection()))
+			{
+				index = i;
+			}
+		}
+		
+		clickStation(index);
+	}
+	
 	public void clickStation(int index)
 	{
 		busLineView.clickStation(index);
 		
 		scrollHandler.sendEmptyMessageDelayed((busLineView.getRow(index + 1)) 
 				* Util.dip2px(BusLineView.STATION_HEIGHT, parent.getResources()) + 20, 200);
+		
+		Log.d(TAG, "" + (busLineView.getRow(index + 1)) 
+				* Util.dip2px(BusLineView.STATION_HEIGHT, parent.getResources()));
 	}
 
 	private Handler scrollHandler = new Handler()

@@ -1,19 +1,19 @@
 package com.greenidea.buswhere.bean;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MultiLineStation
 {
 	private String stationName;
 	private String stationId;
+	private String segmentId;
 	private String lineId;
 	private String lineName;
 	private String direction;
 	private String time;
 	
 	public static final String STATIONNAME = "stationName";
-	public static final String STATIONID = "statiostationIdsnName";
+	public static final String STATIONID = "stationIdsName";
+	public static final String SEGMENTID = "segmentId";
 	public static final String LINEID = "lineId";
 	public static final String LINENAME = "lineName";
 	public static final String DIRECTION = "direction";
@@ -83,9 +83,19 @@ public class MultiLineStation
 	@Override
 	public String toString()
 	{
-		String result = stationName + "-" + stationId + "-"  + lineId + "-"  + lineName + "-" + direction + "-"  + time;
+		String result = stationName + "-" + stationId + "-" + segmentId  + "-"  + lineId + "-"  + lineName + "-" + direction + "-"  + time;
 		
 		return result;
+	}
+
+	public String getSegmentId()
+	{
+		return segmentId;
+	}
+
+	public void setSegmentId(String segmentId)
+	{
+		this.segmentId = segmentId;
 	}
 	
 	

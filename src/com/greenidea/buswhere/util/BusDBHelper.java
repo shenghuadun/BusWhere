@@ -75,6 +75,7 @@ public class BusDBHelper extends SQLiteOpenHelper
     		" (" +
     		MultiLineStation.STATIONNAME + " TEXT not null, " +
     		MultiLineStation.STATIONID + " TEXT not null, " +
+    		MultiLineStation.SEGMENTID + " TEXT not null, " +
     		MultiLineStation.LINEID + " TEXT, " +
     		MultiLineStation.LINENAME + " TEXT not null, " +
     		MultiLineStation.TIME + " TEXT" +

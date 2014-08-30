@@ -3,16 +3,12 @@ package com.greenidea.buswhere.fragment;
 import java.util.List;
 import java.util.Map;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -20,7 +16,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.MultiLineStation;
-import com.greenidea.buswhere.util.Constants;
+import com.greenidea.buswhere.ui.MultiLineStationView;
 import com.greenidea.buswhere.util.Util;
 
 
@@ -46,28 +42,9 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		Map<String, List<MultiLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
 		if(!multiLineStations.isEmpty())
 		{
-			for(Map.Entry<String, List<MultiLineStation>> entry : multiLineStations.entrySet())
-			{
-				String stationName = entry.getKey();
-				List<MultiLineStation> list = entry.getValue();
-				
-				LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.multi_line_station_item, null);
-				TextView stationNameView = (TextView) layout.findViewById(R.id.stationName);
-				stationNameView.setText(stationName);
-				
-				for(MultiLineStation item : list)
-				{
-					TextView line = new TextView(parent);
-//					LayoutParams lp = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-					line.setPadding(parent.dip2px(5), parent.dip2px(7), parent.dip2px(5), parent.dip2px(8));
-					line.setTag(item);
-					line.setOnClickListener(this);
-					line.setText(item.getLineName());
-					line.setBackgroundColor(Color.parseColor("#BBBBBB"));
-					layout.addView(line);
-				}
-				root.addView(layout);
-			}
+			MultiLineStationView view = new MultiLineStationView(parent);
+			view.setStations(multiLineStations);
+			root.addView(view);
 		}
 
 		return root;
