@@ -1,7 +1,11 @@
 package com.greenidea.buswhere.bean;
 
-
-public class MultiLineStation
+/**
+ * 站点，包含了具体某条线路信息
+ * @author Green
+ *
+ */
+public class OneLineStation
 {
 	private String stationName;
 	private String stationId;

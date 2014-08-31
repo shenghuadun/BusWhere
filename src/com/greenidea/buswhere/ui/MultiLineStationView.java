@@ -9,11 +9,13 @@ import java.util.Map.Entry;
 import org.htmlparser.util.ParserException;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.text.Html;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -26,14 +28,14 @@ import android.widget.Toast;
 
 import com.gigi.buslocation.bean.BusPosition;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.util.Util;
 
 
 public class MultiLineStationView extends LinearLayout
 {
-	private Map<String, List<MultiLineStation>> stations;
-	private Map<String, List<MultiStationItemView>> stationItems = new HashMap<String, List<MultiStationItemView>>();
+	private Map<String, List<OneLineStation>> stations;
+	private Map<String, StationItemView> stationItems = new HashMap<String, StationItemView>();
 	private Animation animation;
 	
 	public void init(Context context)
@@ -54,18 +56,18 @@ public class MultiLineStationView extends LinearLayout
 		init(context);
 	}
 
-	public Map<String, List<MultiLineStation>> getStations()
+	public Map<String, List<OneLineStation>> getStations()
 	{
 		return stations;
 	}
 
-	public void setStations(Map<String, List<MultiLineStation>> stations)
+	public void setStations(Map<String, List<OneLineStation>> stations)
 	{
 		this.stations = stations;
 		
 		this.removeAllViews();
 		
-		for(Map.Entry<String, List<MultiLineStation>> entry : stations.entrySet())
+		for(Map.Entry<String, List<OneLineStation>> entry : stations.entrySet())
 		{
 			addStation(entry);
 		}
@@ -91,63 +93,15 @@ public class MultiLineStationView extends LinearLayout
 		}
 	};
 	
-	private OnClickListener onClickListener = new OnClickListener()
-	{
-		@SuppressWarnings("unchecked")
-		@Override
-		public void onClick(View v)
-		{
-			Map<String, Object> tag = (Map<String, Object>) v.getTag();
-			
-			if(tag != null)
-			{
-				List<MultiLineStation> items = (List<MultiLineStation>) tag.get("stations");
-				List<MultiStationItemView> itemViews = (List<MultiStationItemView>) tag.get("stationViews");
-				LinearLayout linesContainer = (LinearLayout) tag.get("container");
-				ImageView loading = (ImageView) tag.get("loading");
-				
-				//展开
-				if(View.GONE == linesContainer.getVisibility())
-				{
-					linesContainer.setVisibility(View.VISIBLE);
-					
-					getBusPositions(items, itemViews, loading);
-
-					Message msg = loadingHandler.obtainMessage();
-					msg.what = 1;
-					msg.obj = loading;
-					loadingHandler.sendMessage(msg);
-					
-				}
-				//合上
-				else
-				{
-					Message msg = loadingHandler.obtainMessage();
-					msg.what = 0;
-					msg.obj = loading;
-					loadingHandler.sendMessage(msg);
-
-					linesContainer.setVisibility(View.GONE);
-				}
-			}
-		}
-	};
-	
-
-	private void getBusPositions(List<MultiLineStation> stations, List<MultiStationItemView> itemViews, ImageView loading)
-	{
-		BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
-		thread.start();
-	}
 
 	private class BusLocatingThread extends Thread
 	{
 		private Context context;
-		private List<MultiLineStation> stations ;
-		private List<MultiStationItemView> itemViews;
+		private List<OneLineStation> stations ;
+		private List<LineItemView> itemViews;
 		private ImageView loading;
 		
-		public BusLocatingThread(Context context, List<MultiLineStation> stations, List<MultiStationItemView> itemViews, ImageView loading)
+		public BusLocatingThread(Context context, List<OneLineStation> stations, List<LineItemView> itemViews, ImageView loading)
 		{
 			this.context = context;
 			this.stations = stations;
@@ -159,11 +113,13 @@ public class MultiLineStationView extends LinearLayout
 		public void run()
 		{
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-			
+		
+			Looper.prepare();
+			Looper.loop();
 			Util busUtil = Util.getInstance(context);
 			
 			int index = 0;
-			for(MultiLineStation station : stations)
+			for(OneLineStation station : stations)
 			{
 				List<BusPosition> positions = null;
 				try
@@ -195,6 +151,8 @@ public class MultiLineStationView extends LinearLayout
 			msg.what = 0;
 			msg.obj = loading;
 			loadingHandler.sendMessage(msg);
+			
+			Looper.myLooper().quit();
 		}
 		
 	}
@@ -204,7 +162,7 @@ public class MultiLineStationView extends LinearLayout
         public void handleMessage(android.os.Message msg) 
         {  
         	List<BusPosition> positions = (List<BusPosition>) ((Map)msg.obj).get("positions");
-        	MultiStationItemView view = (MultiStationItemView) ((Map)msg.obj).get("stationView");
+        	LineItemView view = (LineItemView) ((Map)msg.obj).get("stationView");
         	
         	if(positions.isEmpty())
         	{
@@ -217,74 +175,140 @@ public class MultiLineStationView extends LinearLayout
         }
 	};
 
-	private void addStation(Entry<String, List<MultiLineStation>> entry)
+	private void addStation(Entry<String, List<OneLineStation>> entry)
 	{
 		String stationName = entry.getKey();
 		
-		RelativeLayout relativeLayout = new RelativeLayout(getContext());
-		relativeLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		relativeLayout.setOnClickListener(onClickListener);
-		this.addView(relativeLayout);
-		
-		//站名
-		TextView nameView = new TextView(getContext());
-		nameView.setTextSize(Util.dip2px(18, getResources()));
-		nameView.setText(stationName);
-		relativeLayout.addView(nameView);
-		
-		ImageView loading = new ImageView(getContext());
-		loading.setId(10000);
-		loading.setImageResource(R.drawable.rotate);
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		lp.addRule(RelativeLayout.CENTER_VERTICAL);
-		loading.setLayoutParams(lp);
-		loading.setVisibility(View.INVISIBLE);
-		relativeLayout.addView(loading);
-	
-		List<MultiStationItemView> itemViews = new ArrayList<MultiLineStationView.MultiStationItemView>();
-
-		//本站点所有路线容器，方便总体控制
-		LinearLayout linesContainer = new LinearLayout(getContext());
-		linesContainer.setOrientation(LinearLayout.VERTICAL);
-		//默认不显示，点击后才显示
-		linesContainer.setVisibility(View.GONE);
-		this.addView(linesContainer);
-		
-		List<MultiLineStation> items = entry.getValue();
-		for(MultiLineStation station : items)
-		{
-			MultiStationItemView item = new MultiStationItemView(getContext());
-			item.init(station);
-			itemViews.add(item);
-			linesContainer.addView(item);
-		}
-
-		//添加到TextView上，点击时用来更新
-		Map<String, Object> tag = new HashMap<String, Object>();
-		tag.put("stations", items);
-		tag.put("stationViews", itemViews);
-		tag.put("container", linesContainer);
-		tag.put("loading", loading);
-		relativeLayout.setTag(tag);
-		
-		stationItems.put(stationName, itemViews);
+		StationItemView item = new StationItemView(getContext());
+		item.init(stationName, entry.getValue());
+		stationItems.put(stationName, item);
+		this.addView(item);
 	}
 
-	private static class MultiStationItemView extends LinearLayout
+	private class StationItemView extends LinearLayout
 	{
-		private static String t1 = "<span>index：<span style=\"color:red\">time</span>前到达<span style=\"color:red\">station</span></span>";
-		private static String t2 = "<span>距您还有<span style=\"color:red\">num站</span></span>";
+		RelativeLayout stationNameLayout;
+		TextView nameView;
+		ImageView loading;
+		List<LineItemView> itemViews;
 		
-		private TextView lineName;
-		private TextView text11;
-		private TextView text12;
-		private TextView text21;
-		private TextView text22;
+		LinearLayout lineItemLayout;
 		
-		public MultiStationItemView(Context context)
+		public StationItemView(Context context)
 		{
 			super(context);
+			this.setOrientation(LinearLayout.VERTICAL);
+			int p = Util.dip2px(10, getResources());
+			this.setPadding(p, 0, p, 0);
+			
+			//站名整行
+			stationNameLayout = new RelativeLayout(getContext());
+			stationNameLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			stationNameLayout.setOnClickListener(onClickListener);
+			this.addView(stationNameLayout);
+
+			//站名
+			nameView = new TextView(getContext());
+			nameView.setTextSize(Util.dip2px(14, getResources()));
+
+			stationNameLayout.addView(nameView);
+			
+			//加载图片
+			loading = new ImageView(getContext());
+			loading.setId(10000);
+			loading.setImageResource(R.drawable.rotate);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+			lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			lp.addRule(RelativeLayout.CENTER_VERTICAL);
+			loading.setLayoutParams(lp);
+			loading.setVisibility(View.INVISIBLE);
+			
+			stationNameLayout.addView(loading);
+
+			//本站点所有路线容器，方便总体控制
+			lineItemLayout = new LinearLayout(getContext());
+			lineItemLayout.setOrientation(LinearLayout.VERTICAL);
+			lineItemLayout.setVisibility(View.GONE);
+			this.addView(lineItemLayout);
+		}
+
+		private OnClickListener onClickListener = new OnClickListener()
+		{
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onClick(View v)
+			{
+				Map<String, Object> tag = (Map<String, Object>) v.getTag();
+				
+				if(tag != null)
+				{
+					List<OneLineStation> items = (List<OneLineStation>) tag.get("stations");
+					
+					//展开
+					if(View.GONE == lineItemLayout.getVisibility())
+					{
+						lineItemLayout.setVisibility(View.VISIBLE);
+						
+						BusLocatingThread thread = new BusLocatingThread(getContext(), items, itemViews, loading);
+						thread.start();
+
+						Message msg = loadingHandler.obtainMessage();
+						msg.what = 1;
+						msg.obj = loading;
+						loadingHandler.sendMessage(msg);
+						
+					}
+					//合上
+					else
+					{
+						Message msg = loadingHandler.obtainMessage();
+						msg.what = 0;
+						msg.obj = loading;
+						loadingHandler.sendMessage(msg);
+
+						lineItemLayout.setVisibility(View.GONE);
+					}
+				}
+			}
+		};
+		
+		
+		public void init(String stationName, List<OneLineStation> lineItems)
+		{
+			nameView.setText(stationName);
+		
+			itemViews = new ArrayList<MultiLineStationView.LineItemView>();
+			
+			for(OneLineStation station : lineItems)
+			{
+				LineItemView item = new LineItemView(getContext());
+				item.init(station.getLineName());
+				itemViews.add(item);
+				lineItemLayout.addView(item);
+			}
+
+			//添加到TextView上，点击时用来更新
+			Map<String, Object> tag = new HashMap<String, Object>();
+			tag.put("stations", lineItems);
+			stationNameLayout.setTag(tag);
+		}
+		
+	}
+	
+	private static class LineItemView extends LinearLayout
+	{
+		private TextView lineName;
+		private TextView time1;
+		private TextView time2;
+		private TextView station1;
+		private TextView station2;
+		private TextView num1;
+		private TextView num2;
+		
+		public LineItemView(Context context)
+		{
+			super(context);
+			this.setBackgroundColor(Color.RED);
 		}
 		
 		public void setNoBus()
@@ -293,17 +317,19 @@ public class MultiLineStationView extends LinearLayout
 			
 		}
 
-		public MultiStationItemView init(MultiLineStation station)
+		public LineItemView init(String stationName)
 		{
-			LinearLayout itemRoot = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.multi_station_item_line, null);
+			RelativeLayout itemRoot = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.multi_station_item_line, null);
 			
 			lineName = (TextView) itemRoot.findViewById(R.id.lineName);
-			text11 = (TextView) itemRoot.findViewById(R.id.text11);
-			text12 = (TextView) itemRoot.findViewById(R.id.text12);
-			text21 = (TextView) itemRoot.findViewById(R.id.text21);
-			text22 = (TextView) itemRoot.findViewById(R.id.text22);
+			time1 = (TextView) itemRoot.findViewById(R.id.time1);
+			time2 = (TextView) itemRoot.findViewById(R.id.time2);
+			station1 = (TextView) itemRoot.findViewById(R.id.station1);
+			station2 = (TextView) itemRoot.findViewById(R.id.station2);
+			num1 = (TextView) itemRoot.findViewById(R.id.num1);
+			num2 = (TextView) itemRoot.findViewById(R.id.num2);
 			
-			lineName.setText(station.getLineName());
+			lineName.setText(stationName);
 			
 			this.addView(itemRoot);
 			return this;
@@ -313,29 +339,23 @@ public class MultiLineStationView extends LinearLayout
 		{
 			if(positions.size() > 0)
 			{
-				this.text11.setText(Html.fromHtml(t1
-						.replace("index", "1")
-						.replace("time", positions.get(0).getWhen())
-						.replace("station", positions.get(0).getStationName())));
-				this.text12.setText(Html.fromHtml(t2
-						.replace("num", positions.get(0).getStationNum())));
+				time1.setText(positions.get(0).getWhen());
+				station1.setText(positions.get(0).getStationName());
+				num1.setText(positions.get(0).getStationNum());
 			}
 			else
 			{
-				this.text11.setText("未发车");
+				this.time1.setText("未发车");
 			}
 			if(positions.size() > 1)
 			{
-				this.text21.setText(Html.fromHtml(t1
-						.replace("index", "2")
-						.replace("time", positions.get(1).getWhen())
-						.replace("station", positions.get(1).getStationName())));
-				this.text22.setText(Html.fromHtml(t2
-						.replace("num", positions.get(1).getStationNum())));
+				time2.setText(positions.get(1).getWhen());
+				station2.setText(positions.get(1).getStationName());
+				num2.setText(positions.get(1).getStationNum());
 			}
 			else
 			{
-				this.text21.setText("未发车");
+				this.time2.setText("未发车");
 			}
 		}
 		

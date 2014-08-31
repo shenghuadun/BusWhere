@@ -9,4 +9,9 @@
     
     <color name="menuBack">#F6F6F6</color>
     
+    
+    <color name="num">#1111FF</color>
+    <color name="time">#11FF11</color>
+    <color name="station">#FF1111</color>
+    
 </resources>

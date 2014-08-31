@@ -26,7 +26,7 @@ import com.gigi.buslocation.bean.BusStation;
 import com.gigi.buslocation.util.BusUtil;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
-import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.bean.OneLineStation;
 
 
 public class Util
@@ -524,31 +524,31 @@ public class Util
 	 * 查询多线路站点
 	 * @return 以站名为key的map
 	 */
-	public Map<String, List<MultiLineStation>> queryMultiLineStations()
+	public Map<String, List<OneLineStation>> queryMultiLineStations()
 	{
-		Map<String, List<MultiLineStation>> result = new HashMap<String, List<MultiLineStation>>();
+		Map<String, List<OneLineStation>> result = new HashMap<String, List<OneLineStation>>();
 		
 		SQLiteDatabase db = helper.getWritableDatabase();
 		Cursor cursor = db.query(Constants.TABLENAME_MULTI_LINE_STATION, 
 				null,
 				null, 
-				null, null, null, MultiLineStation.STATIONNAME + " DESC ," + MultiLineStation.TIME + " DESC ," + MultiLineStation.LINEID + " DESC");
+				null, null, null, OneLineStation.STATIONNAME + " DESC ," + OneLineStation.TIME + " DESC ," + OneLineStation.LINEID + " DESC");
 
 		Log.d("记录个数", cursor.getCount() + "");
 
 		String stationName = null;
 		for (int i = 0; i < cursor.getCount(); i++)
 		{
-			List<MultiLineStation> oneStation = new ArrayList<MultiLineStation>();
+			List<OneLineStation> oneStation = new ArrayList<OneLineStation>();
 			cursor.moveToNext();
 			
-			MultiLineStation station = new MultiLineStation();
-			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.STATIONNAME)));
-			station.setStationId(cursor.getString(cursor.getColumnIndex(MultiLineStation.STATIONID)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.LINEID)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.LINENAME)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.DIRECTION)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(MultiLineStation.TIME)));
+			OneLineStation station = new OneLineStation();
+			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.STATIONNAME)));
+			station.setStationId(cursor.getString(cursor.getColumnIndex(OneLineStation.STATIONID)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINEID)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINENAME)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.DIRECTION)));
+			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.TIME)));
 
 			if(stationName == null)
 			{
@@ -557,25 +557,25 @@ public class Util
 			else if(stationName != station.getStationName())
 			{
 				result.put(stationName, oneStation);
-				oneStation = new ArrayList<MultiLineStation>();
+				oneStation = new ArrayList<OneLineStation>();
 				stationName = station.getStationName();
 			}
 			oneStation.add(station);
 		}
 
-		List<MultiLineStation> oneStation = new ArrayList<MultiLineStation>();
+		List<OneLineStation> oneStation = new ArrayList<OneLineStation>();
 		
-		MultiLineStation station = new MultiLineStation();
+		OneLineStation station = new OneLineStation();
 		station.setStationName("高邮湖");
 		station.setStationId("11");
 		station.setLineId("227");
-		station.setLineName("227路");
+		station.setLineName("世园快线7路");
 		station.setDirection("0");
 		station.setTime("100");
 		station.setSegmentId("8525645");
 		oneStation.add(station);
 		
-		station = new MultiLineStation();
+		station = new OneLineStation();
 		station.setStationName("高邮湖");
 		station.setStationId("6");
 		station.setLineId("226");

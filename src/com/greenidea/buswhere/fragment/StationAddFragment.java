@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
-import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.util.Constants;
 
 public class StationAddFragment extends Fragment implements OnClickListener
@@ -25,7 +25,7 @@ public class StationAddFragment extends Fragment implements OnClickListener
 	/**
 	 * 选中的车站
 	 */
-	public MultiLineStation selectStation;
+	public OneLineStation selectStation;
 	
 	public StationAddFragment(MainActivity parent) {
 		setRetainInstance(true);
@@ -54,7 +54,7 @@ public class StationAddFragment extends Fragment implements OnClickListener
 	@Override
 	public void onClick(View v)
 	{
-		MultiLineStation bean = (MultiLineStation) v.getTag();
+		OneLineStation bean = (OneLineStation) v.getTag();
 	}
 
 	

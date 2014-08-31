@@ -15,7 +15,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseFragment;
-import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.ui.MultiLineStationView;
 import com.greenidea.buswhere.util.Util;
 
@@ -29,7 +29,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	/**
 	 * 选中的车站
 	 */
-	public MultiLineStation selectedStation;
+	public OneLineStation selectedStation;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -39,7 +39,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		parent.getSupportActionBar().setTitle(R.string.menu_station);
 		parent.getSupportActionBar().setSubtitle(null);
         
-		Map<String, List<MultiLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
+		Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
 		if(!multiLineStations.isEmpty())
 		{
 			MultiLineStationView view = new MultiLineStationView(parent);
@@ -60,7 +60,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	@Override
 	public void onClick(View v)
 	{
-		MultiLineStation bean = (MultiLineStation) v.getTag();
+		OneLineStation bean = (OneLineStation) v.getTag();
 	}
 
 	@Override

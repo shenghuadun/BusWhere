@@ -12,7 +12,7 @@ import android.util.Log;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
-import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.bean.OneLineStation;
 
 public class BusDBHelper extends SQLiteOpenHelper
 {
@@ -73,12 +73,12 @@ public class BusDBHelper extends SQLiteOpenHelper
     private static final String MULTI_LINE_STATION_TABLE_CREATE ="CREATE TABLE " + 
     		Constants.TABLENAME_MULTI_LINE_STATION +
     		" (" +
-    		MultiLineStation.STATIONNAME + " TEXT not null, " +
-    		MultiLineStation.STATIONID + " TEXT not null, " +
-    		MultiLineStation.SEGMENTID + " TEXT not null, " +
-    		MultiLineStation.LINEID + " TEXT, " +
-    		MultiLineStation.LINENAME + " TEXT not null, " +
-    		MultiLineStation.TIME + " TEXT" +
+    		OneLineStation.STATIONNAME + " TEXT not null, " +
+    		OneLineStation.STATIONID + " TEXT not null, " +
+    		OneLineStation.SEGMENTID + " TEXT not null, " +
+    		OneLineStation.LINEID + " TEXT, " +
+    		OneLineStation.LINENAME + " TEXT not null, " +
+    		OneLineStation.TIME + " TEXT" +
     		");";
 
 	public BusDBHelper(Context context)
