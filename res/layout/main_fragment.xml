@@ -90,11 +90,5 @@
 	    </ListView>
 	</RelativeLayout>
     
-	<!-- 显示广告的Layout -->
-	<RelativeLayout
-	    android:id="@id/adContainer"
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentBottom="true"/>
 	
 </RelativeLayout>

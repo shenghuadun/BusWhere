@@ -8,34 +8,38 @@ import java.util.Map.Entry;
 
 import org.htmlparser.util.ParserException;
 
-import com.gigi.buslocation.bean.BusPosition;
-import com.gigi.buslocation.bean.BusStation;
-import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.bean.MultiLineStation;
-import com.greenidea.buswhere.util.Util;
-
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.text.Html;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gigi.buslocation.bean.BusPosition;
+import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.bean.MultiLineStation;
+import com.greenidea.buswhere.util.Util;
 
 
 public class MultiLineStationView extends LinearLayout
 {
 	private Map<String, List<MultiLineStation>> stations;
 	private Map<String, List<MultiStationItemView>> stationItems = new HashMap<String, List<MultiStationItemView>>();
+	private Animation animation;
 	
 	public void init(Context context)
 	{
 		this.setOrientation(LinearLayout.VERTICAL);
+		animation = AnimationUtils.loadAnimation(context, R.anim.rotate);
 	}
 
 	public MultiLineStationView(Context context, AttributeSet attrs)
@@ -67,6 +71,26 @@ public class MultiLineStationView extends LinearLayout
 		}
 	}
 	
+	private Handler loadingHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			ImageView loading = ((ImageView)msg.obj);
+			switch (msg.what)
+			{
+			case 1:
+				loading.setVisibility(View.VISIBLE);
+				loading.startAnimation(animation);
+				break;
+			case 0:
+				loading.setVisibility(View.GONE);
+			default:
+				break;
+			}
+		}
+	};
+	
 	private OnClickListener onClickListener = new OnClickListener()
 	{
 		@SuppressWarnings("unchecked")
@@ -80,19 +104,29 @@ public class MultiLineStationView extends LinearLayout
 				List<MultiLineStation> items = (List<MultiLineStation>) tag.get("stations");
 				List<MultiStationItemView> itemViews = (List<MultiStationItemView>) tag.get("stationViews");
 				LinearLayout linesContainer = (LinearLayout) tag.get("container");
+				ImageView loading = (ImageView) tag.get("loading");
 				
 				//展开
 				if(View.GONE == linesContainer.getVisibility())
 				{
-//					linesContainer.startAnimation();
 					linesContainer.setVisibility(View.VISIBLE);
 					
-					getBusPositions(items, itemViews);
+					getBusPositions(items, itemViews, loading);
+
+					Message msg = loadingHandler.obtainMessage();
+					msg.what = 1;
+					msg.obj = loading;
+					loadingHandler.sendMessage(msg);
+					
 				}
 				//合上
 				else
 				{
-//					linesContainer.startAnimation();
+					Message msg = loadingHandler.obtainMessage();
+					msg.what = 0;
+					msg.obj = loading;
+					loadingHandler.sendMessage(msg);
+
 					linesContainer.setVisibility(View.GONE);
 				}
 			}
@@ -100,9 +134,9 @@ public class MultiLineStationView extends LinearLayout
 	};
 	
 
-	private void getBusPositions(List<MultiLineStation> stations, List<MultiStationItemView> itemViews)
+	private void getBusPositions(List<MultiLineStation> stations, List<MultiStationItemView> itemViews, ImageView loading)
 	{
-		BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews);
+		BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
 		thread.start();
 	}
 
@@ -111,12 +145,14 @@ public class MultiLineStationView extends LinearLayout
 		private Context context;
 		private List<MultiLineStation> stations ;
 		private List<MultiStationItemView> itemViews;
+		private ImageView loading;
 		
-		public BusLocatingThread(Context context, List<MultiLineStation> stations, List<MultiStationItemView> itemViews)
+		public BusLocatingThread(Context context, List<MultiLineStation> stations, List<MultiStationItemView> itemViews, ImageView loading)
 		{
 			this.context = context;
 			this.stations = stations;
 			this.itemViews = itemViews;
+			this.loading = loading;
 		}
 
 		@Override
@@ -139,7 +175,12 @@ public class MultiLineStationView extends LinearLayout
 				{
 					e.printStackTrace();
 				}
-	        	
+
+	        	if(null == positions)
+	        	{
+	        		Toast.makeText(getContext(), "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
+	        		break;
+	        	}
 				Map param = new HashMap();
 				param.put("stationView", itemViews.get(index));
 				param.put("positions", positions);
@@ -149,6 +190,11 @@ public class MultiLineStationView extends LinearLayout
 				
 				index++;
 			}
+
+			Message msg = loadingHandler.obtainMessage();
+			msg.what = 0;
+			msg.obj = loading;
+			loadingHandler.sendMessage(msg);
 		}
 		
 	}
@@ -160,11 +206,7 @@ public class MultiLineStationView extends LinearLayout
         	List<BusPosition> positions = (List<BusPosition>) ((Map)msg.obj).get("positions");
         	MultiStationItemView view = (MultiStationItemView) ((Map)msg.obj).get("stationView");
         	
-        	if(null == positions)
-        	{
-        		Toast.makeText(getContext(), "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
-        	}
-        	else if(positions.isEmpty())
+        	if(positions.isEmpty())
         	{
         		view.setNoBus();
         	}
@@ -179,13 +221,26 @@ public class MultiLineStationView extends LinearLayout
 	{
 		String stationName = entry.getKey();
 		
+		RelativeLayout relativeLayout = new RelativeLayout(getContext());
+		relativeLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		relativeLayout.setOnClickListener(onClickListener);
+		this.addView(relativeLayout);
+		
 		//站名
 		TextView nameView = new TextView(getContext());
-		nameView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		nameView.setTextSize(Util.dip2px(18, getResources()));
 		nameView.setText(stationName);
-		nameView.setOnClickListener(onClickListener);
-		this.addView(nameView);
+		relativeLayout.addView(nameView);
+		
+		ImageView loading = new ImageView(getContext());
+		loading.setId(10000);
+		loading.setImageResource(R.drawable.rotate);
+		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		lp.addRule(RelativeLayout.CENTER_VERTICAL);
+		loading.setLayoutParams(lp);
+		loading.setVisibility(View.INVISIBLE);
+		relativeLayout.addView(loading);
 	
 		List<MultiStationItemView> itemViews = new ArrayList<MultiLineStationView.MultiStationItemView>();
 
@@ -210,17 +265,22 @@ public class MultiLineStationView extends LinearLayout
 		tag.put("stations", items);
 		tag.put("stationViews", itemViews);
 		tag.put("container", linesContainer);
-		nameView.setTag(tag);
+		tag.put("loading", loading);
+		relativeLayout.setTag(tag);
 		
 		stationItems.put(stationName, itemViews);
 	}
 
 	private static class MultiStationItemView extends LinearLayout
 	{
+		private static String t1 = "<span>index：<span style=\"color:red\">time</span>前到达<span style=\"color:red\">station</span></span>";
+		private static String t2 = "<span>距您还有<span style=\"color:red\">num站</span></span>";
+		
 		private TextView lineName;
-		private TextView stationNum;
-		private TextView curPos;
-		private TextView posTime;
+		private TextView text11;
+		private TextView text12;
+		private TextView text21;
+		private TextView text22;
 		
 		public MultiStationItemView(Context context)
 		{
@@ -235,12 +295,13 @@ public class MultiLineStationView extends LinearLayout
 
 		public MultiStationItemView init(MultiLineStation station)
 		{
-			RelativeLayout itemRoot = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.multi_station_item_line, null);
+			LinearLayout itemRoot = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.multi_station_item_line, null);
 			
 			lineName = (TextView) itemRoot.findViewById(R.id.lineName);
-			stationNum = (TextView) itemRoot.findViewById(R.id.stationNum);
-			curPos = (TextView) itemRoot.findViewById(R.id.curPos);
-			posTime = (TextView) itemRoot.findViewById(R.id.posTime);
+			text11 = (TextView) itemRoot.findViewById(R.id.text11);
+			text12 = (TextView) itemRoot.findViewById(R.id.text12);
+			text21 = (TextView) itemRoot.findViewById(R.id.text21);
+			text22 = (TextView) itemRoot.findViewById(R.id.text22);
 			
 			lineName.setText(station.getLineName());
 			
@@ -250,9 +311,32 @@ public class MultiLineStationView extends LinearLayout
 		
 		public void update(List<BusPosition> positions)
 		{
-			this.stationNum.setText(position.getStationNum());
-			this.curPos.setText(position.getStationName());
-			this.posTime.setText(position.getWhen());
+			if(positions.size() > 0)
+			{
+				this.text11.setText(Html.fromHtml(t1
+						.replace("index", "1")
+						.replace("time", positions.get(0).getWhen())
+						.replace("station", positions.get(0).getStationName())));
+				this.text12.setText(Html.fromHtml(t2
+						.replace("num", positions.get(0).getStationNum())));
+			}
+			else
+			{
+				this.text11.setText("未发车");
+			}
+			if(positions.size() > 1)
+			{
+				this.text21.setText(Html.fromHtml(t1
+						.replace("index", "2")
+						.replace("time", positions.get(1).getWhen())
+						.replace("station", positions.get(1).getStationName())));
+				this.text22.setText(Html.fromHtml(t2
+						.replace("num", positions.get(1).getStationNum())));
+			}
+			else
+			{
+				this.text21.setText("未发车");
+			}
 		}
 		
 	}

@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-        
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-           android:layout_centerVertical="true"
-        android:src="@drawable/line" />
+    android:layout_height="wrap_content" 
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/lineName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:text="世园专线7路"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 	    
@@ -24,117 +16,45 @@
     <LinearLayout 
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content" 
-        android:layout_alignParentLeft="true" 
         android:orientation="vertical"
-        android:layout_toRightOf="@+id/lineName">
+        android:layout_weight="5">
 
         <RelativeLayout
 		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:layout_weight="1" >
-	        <ImageView
-	            android:id="@+id/imageView3"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:layout_centerVertical="true"
-	            android:src="@drawable/station" />
-	
+		    android:layout_height="wrap_content">
+		    <TextView
+		        android:id="@+id/text11"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="1" />
+		    
 	        <TextView
-	            android:id="@+id/curPos"
+	            android:id="@+id/text12"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/imageView3"
-	            android:layout_centerVertical="true"
-	            android:text="青岛大学东院" />
-	
-		    <TextView
-		        android:id="@+id/posTime"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-		        android:text="21秒前到达" />
-	
-		    <ImageView
-		        android:id="@+id/imageView4"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toLeftOf="@id/posTime"
-	            android:layout_centerVertical="true"
-		        android:src="@drawable/jy" />
-		    
-		    
-		    <TextView
-		        android:id="@+id/stationNum"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-		        android:text="距您20站" />
-	
-		    <ImageView
-		        android:id="@+id/imageView2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toLeftOf="@id/stationNum"
-	            android:layout_centerVertical="true"
-		        android:src="@drawable/jy" />
-		    </RelativeLayout>
+	            android:layout_below="@id/text11"
+	            android:text="2" />
+	        
+	    </RelativeLayout>
 	    
-         <RelativeLayout
+        <RelativeLayout
 		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:layout_weight="1" >
-	        <ImageView
-	            android:id="@+id/imageView3"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:layout_centerVertical="true"
-	            android:src="@drawable/station" />
-	
+		    android:layout_height="wrap_content">
+	        
+		    <TextView
+		        android:id="@+id/text21"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="1" />
+		    
 	        <TextView
-	            android:id="@+id/curPos"
+	            android:id="@+id/text22"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/imageView3"
-	            android:layout_centerVertical="true"
-	            android:text="青岛大学东院" />
-	
-		    <TextView
-		        android:id="@+id/posTime"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-		        android:text="21秒前到达" />
-	
-		    <ImageView
-		        android:id="@+id/imageView4"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toLeftOf="@id/posTime"
-	            android:layout_centerVertical="true"
-		        android:src="@drawable/jy" />
-		    
-		    
-		    <TextView
-		        android:id="@+id/stationNum"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentRight="true"
-	            android:layout_centerVertical="true"
-		        android:text="距您20站" />
-	
-		    <ImageView
-		        android:id="@+id/imageView2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toLeftOf="@id/stationNum"
-	            android:layout_centerVertical="true"
-		        android:src="@drawable/jy" />
-		    </RelativeLayout>
+	            android:layout_below="@id/text21"
+	            android:text="2" />
+	        
+	    </RelativeLayout>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
