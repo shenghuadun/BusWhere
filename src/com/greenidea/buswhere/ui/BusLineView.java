@@ -935,23 +935,7 @@ public class BusLineView extends View implements OnTouchListener
 
 		setMeasuredDimension(measuredWidth, measuredHeight);
 		
-		//按照宽度设置每行的数量
-		int width = d2p(STATION_WIDTH);
-		int newNum = (measuredWidth)/width;
-		
-		if(newNum > 0 && STATIONS_PER_LINE != newNum)
-		{
-			STATIONS_PER_LINE = newNum;
-			
-//			int space = measuredWidth % width;
-//			if(space > 50)
-//			{
-//				STATION_WIDTH += space/newNum - 10;
-//				Log.d("修改宽度", newNum + "--" + space + "--" + STATION_WIDTH);
-//			}
-			
-			onMeasureFinished();
-		}
+		onMeasureFinished();
 	}
 
 	private int measureHeight(int measureSpec)
@@ -985,7 +969,7 @@ public class BusLineView extends View implements OnTouchListener
 		int specSize = MeasureSpec.getSize(measureSpec);
 
 		// Default size if no limits are specified.
-		int result = STATIONS_PER_LINE * d2p(STATION_WIDTH) + 2*d2p(BLOCK_PADDING);
+		int result = 0;
 		if (specMode == MeasureSpec.AT_MOST)
 		{
 			// Calculate the ideal size of your control
@@ -993,12 +977,66 @@ public class BusLineView extends View implements OnTouchListener
 			// If your control fills the available space
 			// return the outer bound.
 			result = specSize;
+			
+			if(!measured)
+			{
+				 int padding = d2p(BLOCK_PADDING);
+				//重新计算每行个数
+				STATIONS_PER_LINE = (result - padding) / STATION_WIDTH;
+				//微调宽度
+				int space = (result - padding) % STATION_WIDTH;
+				
+				//剩余空间较大，每行多添一个
+				if(space > STATION_WIDTH/STATIONS_PER_LINE)
+				{
+					STATIONS_PER_LINE++;
+					
+					STATION_WIDTH -= space / STATIONS_PER_LINE;
+				}
+				//微调
+				else
+				{
+					STATION_WIDTH += space/STATIONS_PER_LINE;
+				}
+				Log.d("修改宽度", STATIONS_PER_LINE + "--" + space + "--" + STATION_WIDTH);
+			}
 		}
 
 		else if (specMode == MeasureSpec.EXACTLY)
 		{
 			// If your control can fit within these bounds return that value.
 			result = specSize;
+
+			//应该将dp转为px，但是要转换的太多，不如将宽度转为dp
+			int tmpWidth = p2d(result);
+			Log.e("tmpWidth", tmpWidth + "--");
+			if(!measured)
+			{
+				 int padding = (4+STATIONS_PER_LINE)*BLOCK_PADDING;
+				//重新计算每行个数
+				STATIONS_PER_LINE = (tmpWidth - padding) / STATION_WIDTH;
+				Log.e("每行", STATIONS_PER_LINE + "--" + STATION_WIDTH);
+				//微调宽度
+				int space = (tmpWidth - padding) % STATION_WIDTH;
+				Log.e("剩余", space + "--");
+				
+				//剩余空间较大，每行多添一个
+				if(space > STATION_WIDTH/STATIONS_PER_LINE)
+				{
+					STATIONS_PER_LINE++;
+
+					STATION_WIDTH = (tmpWidth - padding) / STATIONS_PER_LINE;
+				}
+				else
+				{
+					STATION_WIDTH += space/STATIONS_PER_LINE;
+				}
+				Log.d("修改宽度2", STATIONS_PER_LINE + "--" + space + "--" + STATION_WIDTH);
+			}
+		}
+		else
+		{
+			result = STATIONS_PER_LINE * d2p(STATION_WIDTH) + 2*d2p(BLOCK_PADDING);
 		}
 
 		return result;
@@ -1008,6 +1046,11 @@ public class BusLineView extends View implements OnTouchListener
 	{
 		final float scale = getResources().getDisplayMetrics().density;
 		return (int) (dipValue * scale + 0.5f);
+	}
+	private int p2d(float pxValue)
+	{
+		final float scale = getResources().getDisplayMetrics().density;
+		return (int) (pxValue / scale + 0.5f);
 	}
 
 
@@ -1021,10 +1064,4 @@ public class BusLineView extends View implements OnTouchListener
 	{
 		this.pendingClickStationIndex = pendingClickStationIndex;
 	}
-
-	// private int p2d(float pxValue)
-	// {
-	// final float scale = getResources().getDisplayMetrics().density;
-	// return (int) (pxValue / scale + 0.5f);
-	// }
 }
