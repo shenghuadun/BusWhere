@@ -115,7 +115,6 @@ public class MultiLineStationView extends LinearLayout
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 		
 			Looper.prepare();
-			Looper.loop();
 			Util busUtil = Util.getInstance(context);
 			
 			int index = 0;
@@ -151,8 +150,8 @@ public class MultiLineStationView extends LinearLayout
 			msg.what = 0;
 			msg.obj = loading;
 			loadingHandler.sendMessage(msg);
-			
-			Looper.myLooper().quit();
+
+			Looper.loop();
 		}
 		
 	}

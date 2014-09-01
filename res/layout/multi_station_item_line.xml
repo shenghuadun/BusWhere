@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/linenumbk"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
 
@@ -115,4 +114,8 @@
 	    </RelativeLayout>
     </LinearLayout>
 
+    <ImageView 
+	    android:layout_width="match_parent"
+	    android:layout_height="1px"
+	    android:background="@color/separator"/>
 </RelativeLayout>

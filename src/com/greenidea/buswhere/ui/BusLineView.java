@@ -38,7 +38,7 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 界面中每行车站数
 	 */
-	public int STATIONS_PER_LINE = 4;
+	private static int STATIONS_PER_LINE = 4;
 
 	/**
 	 * 车站高度
@@ -47,31 +47,31 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 车站宽度
 	 */
-	public static final int STATION_WIDTH = 90;
+	private static int STATION_WIDTH = 90;
 
 	/**
 	 * 线路宽度
 	 */
-	public static final int LINE_HEIGHT = 8;
+	private static final int LINE_HEIGHT = 8;
 	/**
 	 * 线与边界的距离
 	 */
-	public static final int LINE_MARGIN_BOTTOM = 40;
+	private static final int LINE_MARGIN_BOTTOM = 40;
 	/**
 	 * 小人与下边界的距离
 	 */
-	public static final int MAN_MARGIN_BOTTOM = 5;
+	private static final int MAN_MARGIN_BOTTOM = 5;
 	/**
 	 * 待经过线路宽度
 	 */
-	public static final int STROKE_Unpassed_HEIGHT = 4;
+	private static final int STROKE_Unpassed_HEIGHT = 4;
 
-	public static final int BLOCK_PADDING = 2;
+	private static final int BLOCK_PADDING = 2;
 
 	/**
 	 * 路线拐角半径
 	 */
-	public static final int CORNER_RADIUS = 5;
+	private static final int CORNER_RADIUS = 5;
 
 	/**
 	 * 箭头间距
@@ -81,11 +81,11 @@ public class BusLineView extends View implements OnTouchListener
 	/**
 	 * 下行背景色
 	 */
-	public static final int COLOR_BLOCK_DOWN = Color.parseColor("#c5eaf8");
+	private static final int COLOR_BLOCK_DOWN = Color.parseColor("#c5eaf8");
 	/**
 	 * 上行背景色
 	 */
-	public static final int COLOR_BLOCK_UP = Color.parseColor("#e2f0b6");
+	private static final int COLOR_BLOCK_UP = Color.parseColor("#e2f0b6");
 	/**
 	 * 选中颜色
 	 */
@@ -936,11 +936,19 @@ public class BusLineView extends View implements OnTouchListener
 		setMeasuredDimension(measuredWidth, measuredHeight);
 		
 		//按照宽度设置每行的数量
-		int newNum = (measuredWidth - d2p(40))/d2p(STATION_WIDTH);
+		int width = d2p(STATION_WIDTH);
+		int newNum = (measuredWidth)/width;
 		
-		if(STATIONS_PER_LINE != newNum)
+		if(newNum > 0 && STATIONS_PER_LINE != newNum)
 		{
 			STATIONS_PER_LINE = newNum;
+			
+//			int space = measuredWidth % width;
+//			if(space > 50)
+//			{
+//				STATION_WIDTH += space/newNum - 10;
+//				Log.d("修改宽度", newNum + "--" + space + "--" + STATION_WIDTH);
+//			}
 			
 			onMeasureFinished();
 		}

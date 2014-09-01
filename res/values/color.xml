@@ -14,4 +14,5 @@
     <color name="time">#11FF11</color>
     <color name="station">#FF1111</color>
     
+    <color name="separator">#aaaaaa</color>
 </resources>
