@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp">
-
+    android:layout_height="match_parent">
+    
     <TextView
         android:id="@+id/lineName"
         android:layout_width="70dp"
@@ -15,104 +13,115 @@
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 	    
 	    
-    <LinearLayout 
+    <RelativeLayout 
+        android:id="@+id/relative1"
         android:layout_width="match_parent" 
         android:layout_height="wrap_content" 
-        android:layout_toRightOf="@id/lineName"
-        android:layout_centerVertical="true"
-        android:orientation="vertical">
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/lineName">
 
-        <RelativeLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content">
-		    
-	        <TextView
-	            android:id="@+id/num1"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:textSize="18sp"
-				android:textColor="@color/num"	            
-	            android:text="28" />
-	        
-		    <TextView
-		        android:id="@+id/zhan1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toRightOf="@id/num1"
-		        android:text="站" />
-	        
-		    <TextView
-		        android:id="@+id/time1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="10dp"
-		        android:layout_toRightOf="@id/zhan1"
-	            android:textSize="18sp"
-				android:textColor="@color/time"	  
-		        android:text="time" />
-		    
-	        <TextView
-	            android:id="@+id/text1"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/time1"
-	            android:text="前到达" />
-	        
-	        <TextView
-	            android:id="@+id/station1"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/text1"
-	            android:textSize="18sp"
-				android:textColor="@color/station"	  
-	            android:text="五四广场" />
-	        
-	    </RelativeLayout>
+        <TextView
+            android:id="@+id/num1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="24sp"
+			android:textColor="@color/numPrimary"
+            android:text="" />
+       
+        <TextView
+            android:id="@+id/station1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	    	android:layout_toRightOf="@id/num1"
+	    	android:layout_toLeftOf="@+id/time1"
+            android:layout_alignBottom="@id/num1"
+            android:textSize="18sp"
+			android:textColor="@color/stationPrimary"	  
+            android:text="" />
+        
+	    <TextView
+	        android:id="@id/time1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	    	android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/num1"
+			android:textColor="@color/timePrimary"	  
+	        android:text="" />
+        
+	    <TextView
+	        android:id="@+id/nobus1"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_alignLeft="@id/num1"
+            android:layout_alignBottom="@id/num1"
+            android:background="#fff"
+			android:visibility="gone"  
+			android:textColor="@color/timeSecondary"	  
+	        android:text="尚未发车" />
+    </RelativeLayout>
 	    
-        <RelativeLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content">
-		    
-	        <TextView
-	            android:id="@+id/num2"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_alignParentLeft="true"
-	            android:text="28" />
-	        
-		    <TextView
-		        android:id="@+id/zhan2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_toRightOf="@id/num2"
-		        android:text="站" />
-	        
-		    <TextView
-		        android:id="@+id/time2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="10dp"
-		        android:layout_toRightOf="@id/zhan2"
-		        android:text="time" />
-		    
-	        <TextView
-	            android:id="@+id/text2"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/time2"
-	            android:text="前到达" />
-	        
-	        <TextView
-	            android:id="@+id/station2"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:layout_toRightOf="@id/text2"
-	            android:text="五四广场" />
-	        
-	        
-	    </RelativeLayout>
-    </LinearLayout>
+    <ImageView 
+        android:id="@+id/separator1"
+	    android:layout_width="match_parent"
+	    android:layout_height="1px"
+	    android:background="@color/separator"
+        android:layout_below="@id/relative1"
+        android:layout_toRightOf="@id/lineName"/>
+    
+    <RelativeLayout 
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/separator1"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/lineName">
+
+        <TextView
+            android:id="@+id/num2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:textSize="24sp"
+			android:textColor="@color/numSecondary"
+            android:text="" />
+        
+        <TextView
+            android:id="@+id/station2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	    	android:layout_toRightOf="@id/num2"
+	    	android:layout_toLeftOf="@+id/time2"
+            android:layout_alignBottom="@id/num2"
+            android:textSize="18sp"
+            android:textColor="@color/stationSecondary"
+            android:text="" />
+        
+	    <TextView
+	        android:id="@id/time2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="10dp"
+	    	android:layout_alignParentRight="true"
+            android:layout_alignBottom="@id/num2"
+			android:textColor="@color/timeSecondary"	
+	        android:text="" />
+	    
+	    <TextView
+	        android:id="@+id/nobus2"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_alignLeft="@id/num2"
+            android:layout_alignBottom="@id/num2"
+            android:background="#fff"
+			android:visibility="gone"  
+			android:textColor="@color/timeSecondary"	  
+	        android:text="尚未发车" />
+	    
+    </RelativeLayout>
 
     <ImageView 
 	    android:layout_width="match_parent"

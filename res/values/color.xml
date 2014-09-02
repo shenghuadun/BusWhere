@@ -10,9 +10,14 @@
     <color name="menuBack">#F6F6F6</color>
     
     
-    <color name="num">#1111FF</color>
-    <color name="time">#11FF11</color>
-    <color name="station">#FF1111</color>
+    <color name="numPrimary">#00AA00</color>
+    <color name="numSecondary">#009900</color>
+    
+    <color name="timePrimary">#777777</color>
+    <color name="timeSecondary">#777777</color>
+    
+    <color name="stationPrimary">#666666</color>
+    <color name="stationSecondary">#666666</color>
     
     <color name="separator">#aaaaaa</color>
 </resources>

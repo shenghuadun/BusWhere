@@ -116,7 +116,7 @@ public class BusLineFragment extends BaseFragment
 			}
 
 			currentStation = (BusStation) savedInstanceState.get("currentStation");
-			if(null != currentLine)
+			if(null != currentStation)
 			{
 				clickStation(currentStation);
 			}
@@ -136,7 +136,7 @@ public class BusLineFragment extends BaseFragment
 		{
 			outState.putSerializable("currentStation", currentStation);
 		}
-		if(null != busStations)
+		if(null != currentLine)
 		{
 			outState.putSerializable("currentLine", currentLine);
 		}

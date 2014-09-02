@@ -570,22 +570,44 @@ public class Util
 		station.setStationId("11");
 		station.setLineId("227");
 		station.setLineName("世园快线7路");
-		station.setDirection("0");
+		station.setDirection("1");
 		station.setTime("100");
 		station.setSegmentId("8525645");
 		oneStation.add(station);
 		
-		station = new OneLineStation();
-		station.setStationName("高邮湖");
-		station.setStationId("6");
-		station.setLineId("226");
-		station.setLineName("226路");
-		station.setDirection("0");
-		station.setTime("100");
-		station.setSegmentId("8525644");
-		oneStation.add(station);
+//		station = new OneLineStation();
+//		station.setStationName("高邮湖");
+//		station.setStationId("6");
+//		station.setLineId("226");
+//		station.setLineName("226路");
+//		station.setDirection("1");
+//		station.setTime("100");
+//		station.setSegmentId("8525644");
+//		oneStation.add(station);
 		
 		result.put("高邮湖", oneStation);
+
+//		station = new OneLineStation();
+//		station.setStationName("高邮湖1");
+//		station.setStationId("11");
+//		station.setLineId("227");
+//		station.setLineName("世园快线7路");
+//		station.setDirection("1");
+//		station.setTime("100");
+//		station.setSegmentId("8525645");
+//		oneStation.add(station);
+//		
+//		station = new OneLineStation();
+//		station.setStationName("高邮湖1");
+//		station.setStationId("6");
+//		station.setLineId("226");
+//		station.setLineName("226路");
+//		station.setDirection("1");
+//		station.setTime("100");
+//		station.setSegmentId("8525644");
+//		oneStation.add(station);
+//		
+//		result.put("高邮湖1", oneStation);
 		
 		
 		cursor.close();

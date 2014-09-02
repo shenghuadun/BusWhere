@@ -25,6 +25,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	public static final int FRAGMENT_INDEX = 2;
 
 	private LinearLayout root;
+	private LinearLayout container;
 	
 	/**
 	 * 选中的车站
@@ -35,6 +36,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
 		root =  (LinearLayout) inflater.inflate(R.layout.stationfragment, null);
+		container = (LinearLayout) root.findViewById(R.id.container);
 		
 		parent.getSupportActionBar().setTitle(R.string.menu_station);
 		parent.getSupportActionBar().setSubtitle(null);
@@ -44,7 +46,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		{
 			MultiLineStationView view = new MultiLineStationView(parent);
 			view.setStations(multiLineStations);
-			root.addView(view);
+			container.addView(view);
 		}
 
 		return root;
