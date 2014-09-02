@@ -519,6 +519,27 @@ public class Util
 		return rows != 0;
 	}
 	
+	public String getLineNameById(String id)
+	{
+		String lineId = "";
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_LINEINFO, 
+				new String[]{BusLine.LINENAME},
+				BusLine.LINEID + " = ? ", 
+				new String[]{id}, null, null, null);
+
+		for (int i = 0; i < cursor.getCount(); i++)
+		{
+			cursor.moveToNext();
+			
+			lineId = cursor.getString(0);
+		}
+		
+		cursor.close();
+		db.close();
+		helper.close();
+		return lineId;
+	}
 
 	/**
 	 * 查询多线路站点
@@ -537,24 +558,24 @@ public class Util
 		Log.d("记录个数", cursor.getCount() + "");
 
 		String stationName = null;
+		List<OneLineStation> oneStation = new ArrayList<OneLineStation>();
 		for (int i = 0; i < cursor.getCount(); i++)
 		{
-			List<OneLineStation> oneStation = new ArrayList<OneLineStation>();
 			cursor.moveToNext();
 			
 			OneLineStation station = new OneLineStation();
 			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.STATIONNAME)));
 			station.setStationId(cursor.getString(cursor.getColumnIndex(OneLineStation.STATIONID)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINEID)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINENAME)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.DIRECTION)));
-			station.setStationName(cursor.getString(cursor.getColumnIndex(OneLineStation.TIME)));
+			station.setLineId(cursor.getString(cursor.getColumnIndex(OneLineStation.LINEID)));
+			station.setLineName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINENAME)));
+			station.setDirection(cursor.getString(cursor.getColumnIndex(OneLineStation.DIRECTION)));
+			station.setTime(cursor.getString(cursor.getColumnIndex(OneLineStation.TIME)));
 
 			if(stationName == null)
-			{
+			{ 
 				stationName = station.getStationName();
 			}
-			else if(stationName != station.getStationName())
+			else if(!stationName.equals(station.getStationName()))
 			{
 				result.put(stationName, oneStation);
 				oneStation = new ArrayList<OneLineStation>();
@@ -563,56 +584,49 @@ public class Util
 			oneStation.add(station);
 		}
 
-		List<OneLineStation> oneStation = new ArrayList<OneLineStation>();
-		
-		OneLineStation station = new OneLineStation();
-		station.setStationName("高邮湖");
-		station.setStationId("11");
-		station.setLineId("227");
-		station.setLineName("世园快线7路");
-		station.setDirection("1");
-		station.setTime("100");
-		station.setSegmentId("8525645");
-		oneStation.add(station);
-		
-//		station = new OneLineStation();
-//		station.setStationName("高邮湖");
-//		station.setStationId("6");
-//		station.setLineId("226");
-//		station.setLineName("226路");
-//		station.setDirection("1");
-//		station.setTime("100");
-//		station.setSegmentId("8525644");
-//		oneStation.add(station);
-		
-		result.put("高邮湖", oneStation);
-
-//		station = new OneLineStation();
-//		station.setStationName("高邮湖1");
-//		station.setStationId("11");
-//		station.setLineId("227");
-//		station.setLineName("世园快线7路");
-//		station.setDirection("1");
-//		station.setTime("100");
-//		station.setSegmentId("8525645");
-//		oneStation.add(station);
-//		
-//		station = new OneLineStation();
-//		station.setStationName("高邮湖1");
-//		station.setStationId("6");
-//		station.setLineId("226");
-//		station.setLineName("226路");
-//		station.setDirection("1");
-//		station.setTime("100");
-//		station.setSegmentId("8525644");
-//		oneStation.add(station);
-//		
-//		result.put("高邮湖1", oneStation);
-		
+		if(!oneStation.isEmpty())
+		{
+			result.put(stationName, oneStation);
+		}
 		
 		cursor.close();
 		db.close();
 		helper.close();
 		return result;
+	}
+	
+
+	/**
+	 * 查询多线路站点
+	 * @return 以站名为key的map
+	 */
+	public boolean saveMultiLineStation(OneLineStation station)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(OneLineStation.STATIONID, station.getStationId());
+		values.put(OneLineStation.STATIONNAME, station.getStationName());
+		values.put(OneLineStation.LINEID, station.getLineId());
+		values.put(OneLineStation.LINENAME, station.getLineName());
+		values.put(OneLineStation.DIRECTION, station.getDirection());
+		values.put(OneLineStation.SEGMENTID, station.getSegmentId());
+		values.put(OneLineStation.TIME, station.getTime());
+		long rowid = db.insert(Constants.TABLENAME_MULTI_LINE_STATION, null, values );
+		
+		db.close();
+		helper.close();
+		return rowid > 0;
+	}
+	
+	public boolean isMultiLineStationExists(OneLineStation station)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		Cursor cursor = db.query(Constants.TABLENAME_MULTI_LINE_STATION, 
+				null,
+				OneLineStation.LINEID  + "=? and " + OneLineStation.STATIONID + " = ?", 
+				new String[]{station.getLineId(), station.getStationId()}, null, null, null);
+
+		return cursor.getCount() > 0;
 	}
 }

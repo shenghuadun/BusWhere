@@ -83,9 +83,11 @@ public class MultiLineStationView extends LinearLayout
 			{
 			case 1:
 				loading.setVisibility(View.VISIBLE);
-				loading.startAnimation(animation);
+				loading.setAnimation(animation);
+				animation.start();
 				break;
 			case 0:
+				loading.clearAnimation();
 				loading.setVisibility(View.GONE);
 			default:
 				break;
@@ -219,7 +221,7 @@ public class MultiLineStationView extends LinearLayout
 			stationNameLayout.addView(loading);
 
 			ImageView separator1 = new ImageView(getContext());
-			separator1.setBackgroundColor(R.color.separator);
+			separator1.setBackgroundColor( getResources().getColor(R.color.separator));
 			LayoutParams lparam = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
 			lparam.setMargins(0, 0, 0, -1);
 			separator1.setLayoutParams(lparam);
@@ -234,7 +236,7 @@ public class MultiLineStationView extends LinearLayout
 			this.addView(lineItemLayout);
 			
 			ImageView separator2 = new ImageView(getContext());
-			separator2.setBackgroundColor(R.color.separator);
+			separator2.setBackgroundColor( getResources().getColor(R.color.separator));
 			LayoutParams param = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
 			param.setMargins(0, -1, 0, 0);
 			separator2.setLayoutParams(param);
@@ -396,7 +398,7 @@ public class MultiLineStationView extends LinearLayout
 		{
 			hideNoBus(1);
 			hideNoBus(2);
-			if(null == positions)
+			if(null == positions || positions.isEmpty())
 			{
         		showNoBus(1);
         		showNoBus(2);

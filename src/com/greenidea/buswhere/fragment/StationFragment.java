@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -26,8 +28,10 @@ public class StationFragment extends BaseFragment implements OnClickListener
 {
 	public static final int FRAGMENT_INDEX = 2;
 
-	private LinearLayout root;
-	private LinearLayout container;
+	private RelativeLayout root;
+	private LinearLayout scroll;
+	
+	private TextView empty;
 	
 	/**
 	 * 选中的车站
@@ -37,8 +41,9 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		root =  (LinearLayout) inflater.inflate(R.layout.stationfragment, null);
-		container = (LinearLayout) root.findViewById(R.id.container);
+		root =  (RelativeLayout) inflater.inflate(R.layout.stationfragment, null);
+		scroll = (LinearLayout) root.findViewById(R.id.container);
+		empty = (TextView) root.findViewById(R.id.empty);
 		
 		parent.getSupportActionBar().setTitle(R.string.menu_station);
 		parent.getSupportActionBar().setSubtitle(null);
@@ -48,7 +53,11 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		{
 			MultiLineStationView view = new MultiLineStationView(parent);
 			view.setStations(multiLineStations);
-			container.addView(view);
+			scroll.addView(view);
+		}
+		else
+		{
+			empty.setVisibility(View.VISIBLE);
 		}
 
 		return root;
@@ -93,7 +102,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		{
 		case R.id.addStation:
 			Intent intent = new Intent(parent, StationAddActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, 1001);
 			break;
 
 		default:
@@ -101,6 +110,25 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		}
 		
 		return true;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if(requestCode == 1001 && 1 == resultCode)
+		{
+			scroll.removeAllViews();
+			
+			Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
+			if(!multiLineStations.isEmpty())
+			{
+				MultiLineStationView view = new MultiLineStationView(parent);
+				view.setStations(multiLineStations);
+				scroll.addView(view);
+			}
+
+			empty.setVisibility(View.GONE);
+		}
 	}
 
 	

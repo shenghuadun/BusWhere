@@ -16,7 +16,7 @@ public class OneLineStation
 	private String time;
 	
 	public static final String STATIONNAME = "stationName";
-	public static final String STATIONID = "stationIdsName";
+	public static final String STATIONID = "stationId";
 	public static final String SEGMENTID = "segmentId";
 	public static final String LINEID = "lineId";
 	public static final String LINENAME = "lineName";

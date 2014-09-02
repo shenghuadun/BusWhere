@@ -78,6 +78,7 @@ public class BusDBHelper extends SQLiteOpenHelper
     		OneLineStation.SEGMENTID + " TEXT not null, " +
     		OneLineStation.LINEID + " TEXT, " +
     		OneLineStation.LINENAME + " TEXT not null, " +
+    		OneLineStation.DIRECTION + " TEXT not null, " +
     		OneLineStation.TIME + " TEXT" +
     		");";
 

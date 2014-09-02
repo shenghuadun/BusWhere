@@ -22,12 +22,15 @@ import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
+import com.greenidea.buswhere.bean.OneLineStation;
+import com.greenidea.buswhere.component.AlertDialogFragment;
 import com.greenidea.buswhere.component.HintAdapter;
+import com.greenidea.buswhere.component.AlertDialogFragment.OnUserSelectListener;
 import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
 
-public class StationAddActivity extends BaseActivity implements OnHintClickListener
+public class StationAddActivity extends BaseActivity implements OnHintClickListener, OnUserSelectListener
 {
 	//输入框及按钮
 	private EditText lineNumInput;
@@ -115,7 +118,9 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
         public void handleMessage(android.os.Message msg) 
         {  
         	BusStation stationClicked = (BusStation)msg.obj;
-
+        	
+        	AlertDialogFragment fragment = new AlertDialogFragment("添加" + stationClicked.getStationName(), StationAddActivity.this, stationClicked);
+        	fragment.show(getSupportFragmentManager(), "");
         }
 	};
 	
@@ -233,5 +238,45 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 	{
 		queryBus(lineId);
 		hideHints();
+	}
+
+	@Override
+	public void onPositiveButtonClicked(Object obj)
+	{
+		BusStation station = (BusStation) obj;
+		OneLineStation s = new OneLineStation();
+		s.setStationId(station.getStationId());
+		s.setStationName(station.getStationName());
+		s.setLineId(station.getLineId());
+		s.setLineName(Util.getInstance(this).getLineNameById(station.getLineId()));
+		s.setSegmentId(station.getSegmentId());
+		s.setDirection(station.getDirection());
+		s.setTime("" + System.currentTimeMillis() );
+		
+		Util util = Util.getInstance(this);
+		if(!util.isMultiLineStationExists(s))
+		{
+			boolean saveResult = util.saveMultiLineStation(s);
+			if(saveResult)
+			{
+				Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
+				setResult(1);
+				finish();
+			}
+			else
+			{
+				Toast.makeText(this, "添加失败", Toast.LENGTH_SHORT).show();
+			}
+		}
+		else
+		{
+			Toast.makeText(this, "已经添加过了", Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	@Override
+	public void onNegativeButtonClicked(Object obj)
+	{
+		
 	}
 }
