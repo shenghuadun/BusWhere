@@ -58,7 +58,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	{
 		root = inflater.inflate(R.layout.main_fragment, null);
 		
-		hintAdapter = new HintAdapter(parent);
+		hintAdapter = new HintAdapter(parent, parent);
 		
 		return root;
 	}

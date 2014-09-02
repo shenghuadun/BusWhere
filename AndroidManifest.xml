@@ -63,6 +63,10 @@
             </intent-filter>
         </activity>
         
+	   <activity
+	       android:name="com.greenidea.buswhere.activity.StationAddActivity"
+		   android:label="添加车站">
+	   </activity>
         
 <!-- 广告开始 -->
         <!-- 芒果 -->

@@ -31,12 +31,13 @@ import com.greenidea.buswhere.fragment.BusLineFragment;
 import com.greenidea.buswhere.fragment.MainFragment;
 import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.fragment.StationFragment;
+import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.util.BusDBHelper;
 import com.greenidea.buswhere.util.Constants;
 import com.greenidea.buswhere.util.Util;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends BaseActivity implements OnHintClickListener
 {
 	private MenuFragment menuFragment;
 	private MainFragment mainFragment;
@@ -457,8 +458,14 @@ public class MainActivity extends BaseActivity
 			m.put("line", line);
 			
 			msg.obj = m;
-			lineStationInfoHandler.sendMessageDelayed(msg, 1000);
+			lineStationInfoHandler.sendMessageDelayed(msg, 300);
 		}
+	}
+
+	@Override
+	public void onHintItemClicked(String lineId)
+	{
+		queryBus(lineId, null, null);	
 	}
 	
 }

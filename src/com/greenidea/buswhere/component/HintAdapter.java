@@ -3,6 +3,7 @@ package com.greenidea.buswhere.component;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -16,11 +17,12 @@ import android.widget.TextView;
 import com.gigi.buslocation.bean.BusLine;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.MainActivity;
+import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.util.Util;
 
 public class HintAdapter extends BaseAdapter
 {
-	private MainActivity context;
+	private OnHintClickListener listener;
     private LayoutInflater mInflater;
     private Bitmap gj;
     private Bitmap jy;
@@ -32,9 +34,9 @@ public class HintAdapter extends BaseAdapter
 	 */
 	private List<BusLine> allBusLines = null;
 
-    public HintAdapter(MainActivity context) 
+    public HintAdapter(OnHintClickListener listener, Context context) 
     {
-    	this.context = context;
+    	this.listener = listener;
         mInflater = LayoutInflater.from(context);
 
         gj = BitmapFactory.decodeResource(context.getResources(), R.drawable.gj);
@@ -98,7 +100,7 @@ public class HintAdapter extends BaseAdapter
 				@Override
 				public void onClick(View v)
 				{
-					context.queryBus(((ViewHolder)v.getTag()).lineId, null, null);	
+					listener.onHintItemClicked(((ViewHolder)v.getTag()).lineId);
 				}
 			});
         } 

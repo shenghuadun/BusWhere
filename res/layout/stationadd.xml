@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#fff">
+    
+	<RelativeLayout
+		android:id="@+id/inputContainer"
+		android:focusable="true" 
+		android:focusableInTouchMode="true"
+		android:padding="10dp" 
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+          
+		<EditText
+		    android:id="@+id/lineNum"
+		    android:layout_width="fill_parent"
+		    android:layout_height="48dp"
+		    android:ems="10"
+		    android:layout_centerHorizontal="true"
+		    android:background="@drawable/linenumbk"
+		    android:inputType="number" 
+		    android:hint="隧道、世园、高新路线请输0">
+		</EditText>
+
+		<ImageView
+		    android:id="@+id/btnSearch"
+		    android:layout_width="wrap_content"
+		    android:layout_height="48dp"
+		    android:layout_alignRight="@id/lineNum"
+		    android:src="@drawable/abs__ic_search" />
+	</RelativeLayout>
+	    
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+	    android:layout_below="@id/inputContainer"
+		android:layout_marginTop="5dp"
+        android:fadingEdge="none"
+        android:background="#fafafa"
+        android:scrollbarStyle="outsideOverlay">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            <com.greenidea.buswhere.ui.BusLineView
+                android:id="@+id/busLineView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" 
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="3dp"/>
+       	</LinearLayout>
+    </ScrollView>
+    
+	<ListView 
+		android:id="@+id/hintList"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="5dp"
+		android:visibility="gone"
+		android:overScrollMode="never"
+	    android:layout_below="@id/inputContainer">
+	</ListView>
+</RelativeLayout>

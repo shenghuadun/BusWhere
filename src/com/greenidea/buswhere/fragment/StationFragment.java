@@ -3,6 +3,7 @@ package com.greenidea.buswhere.fragment;
 import java.util.List;
 import java.util.Map;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.activity.StationAddActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.ui.MultiLineStationView;
@@ -87,7 +89,18 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		return super.onOptionsItemSelected(item);
+		switch (item.getItemId())
+		{
+		case R.id.addStation:
+			Intent intent = new Intent(parent, StationAddActivity.class);
+			startActivity(intent);
+			break;
+
+		default:
+			break;
+		}
+		
+		return true;
 	}
 
 	
