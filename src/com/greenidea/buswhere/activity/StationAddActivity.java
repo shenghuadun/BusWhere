@@ -18,14 +18,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.component.AlertDialogFragment;
-import com.greenidea.buswhere.component.HintAdapter;
 import com.greenidea.buswhere.component.AlertDialogFragment.OnUserSelectListener;
+import com.greenidea.buswhere.component.HintAdapter;
 import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
@@ -86,7 +85,7 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 			{
 				Message msg = queryHintsHandler.obtainMessage();
 				msg.obj = s.toString();
-				queryHintsHandler.sendMessageDelayed(msg, 300);
+				queryHintsHandler.sendMessageDelayed(msg, 200);
 			}
 
 			@Override
