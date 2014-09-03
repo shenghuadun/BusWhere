@@ -328,7 +328,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	 * 选中常用车站
 	 */
 	@Override
-	public void onItemSelectd(View item)
+	public void onItemSelected(SlideToDeleteListView slideToDeleteListView, int index, View item)
 	{
 		FavStationBean bean = (FavStationBean)item.getTag();
 		
@@ -341,7 +341,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	 * 删除常用车站
 	 */
 	@Override
-	public void onItemDelete(View item)
+	public void onItemDelete(SlideToDeleteListView slideToDeleteListView, int index, View item)
 	{
 		FavStationBean bean = (FavStationBean)item.getTag();
 		

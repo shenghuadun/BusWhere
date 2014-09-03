@@ -568,6 +568,7 @@ public class Util
 			station.setStationId(cursor.getString(cursor.getColumnIndex(OneLineStation.STATIONID)));
 			station.setLineId(cursor.getString(cursor.getColumnIndex(OneLineStation.LINEID)));
 			station.setLineName(cursor.getString(cursor.getColumnIndex(OneLineStation.LINENAME)));
+			station.setSegmentId(cursor.getString(cursor.getColumnIndex(OneLineStation.SEGMENTID)));
 			station.setDirection(cursor.getString(cursor.getColumnIndex(OneLineStation.DIRECTION)));
 			station.setTime(cursor.getString(cursor.getColumnIndex(OneLineStation.TIME)));
 

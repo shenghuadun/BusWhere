@@ -1009,16 +1009,16 @@ public class BusLineView extends View implements OnTouchListener
 
 			//应该将dp转为px，但是要转换的太多，不如将宽度转为dp
 			int tmpWidth = p2d(result);
-			Log.e("tmpWidth", tmpWidth + "--");
+			Log.d("tmpWidth", tmpWidth + "--");
 			if(!measured)
 			{
 				 int padding = (4+STATIONS_PER_LINE)*BLOCK_PADDING;
 				//重新计算每行个数
 				STATIONS_PER_LINE = (tmpWidth - padding) / STATION_WIDTH;
-				Log.e("每行", STATIONS_PER_LINE + "--" + STATION_WIDTH);
+				Log.d("每行", STATIONS_PER_LINE + "--" + STATION_WIDTH);
 				//微调宽度
 				int space = (tmpWidth - padding) % STATION_WIDTH;
-				Log.e("剩余", space + "--");
+				Log.d("剩余", space + "--");
 				
 				//剩余空间较大，每行多添一个
 				if(space > STATION_WIDTH/STATIONS_PER_LINE)
