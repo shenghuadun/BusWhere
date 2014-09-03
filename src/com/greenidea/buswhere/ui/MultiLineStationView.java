@@ -9,11 +9,13 @@ import java.util.Map.Entry;
 import org.htmlparser.util.ParserException;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -27,22 +29,19 @@ import android.widget.Toast;
 import com.gigi.buslocation.bean.BusPosition;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.bean.OneLineStation;
-import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
 import com.greenidea.buswhere.util.Util;
 
 
-public class MultiLineStationView extends LinearLayout implements OnItemEventListener
+public class MultiLineStationView extends LinearLayout
 {
 	private Map<String, List<OneLineStation>> stations;
+	private Map<String, StationItemView> stationItems = new HashMap<String, StationItemView>();
 	private Animation animation;
-	private SlideToDeleteListView slideToDeleteListView;
 	
 	public void init(Context context)
 	{
 		this.setOrientation(LinearLayout.VERTICAL);
 		animation = AnimationUtils.loadAnimation(context, R.anim.rotate);
-
-		slideToDeleteListView = new SlideToDeleteListView(getContext());
 	}
 
 	public MultiLineStationView(Context context, AttributeSet attrs)
@@ -67,16 +66,11 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		this.stations = stations;
 		
 		this.removeAllViews();
-
-		slideToDeleteListView.helper.removeAllViews();
-		slideToDeleteListView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-		slideToDeleteListView.helper.setOnItemEventListener(this);
 		
 		for(Map.Entry<String, List<OneLineStation>> entry : stations.entrySet())
 		{
-			addStation(slideToDeleteListView, entry);
+			addStation(entry);
 		}
-		this.addView(slideToDeleteListView);
 	}
 	
 	private Handler loadingHandler = new Handler()
@@ -175,94 +169,140 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
         }
 	};
 
-	private void addStation(SlideToDeleteListView slideToDeleteListView, Entry<String, List<OneLineStation>> entry)
+	private void addStation(Entry<String, List<OneLineStation>> entry)
 	{
 		String stationName = entry.getKey();
-
-		RelativeLayout stationNameLayout = new RelativeLayout(getContext());
 		
-		TextView nameView = new TextView(getContext());
-		nameView.setTextSize(Util.dip2px(14, getResources()));
-
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		int margin = Util.dip2px(20, getResources());
-		lp.setMargins(margin, 0, margin, 0);
-		nameView.setLayoutParams(lp);
-		nameView.setText(stationName);
-		stationNameLayout.addView(nameView);
-		
-		ImageView loading = new ImageView(getContext());
-		loading.setId(10000);
-		loading.setImageResource(R.drawable.rotate);
-		RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		rlp.addRule(RelativeLayout.CENTER_VERTICAL);
-		loading.setLayoutParams(rlp);
-		loading.setVisibility(View.INVISIBLE);
-		
-		stationNameLayout.addView(loading);
-		stationNameLayout.setTag(entry.getValue());
-		
-		slideToDeleteListView.helper.addDeletableView(stationNameLayout);
+		StationItemView item = new StationItemView(getContext());
+		item.init(stationName, entry.getValue());
+		stationItems.put(stationName, item);
+		this.addView(item);
 	}
 
-	@Override
-	public void onItemDelete(SlideToDeleteListView slideToDeleteListView, int index, View view)
+	private class StationItemView extends LinearLayout
 	{
-		Toast.makeText(getContext(), "删除", Toast.LENGTH_LONG).show();
-	}
-
-	@Override
-	public void onItemSelected(SlideToDeleteListView slideToDeleteListView, int index, View view)
-	{
-		List<OneLineStation> stations = (List<OneLineStation>) view.getTag();
+		RelativeLayout stationNameLayout;
+		TextView nameView;
+		ImageView loading;
+		List<LineItemView> itemViews;
 		
-		int size = slideToDeleteListView.helper.getChildCount();
-		//下方还有其他项（包括可删的或不可删的）
-		if(index < size -1)
+		LinearLayout lineItemLayout;
+		
+		public StationItemView(Context context)
 		{
-			//下一项是可删的，表示本项还未展开
-			if(slideToDeleteListView.helper.isItemDeletable(index + 1))
-			{
-				Toast.makeText(getContext(), "展开", Toast.LENGTH_LONG).show();
-				
-				LinearLayout lineItemLayout = new LinearLayout(getContext());
-				List<LineItemView> itemViews = new ArrayList<MultiLineStationView.LineItemView>();
-				
-				for(OneLineStation station : stations)
-				{
-					LineItemView item = new LineItemView(getContext());
-					item.init(station.getLineName());
-					itemViews.add(item);
-					lineItemLayout.addView(item);
-				}
-				slideToDeleteListView.helper.addNormalView(lineItemLayout, index);
-				
-				ImageView loading = new ImageView(getContext());
-				loading.setId(10000);
-				loading.setImageResource(R.drawable.rotate);
-				RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-				lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				lp.addRule(RelativeLayout.CENTER_VERTICAL);
-				loading.setLayoutParams(lp);
-				loading.setVisibility(View.INVISIBLE);
-				
-				BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
-				thread.start();
+			super(context);
+			this.setOrientation(LinearLayout.VERTICAL);
+			this.setBackgroundColor(Color.parseColor("#f6f6f6"));
 
-				Message msg = loadingHandler.obtainMessage();
-				msg.what = 1;
-				msg.obj = loading;
-				loadingHandler.sendMessage(msg);
-			}
-			else
-			{
-				Toast.makeText(getContext(), "关闭", Toast.LENGTH_LONG).show();
-			}
+			int p = Util.dip2px(10, getResources());
+			//站名整行
+			stationNameLayout = new RelativeLayout(getContext());
+			stationNameLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			stationNameLayout.setOnClickListener(onClickListener);
+			stationNameLayout.setPadding(p, p, p, p);
+			this.addView(stationNameLayout);
+
+			//站名
+			nameView = new TextView(getContext());
+			nameView.setTextSize(Util.dip2px(14, getResources()));
+
+			stationNameLayout.addView(nameView);
+			
+			//加载图片
+			loading = new ImageView(getContext());
+			loading.setId(10000);
+			loading.setImageResource(R.drawable.rotate);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+			lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			lp.addRule(RelativeLayout.CENTER_VERTICAL);
+			loading.setLayoutParams(lp);
+			loading.setVisibility(View.INVISIBLE);
+			
+			stationNameLayout.addView(loading);
+
+			ImageView separator1 = new ImageView(getContext());
+			separator1.setBackgroundColor( getResources().getColor(R.color.separator));
+			LayoutParams lparam = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
+			lparam.setMargins(0, 0, 0, -1);
+			separator1.setLayoutParams(lparam);
+			this.addView(separator1);
+			
+			//本站点所有路线容器，方便总体控制
+			lineItemLayout = new LinearLayout(getContext());
+			lineItemLayout.setOrientation(LinearLayout.VERTICAL);
+			lineItemLayout.setVisibility(View.GONE);
+			lineItemLayout.setPadding(p, 0, p, 0);
+			lineItemLayout.setBackgroundColor(Color.WHITE);
+			this.addView(lineItemLayout);
+			
+			ImageView separator2 = new ImageView(getContext());
+			separator2.setBackgroundColor( getResources().getColor(R.color.separator));
+			LayoutParams param = new LayoutParams(LayoutParams.MATCH_PARENT, 1);
+			param.setMargins(0, -1, 0, 0);
+			separator2.setLayoutParams(param);
+			this.addView(separator2);
+			
 		}
-		else
+
+		private OnClickListener onClickListener = new OnClickListener()
 		{
-			Toast.makeText(getContext(), "展开", Toast.LENGTH_LONG).show();
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onClick(View v)
+			{
+				Map<String, Object> tag = (Map<String, Object>) v.getTag();
+				
+				if(tag != null)
+				{
+					List<OneLineStation> items = (List<OneLineStation>) tag.get("stations");
+					
+					//展开
+					if(View.GONE == lineItemLayout.getVisibility())
+					{
+						lineItemLayout.setVisibility(View.VISIBLE);
+						
+						BusLocatingThread thread = new BusLocatingThread(getContext(), items, itemViews, loading);
+						thread.start();
+
+						Message msg = loadingHandler.obtainMessage();
+						msg.what = 1;
+						msg.obj = loading;
+						loadingHandler.sendMessage(msg);
+						
+					}
+					//合上
+					else
+					{
+						Message msg = loadingHandler.obtainMessage();
+						msg.what = 0;
+						msg.obj = loading;
+						loadingHandler.sendMessage(msg);
+
+						lineItemLayout.setVisibility(View.GONE);
+					}
+				}
+			}
+		};
+		
+		
+		public void init(String stationName, List<OneLineStation> lineItems)
+		{
+			nameView.setText(stationName);
+		
+			itemViews = new ArrayList<MultiLineStationView.LineItemView>();
+			
+			for(OneLineStation station : lineItems)
+			{
+				LineItemView item = new LineItemView(getContext());
+				item.init(station.getLineName());
+				itemViews.add(item);
+				lineItemLayout.addView(item);
+			}
+
+			//添加到TextView上，点击时用来更新
+			Map<String, Object> tag = new HashMap<String, Object>();
+			tag.put("stations", lineItems);
+			stationNameLayout.setTag(tag);
 		}
 		
 	}
@@ -283,6 +323,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		public LineItemView(Context context)
 		{
 			super(context);
+//			this.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, Util.dip2px(100, getResources())));
 		}
 		
 		public void showNoBus(int index)
@@ -382,5 +423,4 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		}
 		
 	}
-
 }

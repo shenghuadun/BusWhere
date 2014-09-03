@@ -3,7 +3,6 @@ package com.greenidea.buswhere.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.integer;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -55,6 +54,9 @@ public class SlideToDeleteListView extends ScrollView
 
 	private LinearLayout container;
 	
+	//滑动时，删除按钮是否淡入淡出
+	private boolean alphaEffectEnabled = false;
+
 	private OnItemEventListener onItemEventListener;
 	
 	/**
@@ -63,6 +65,7 @@ public class SlideToDeleteListView extends ScrollView
 	public Helper helper = new Helper();
 	
 	private List<ItemView> children = new ArrayList<SlideToDeleteListView.ItemView>();
+	
 	
 	/*
 	 ************************************************************************** 
@@ -107,7 +110,15 @@ public class SlideToDeleteListView extends ScrollView
 	 */
 	private void addDeletableView(View view)
 	{
-		addDeletableView(view, container.getChildCount());
+		ItemView itemView = new ItemView(this.getContext(), this.alphaEffectEnabled);
+		itemView.addContentView(view);
+		itemView.setOnItemTouchListener(onItemTouchListener);
+		
+		container.addView(itemView.container);
+		children.add(itemView);
+
+		//注册删除按钮的点击事件
+		itemView.container.findViewById(ItemView.DEL_BTN_ID).setOnClickListener(onClickListener);
 	}
 
 	/**
@@ -116,7 +127,7 @@ public class SlideToDeleteListView extends ScrollView
 	 */
 	private void addDeletableView(View view, int index)
 	{
-		ItemView itemView = new ItemView(this.getContext(), index, true);
+		ItemView itemView = new ItemView(this.getContext(), alphaEffectEnabled);
 		itemView.addContentView(view);
 		itemView.setOnItemTouchListener(onItemTouchListener);
 		
@@ -129,15 +140,19 @@ public class SlideToDeleteListView extends ScrollView
 	
 	private void addNormalView(View view)
 	{
-		addNormalView(view, container.getChildCount());
+		LinearLayout temp = new LinearLayout(this.getContext());
+		temp.addView(view);
+		temp.setBackgroundColor(SlideToDeleteListView.normalViewColor);
+
+		container.addView(temp);
 	}
 	private void addNormalView(View view, int index)
 	{
-		ItemView itemView = new ItemView(this.getContext(), index, false);
-		itemView.container.addView(view, index);
-		itemView.container.setBackgroundColor(SlideToDeleteListView.normalViewColor);
-
-		container.addView(itemView.container);
+		LinearLayout temp = new LinearLayout(this.getContext());
+		temp.addView(view);
+		temp.setBackgroundColor(SlideToDeleteListView.normalViewColor);
+		
+		container.addView(temp, index);
 	}
 	
 	/**
@@ -194,28 +209,28 @@ public class SlideToDeleteListView extends ScrollView
 	public class Helper
 	{
 		/**
-		 * 获取列表项数量
+		 * 滑动时，删除按钮是否有渐隐渐现效果
 		 * @return
 		 */
-		public int getChildCount()
+		public boolean isAlphaEffectEnabled()
 		{
-			return SlideToDeleteListView.this.container.getChildCount();
+			return alphaEffectEnabled;
 		}
 
 		/**
-		 * 获取第index个客户添加的view
-		 * @param index
-		 * @return
+		 * 设置滑动时删除按钮渐隐渐现效果
+		 * @param alphaEffectEnabled true为开启，false禁用
 		 */
-		public View getChildAt(int index)
+		public void setAlphaEffectEnabled(boolean alphaEffectEnabled)
 		{
-			return container.getChildAt(index);
+			SlideToDeleteListView.this.alphaEffectEnabled = alphaEffectEnabled;
+			
+			for(ItemView view : children)
+			{
+				view.setAlphaEffectEnabled(alphaEffectEnabled);
+			}
 		}
 		
-		public boolean isItemDeletable(int index)
-		{
-			return children.get(index).isDeletable;
-		}
 		/**
 		 * 添加View作为列表项，可以向左滑动显示删除按钮
 		 * @param view
@@ -326,13 +341,13 @@ public class SlideToDeleteListView extends ScrollView
 		 * 点击当前项的删除按钮
 		 * @param item
 		 */
-		void onItemDelete(SlideToDeleteListView slideToDeleteListView, int index, View item);
+		void onItemDelete(View item);
 		
 		/**
 		 * 当前项被选中
 		 * @param item
 		 */
-		void onItemSelected(SlideToDeleteListView slideToDeleteListView, int index, View item);
+		void onItemSelectd(View item);
 	}
 	
 	private View.OnClickListener onClickListener = new OnClickListener()
@@ -378,7 +393,7 @@ public class SlideToDeleteListView extends ScrollView
 								public void run()
 								{
 									SlideToDeleteListView.this.helper.removeView(((ItemView) v.getTag()));	
-									onItemEventListener.onItemDelete(SlideToDeleteListView.this, ((ItemView) v.getTag()).index, ((ItemView) v.getTag()).content.getChildAt(0));	
+									onItemEventListener.onItemDelete(((ItemView) v.getTag()).content.getChildAt(0));	
 								}
 							}, 20);		
 							
@@ -403,7 +418,7 @@ public class SlideToDeleteListView extends ScrollView
 			{
 				if(null != onItemEventListener)
 				{
-					onItemEventListener.onItemSelected(SlideToDeleteListView.this, itemView.index, itemView.content.getChildAt(0));
+					onItemEventListener.onItemSelectd(itemView.content.getChildAt(0));
 				}
 				
 				itemView.content.setBackgroundColor(SlideToDeleteListView.selectedColor);
@@ -440,10 +455,6 @@ public class SlideToDeleteListView extends ScrollView
 		
 		private Button delBtn;
 
-		/**
-		 * 在列表中的索引
-		 */
-		public int index;
 		//从上往下嵌套
 		private RelativeLayout container;
 		private HOverScrollView scroller;
@@ -451,72 +462,60 @@ public class SlideToDeleteListView extends ScrollView
 		private RelativeLayout content;
 		
 		private boolean isFinishedLayout = false;
-		public boolean isDeletable;
 		
-		public ItemView(Context context, int index, boolean isDeletable)
+		public ItemView(Context context, boolean alphaEffectEnabled)
 		{
-			this.index = index;
 			container = new RelativeLayout(context);
-			this.isDeletable = isDeletable;
+			//用于调用hideDelBtn()方法
+			container.setTag(this);
+			container.setBackgroundColor(SlideToDeleteListView.separatorColor);
+			container.setPadding(0, 1, 0, 0);
 			
-			if(isDeletable)
-			{
-				//用于调用hideDelBtn()方法
-				container.setTag(this);
-				container.setBackgroundColor(SlideToDeleteListView.separatorColor);
-				container.setPadding(0, 1, 0, 0);
-				
-				//1.生成删除按钮
-				delBtn = new Button(context, null, android.R.attr.buttonStyleSmall);
-				delBtn.setId(ItemView.DEL_BTN_ID);
-				delBtn.setTextColor(Color.WHITE);
-	
-				//设置按钮默认、按下背景色
-				StateListDrawable drawable = new StateListDrawable();
-				drawable.addState(new int[]{android.R.attr.state_pressed}, SlideToDeleteListView.DEL_BTN_PRESSED_COLOR);
-				drawable.addState(new int[]{}, SlideToDeleteListView.DEL_BTN_DEFAULT_COLOR);
-				delBtn.setBackgroundDrawable(drawable);
-				delBtn.setText("删除");
-				
-				//靠右对齐
-				RelativeLayout.LayoutParams del_param = new RelativeLayout.LayoutParams(SlideToDeleteListView.dip2px(ItemView.DEL_WIDTH, delBtn.getResources()), RelativeLayout.LayoutParams.MATCH_PARENT);
-				del_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				del_param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-				
-				delBtn.setLayoutParams(del_param);
-				delBtn.setTag(this);
-				
-				//因为container背景色为灰色，删除按钮淡入淡出效果需要白色背景，所以此处添加一个白色的图片
-				ImageView whiteBack = new ImageView(context);
-				whiteBack.setBackgroundColor(Color.WHITE);
-				whiteBack.setLayoutParams(del_param);
-				container.addView(whiteBack);
-				container.addView(delBtn);
-	
-				//2.为了能够撑开HOverScrollView，需要生成一个占位视图
-				placeholder = new LinearLayout(context);
-				placeholder.setId(PLACE_HOLDER_ID);
-				
-				//3.放置内容的视图，宽高是按内容适配的
-				content = new RelativeLayout(context);
-				content.setId(ItemView.CONTENT_ID);
-				content.setBackgroundColor(Color.WHITE);
-				
-				placeholder.addView(content);
-				
-				
-				//4.水平滚动视图
-				scroller = new HOverScrollView(context, placeholder, this);
-				scroller.setHorizontalFadingEdgeEnabled(false);
-				container.addView(scroller);
-	
-				//5.在显示前，设置内容的宽度和占位视图的padding
-				setOnPreDrawListener();
-			}
-		}
+			//1.生成删除按钮
+			delBtn = new Button(context, null, android.R.attr.buttonStyleSmall);
+			delBtn.setId(ItemView.DEL_BTN_ID);
+			delBtn.setTextColor(Color.WHITE);
 
-		private void setOnPreDrawListener()
-		{
+			//设置按钮默认、按下背景色
+			StateListDrawable drawable = new StateListDrawable();
+			drawable.addState(new int[]{android.R.attr.state_pressed}, SlideToDeleteListView.DEL_BTN_PRESSED_COLOR);
+			drawable.addState(new int[]{}, SlideToDeleteListView.DEL_BTN_DEFAULT_COLOR);
+			delBtn.setBackgroundDrawable(drawable);
+			delBtn.setText("删除");
+			
+			//靠右对齐
+			RelativeLayout.LayoutParams del_param = new RelativeLayout.LayoutParams(SlideToDeleteListView.dip2px(ItemView.DEL_WIDTH, delBtn.getResources()), RelativeLayout.LayoutParams.MATCH_PARENT);
+			del_param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			del_param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+			
+			delBtn.setLayoutParams(del_param);
+			delBtn.setTag(this);
+			
+			//因为container背景色为灰色，删除按钮淡入淡出效果需要白色背景，所以此处添加一个白色的图片
+			ImageView whiteBack = new ImageView(context);
+			whiteBack.setBackgroundColor(Color.WHITE);
+			whiteBack.setLayoutParams(del_param);
+			container.addView(whiteBack);
+			container.addView(delBtn);
+
+			//2.为了能够撑开HOverScrollView，需要生成一个占位视图
+			placeholder = new LinearLayout(context);
+			placeholder.setId(PLACE_HOLDER_ID);
+			
+			//3.放置内容的视图，宽高是按内容适配的
+			content = new RelativeLayout(context);
+			content.setId(ItemView.CONTENT_ID);
+			content.setBackgroundColor(Color.WHITE);
+			
+			placeholder.addView(content);
+			
+			
+			//4.水平滚动视图
+			scroller = new HOverScrollView(context, placeholder, this, alphaEffectEnabled);
+			scroller.setHorizontalFadingEdgeEnabled(false);
+			container.addView(scroller);
+
+			//5.在显示前，设置内容的宽度和占位视图的padding
 			placeholder.getViewTreeObserver().addOnPreDrawListener(new OnPreDrawListener()
 			{
 				@Override
@@ -592,14 +591,25 @@ public class SlideToDeleteListView extends ScrollView
 						LinearLayout.LayoutParams content_param = 
 								new LinearLayout.LayoutParams(width, height);
 						content.setLayoutParams(content_param);
-						content.postInvalidate();
+
 					}
 					
 					return true;
 				}
 			});
+			
 		}
 		
+		public void setAlphaEffectEnabled(boolean alphaEffectEnabled)
+		{
+			this.scroller.setAlphaEffectEnabled(alphaEffectEnabled);
+		}
+		
+		public boolean isAlphaEffectEnabled()
+		{
+			return this.scroller.alphaEffectEnabled;
+		}
+
 		void setOnItemTouchListener(OnItemTouchListener onItemTouchListener)
 		{
 			this.scroller.setOnItemTouchListener(onItemTouchListener);
@@ -610,6 +620,7 @@ public class SlideToDeleteListView extends ScrollView
 			if(this.scroller.getScrollX() != 0)
 			{
 				this.scroller.bringToFront();
+//				this.scroller.delBtn.setAlpha(1);
 				this.scroller.smoothScrollTo(0, 0);
 			}
 		}
@@ -618,6 +629,7 @@ public class SlideToDeleteListView extends ScrollView
 			if(this.scroller.getScrollX() != this.scroller.delBtnWidth_PX)
 			{
 				this.scroller.bringToFront();
+//				this.scroller.delBtn.setAlpha(1);
 				this.scroller.smoothScrollTo(this.scroller.delBtnWidth_PX, 0);
 			}
 		}
@@ -645,6 +657,8 @@ public class SlideToDeleteListView extends ScrollView
 			void onItemTouch(ItemView itemView, boolean isSelect);
 		}
 	}
+	
+
 	
 	
 	private static class HOverScrollView extends HorizontalScrollView
@@ -676,8 +690,11 @@ public class SlideToDeleteListView extends ScrollView
 		private float offset = 0;
 		
 		public static final int overScrollDistance_PX = 500;
+
+		//滑动时，删除按钮是否淡入淡出
+		private boolean alphaEffectEnabled = false;
 		
-		public HOverScrollView(Context context, View content, ItemView parent)
+		public HOverScrollView(Context context, View content, ItemView parent, boolean alphaEffectEnabled)
 		{
 			super(context);
 //			this.setOnTouchListener(listener);
@@ -687,7 +704,13 @@ public class SlideToDeleteListView extends ScrollView
 			this.delBtn = parent.delBtn;
 			this.setHorizontalScrollBarEnabled(false);
 
+			this.alphaEffectEnabled = alphaEffectEnabled;
 			this.addView(contentView);
+		}
+		
+		public void setAlphaEffectEnabled(boolean alphaEffectEnabled)
+		{
+			this.alphaEffectEnabled = alphaEffectEnabled;
 		}
 	    
 		public void setOnItemTouchListener(OnItemTouchListener onItemTouchListener)
@@ -760,6 +783,13 @@ public class SlideToDeleteListView extends ScrollView
 						return true;
 					}
 				}
+				
+				if(this.alphaEffectEnabled)
+				{
+					float alpha = getScrollX() / (float)delBtnWidth_PX ;
+					alpha = alpha < 1 ? alpha : 1;
+//					delBtn.setAlpha(alpha);
+				}
 
 				break;
 			case MotionEvent.ACTION_UP:
@@ -818,19 +848,42 @@ public class SlideToDeleteListView extends ScrollView
 				{
 					((HOverScrollView)msg.obj).bringToFront();
 				}
+
+				
+				//删除按钮的渐隐渐现效果
+				if(((HOverScrollView)msg.obj).alphaEffectEnabled)
+				{
+					Message alphaMsg = alphaHandler.obtainMessage();
+					alphaMsg.obj = msg.obj;
+					
+					alphaHandler.sendMessage(alphaMsg);
+				}
 			}
 		};
+		
 
-	}
-	
-
-	public class LayoutParams extends LinearLayout.LayoutParams
-	{
-
-		public LayoutParams(int width, int height)
+		private static Handler alphaHandler = new Handler()
 		{
-			super(width, height);
-		}
+			private static final double STEP = 0.05;
+			private static final long INTERVAL = 30;
+			
+			@Override
+			public void handleMessage(Message msg)
+			{
+				View delBtn = ((HOverScrollView)msg.obj).delBtn;
+				
+//				double alpha = delBtn.getAlpha();
+//				if(alpha < 1)
+//				{
+//					delBtn.setAlpha((float)(alpha + STEP));
+//					
+//					Message alphaMsg = alphaHandler.obtainMessage();
+//					alphaMsg.obj = msg.obj;
+//					
+//					alphaHandler.sendMessageDelayed(alphaMsg, INTERVAL);
+//				}
+			}
+		};
 	}
 	
 }
