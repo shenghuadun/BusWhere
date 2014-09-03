@@ -101,6 +101,21 @@ public class SlideToDeleteListView extends ScrollView
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		this.setVisibility(View.VISIBLE);
 	}
+
+	private void refreshIndex()
+	{
+		int size = container.getChildCount();
+		children.clear();
+		for(int i=0; i<size; i++)
+		{
+			View view  = container.getChildAt(i);
+			ItemView itemView = (ItemView) view.getTag();
+			itemView.index = i;
+			
+			children.add(itemView);
+		}
+		
+	}
 	/**
 	 * 添加View作为列表项，可以向左滑动显示删除按钮
 	 * @param view
@@ -116,7 +131,7 @@ public class SlideToDeleteListView extends ScrollView
 	 */
 	private void addDeletableView(View view, int index)
 	{
-		ItemView itemView = new ItemView(this.getContext(), index, true);
+		ItemView itemView = new ItemView(this.getContext(), true);
 		itemView.addContentView(view);
 		itemView.setOnItemTouchListener(onItemTouchListener);
 		
@@ -125,6 +140,7 @@ public class SlideToDeleteListView extends ScrollView
 
 		//注册删除按钮的点击事件
 		itemView.container.findViewById(ItemView.DEL_BTN_ID).setOnClickListener(onClickListener);
+		refreshIndex();
 	}
 	
 	private void addNormalView(View view)
@@ -133,11 +149,14 @@ public class SlideToDeleteListView extends ScrollView
 	}
 	private void addNormalView(View view, int index)
 	{
-		ItemView itemView = new ItemView(this.getContext(), index, false);
-		itemView.container.addView(view, index);
+		ItemView itemView = new ItemView(this.getContext(), false);
+		itemView.container.addView(view);
 		itemView.container.setBackgroundColor(SlideToDeleteListView.normalViewColor);
 
-		container.addView(itemView.container);
+		container.addView(itemView.container, index);
+		children.add(itemView);
+		
+		refreshIndex();
 	}
 	
 	/**
@@ -177,12 +196,14 @@ public class SlideToDeleteListView extends ScrollView
 	{
 		container.removeViewAt(index);
 		children.remove(index);
+		refreshIndex();
 	}
 	
 	private void removeView(ItemView view)
 	{
 		container.removeView(view.container);
 		children.remove(view);
+		refreshIndex();
 	}
 
 	static int dip2px(float dipValue, Resources resource)
@@ -277,7 +298,7 @@ public class SlideToDeleteListView extends ScrollView
 		{
 			SlideToDeleteListView.this.removeViewAt(index);
 		}
-		
+
 		/**
 		 * 删除列表项
 		 * @param view
@@ -313,6 +334,25 @@ public class SlideToDeleteListView extends ScrollView
 		{
 			SlideToDeleteListView.this.container.setPadding(padding, padding, padding, padding);
 		}
+		
+		/**
+		 * 将黄色按下效果恢复成白色，并隐藏删除按钮
+		 */
+		public void resetPressState()
+		{
+			int count = container.getChildCount();
+			
+			for(int i=0; i<count; i++)
+			{
+				View view = container.getChildAt(i);
+				ItemView itemView = (ItemView) view.getTag();
+				if(itemView.isDeletable)
+				{
+					itemView.hideDelBtn();
+					itemView.content.setBackgroundColor(Color.WHITE);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -323,7 +363,7 @@ public class SlideToDeleteListView extends ScrollView
 	public static interface OnItemEventListener
 	{
 		/**
-		 * 点击当前项的删除按钮
+		 * 点击当前项的删除按钮，将在项从组件中删除之前调用
 		 * @param item
 		 */
 		void onItemDelete(SlideToDeleteListView slideToDeleteListView, int index, View item);
@@ -377,8 +417,8 @@ public class SlideToDeleteListView extends ScrollView
 								@Override
 								public void run()
 								{
-									SlideToDeleteListView.this.helper.removeView(((ItemView) v.getTag()));	
 									onItemEventListener.onItemDelete(SlideToDeleteListView.this, ((ItemView) v.getTag()).index, ((ItemView) v.getTag()).content.getChildAt(0));	
+									SlideToDeleteListView.this.helper.removeView(((ItemView) v.getTag()));	
 								}
 							}, 20);		
 							
@@ -414,7 +454,8 @@ public class SlideToDeleteListView extends ScrollView
 			for(int i=0; i<count; i++)
 			{
 				View view = SlideToDeleteListView.this.container.getChildAt(i);
-				if(view.getTag() != null && view.getTag() instanceof ItemView && view.getTag() != itemView)
+				Object tag = view.getTag();
+				if(tag != null && tag instanceof ItemView && tag != itemView && ((ItemView)tag).isDeletable)
 				{
 					((ItemView) view.getTag()).hideDelBtn();
 
@@ -453,16 +494,16 @@ public class SlideToDeleteListView extends ScrollView
 		private boolean isFinishedLayout = false;
 		public boolean isDeletable;
 		
-		public ItemView(Context context, int index, boolean isDeletable)
+		public ItemView(Context context, boolean isDeletable)
 		{
 			this.index = index;
 			container = new RelativeLayout(context);
 			this.isDeletable = isDeletable;
 			
+			//用于调用hideDelBtn()方法及设置index
+			container.setTag(this);
 			if(isDeletable)
 			{
-				//用于调用hideDelBtn()方法
-				container.setTag(this);
 				container.setBackgroundColor(SlideToDeleteListView.separatorColor);
 				container.setPadding(0, 1, 0, 0);
 				
@@ -602,12 +643,15 @@ public class SlideToDeleteListView extends ScrollView
 		
 		void setOnItemTouchListener(OnItemTouchListener onItemTouchListener)
 		{
-			this.scroller.setOnItemTouchListener(onItemTouchListener);
+			if(isDeletable)
+			{
+				this.scroller.setOnItemTouchListener(onItemTouchListener);
+			}
 		}
 		
 		void hideDelBtn()
 		{
-			if(this.scroller.getScrollX() != 0)
+			if(isDeletable && this.scroller.getScrollX() != 0)
 			{
 				this.scroller.bringToFront();
 				this.scroller.smoothScrollTo(0, 0);
@@ -615,7 +659,7 @@ public class SlideToDeleteListView extends ScrollView
 		}
 		void showDelBtn()
 		{
-			if(this.scroller.getScrollX() != this.scroller.delBtnWidth_PX)
+			if(isDeletable && this.scroller.getScrollX() != this.scroller.delBtnWidth_PX)
 			{
 				this.scroller.bringToFront();
 				this.scroller.smoothScrollTo(this.scroller.delBtnWidth_PX, 0);
@@ -824,7 +868,7 @@ public class SlideToDeleteListView extends ScrollView
 	}
 	
 
-	public class LayoutParams extends LinearLayout.LayoutParams
+	public static class LayoutParams extends LinearLayout.LayoutParams
 	{
 
 		public LayoutParams(int width, int height)

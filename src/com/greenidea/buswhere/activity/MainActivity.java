@@ -1,21 +1,16 @@
 package com.greenidea.buswhere.activity;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.R.anim;
 import android.app.Instrumentation;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.os.StrictMode;
 import android.view.KeyEvent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -29,45 +24,24 @@ import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
 import com.greenidea.buswhere.fragment.BusLineFragment;
 import com.greenidea.buswhere.fragment.MainFragment;
-import com.greenidea.buswhere.fragment.MenuFragment;
-import com.greenidea.buswhere.fragment.StationFragment;
 import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.util.BusDBHelper;
 import com.greenidea.buswhere.util.Constants;
 import com.greenidea.buswhere.util.Util;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class MainActivity extends BaseActivity implements OnHintClickListener
 {
-	private MenuFragment menuFragment;
 	private MainFragment mainFragment;
 	private BusLineFragment busLineFragment;
-	private StationFragment stationFragment;
+	private MultiLineStationActivity stationFragment;
 
 	private List<FavStationBean> favStations = new ArrayList<FavStationBean>();
 	
 	private List<HisLineBean> hisStations = new ArrayList<HisLineBean>();
 	
-	public MainActivity() 
-	{
-		super(R.string.app_name);
-	}
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
-		
-//			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//				 .detectAll()  // or .detectAll() for all detectable problems
-//		         .penaltyLog()
-//		         .build());
-//			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//		         .detectAll()
-//		         .penaltyLog()
-//		         .penaltyDeath()
-//		         .build());
-			         
-	         
 		super.onCreate(savedInstanceState);
 
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
@@ -79,21 +53,8 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		}
 
 		setContentView(R.layout.main);
-		
-		menuFragment = new MenuFragment();
+
 		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
-		
-		// set the Behind View
-		FrameLayout f = new FrameLayout(this);
-		f.setId(190871026);
-		setBehindContentView(f);
-		
-		getSupportFragmentManager()
-		.beginTransaction()
-		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
-		.replace(190871026, menuFragment)
-		.commit();
-		
 	}
 	
 	public void queryHisAndFav()
@@ -120,11 +81,11 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		return result;
 	}
 
-	public void setTitle()
-	{
-		getSupportActionBar().setTitle(R.string.app_name);
-		getSupportActionBar().setSubtitle(null);
-	}
+//	public void setTitle()
+//	{
+//		getSupportActionBar().setTitle(R.string.app_name);
+//		getSupportActionBar().setSubtitle(null);
+//	}
 	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event)
@@ -211,19 +172,6 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 
 			//立即切换fragment
 			getSupportFragmentManager().executePendingTransactions();
-			break;
-
-		case StationFragment.FRAGMENT_INDEX:
-			if(null == stationFragment)
-			{
-				stationFragment = new StationFragment();
-			}
-			getSupportFragmentManager()
-			.beginTransaction()
-			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
-			.replace(R.id.content_frame, stationFragment)
-			.addToBackStack(null)
-			.commit();
 			break;
 
 		default:

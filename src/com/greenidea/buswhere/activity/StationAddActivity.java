@@ -40,11 +40,6 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 	private HintAdapter hintAdapter;
 	
 	private BusLineView busLineView;
-
-	public StationAddActivity()
-	{
-		super(R.string.app_name);
-	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -52,9 +47,6 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 		super.onCreate(savedInstanceState);
 
 		setTitle("添加车站");
-		FrameLayout f = new FrameLayout(this);
-		f.setId(190871026);
-		setBehindContentView(f);
 		
 		setContentView(R.layout.stationadd);
 		findViews();

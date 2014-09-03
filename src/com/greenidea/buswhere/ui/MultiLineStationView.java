@@ -209,7 +209,19 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 	@Override
 	public void onItemDelete(SlideToDeleteListView slideToDeleteListView, int index, View view)
 	{
-		Toast.makeText(getContext(), "删除", Toast.LENGTH_LONG).show();
+		int size = slideToDeleteListView.helper.getChildCount();
+		//本项已经展开
+		if(index < size -1 && !slideToDeleteListView.helper.isItemDeletable(index + 1))
+		{
+			slideToDeleteListView.helper.removeViewAt(index + 1);
+		}
+		
+		List<OneLineStation> stations = (List<OneLineStation>) view.getTag();
+		Util util = Util.getInstance(getContext());
+		for(OneLineStation station : stations)
+		{
+			util.deleteMultiLineStation(station);
+		}
 	}
 
 	@Override
@@ -224,47 +236,66 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			//下一项是可删的，表示本项还未展开
 			if(slideToDeleteListView.helper.isItemDeletable(index + 1))
 			{
-				Toast.makeText(getContext(), "展开", Toast.LENGTH_LONG).show();
-				
-				LinearLayout lineItemLayout = new LinearLayout(getContext());
-				List<LineItemView> itemViews = new ArrayList<MultiLineStationView.LineItemView>();
-				
-				for(OneLineStation station : stations)
-				{
-					LineItemView item = new LineItemView(getContext());
-					item.init(station.getLineName());
-					itemViews.add(item);
-					lineItemLayout.addView(item);
-				}
-				slideToDeleteListView.helper.addNormalView(lineItemLayout, index);
-				
-				ImageView loading = new ImageView(getContext());
-				loading.setId(10000);
-				loading.setImageResource(R.drawable.rotate);
-				RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-				lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				lp.addRule(RelativeLayout.CENTER_VERTICAL);
-				loading.setLayoutParams(lp);
-				loading.setVisibility(View.INVISIBLE);
-				
-				BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
-				thread.start();
-
-				Message msg = loadingHandler.obtainMessage();
-				msg.what = 1;
-				msg.obj = loading;
-				loadingHandler.sendMessage(msg);
+				showLines(slideToDeleteListView, index, stations);
 			}
 			else
 			{
-				Toast.makeText(getContext(), "关闭", Toast.LENGTH_LONG).show();
+				slideToDeleteListView.helper.removeViewAt(index+1);
+				slideToDeleteListView.helper.resetPressState();
 			}
 		}
 		else
 		{
-			Toast.makeText(getContext(), "展开", Toast.LENGTH_LONG).show();
+			showLines(slideToDeleteListView, index, stations);
 		}
 		
+	}
+
+	/**
+	 * 添加点击的这站对应的路线
+	 * @param slideToDeleteListView
+	 * @param index
+	 * @param stations
+	 */
+	private void showLines(SlideToDeleteListView slideToDeleteListView, int index, List<OneLineStation> stations)
+	{
+		LinearLayout lineItemLayout = new LinearLayout(getContext());
+		lineItemLayout.setOrientation(LinearLayout.VERTICAL);
+		List<LineItemView> itemViews = new ArrayList<MultiLineStationView.LineItemView>();
+		
+		for(OneLineStation station : stations)
+		{
+			LineItemView item = new LineItemView(getContext());
+			item.init(station.getLineName());
+			itemViews.add(item);
+			lineItemLayout.addView(item);
+		}
+		
+		SlideToDeleteListView.LayoutParams layoutParams = 
+				new SlideToDeleteListView.LayoutParams(
+						SlideToDeleteListView.LayoutParams.MATCH_PARENT,
+						SlideToDeleteListView.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(Util.dip2px(30, getResources()), 0, 0, 0);
+		lineItemLayout.setLayoutParams(layoutParams);
+		
+		slideToDeleteListView.helper.addNormalView(lineItemLayout, index+1);
+		
+		ImageView loading = new ImageView(getContext());
+		loading.setId(10000);
+		loading.setImageResource(R.drawable.rotate);
+		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		lp.addRule(RelativeLayout.CENTER_VERTICAL);
+		loading.setLayoutParams(lp);
+		loading.setVisibility(View.INVISIBLE);
+		
+		BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
+		thread.start();
+
+		Message msg = loadingHandler.obtainMessage();
+		msg.what = 1;
+		msg.obj = loading;
+		loadingHandler.sendMessage(msg);
 	}
 	
 	private static class LineItemView extends LinearLayout

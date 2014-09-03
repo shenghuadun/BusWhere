@@ -1,5 +1,6 @@
 package com.greenidea.buswhere.base;
 
+import android.R.anim;
 import android.app.Dialog;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -8,11 +9,14 @@ import android.os.Message;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.fragment.MainFragment;
+import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.util.Util;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
@@ -20,18 +24,15 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class BaseActivity extends SlidingFragmentActivity {
 
-	private int mTitleRes;
-	protected ListFragment mFrag;
+//	protected ListFragment mFrag;
+	private MenuFragment menuFragment;
 
-	public BaseActivity(int titleRes) {
-		mTitleRes = titleRes;
+	public BaseActivity() {
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		setTitle(mTitleRes);
 
 		// customize the SlidingMenu
 		SlidingMenu sm = getSlidingMenu();
@@ -49,6 +50,19 @@ public class BaseActivity extends SlidingFragmentActivity {
 //		});
 		
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		menuFragment = new MenuFragment();
+
+		// set the Behind View
+		FrameLayout f = new FrameLayout(this);
+		f.setId(190871026);
+		setBehindContentView(f);
+		
+		getSupportFragmentManager()
+		.beginTransaction()
+		.setCustomAnimations(anim.slide_in_left, anim.slide_out_right)
+		.replace(190871026, menuFragment)
+		.commit();
 	}
 
 //	@Override

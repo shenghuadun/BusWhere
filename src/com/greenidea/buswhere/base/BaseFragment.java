@@ -5,11 +5,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.greenidea.buswhere.activity.MainActivity;
 
 public class BaseFragment extends SherlockFragment
 {
-	protected MainActivity parent;
+	protected BaseActivity parent;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -22,7 +21,7 @@ public class BaseFragment extends SherlockFragment
 	@Override
 	public void onAttach(Activity activity)
 	{
-		parent = (MainActivity) activity;
+		parent = (BaseActivity)activity;
 		super.onAttach(activity);
 	}
 

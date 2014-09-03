@@ -24,6 +24,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.FavStationBean;
 import com.greenidea.buswhere.bean.HisLineBean;
@@ -34,6 +35,7 @@ import com.greenidea.buswhere.ui.SlideToDeleteListView.OnItemEventListener;
 public class MainFragment extends BaseFragment implements OnItemEventListener
 {
 	private View root;
+	private MainActivity parent;
 
 	//输入框及按钮
 	private EditText lineNumInput;
@@ -56,6 +58,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
+		parent = (MainActivity) super.parent;
 		root = inflater.inflate(R.layout.main_fragment, null);
 		
 		hintAdapter = new HintAdapter(parent, parent);

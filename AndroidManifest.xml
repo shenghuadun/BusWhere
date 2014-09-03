@@ -67,6 +67,10 @@
 	       android:name=".activity.StationAddActivity"
 		   android:label="添加车站">
 	   </activity>
+	   <activity
+	       android:name=".activity.MultiLineStationActivity"
+		   android:label="@string/menu_station">
+	   </activity>
         
 <!-- 广告开始 -->
         <!-- 芒果 -->

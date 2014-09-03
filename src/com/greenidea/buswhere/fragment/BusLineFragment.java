@@ -26,6 +26,7 @@ import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusPosition;
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
@@ -35,6 +36,7 @@ public class BusLineFragment extends BaseFragment
 	private static final String TAG = "BusLineFragment";
 	public static final int FRAGMENT_INDEX = 1;
 	
+	private MainActivity parent;
 	private View contentView;
 	
 	private ScrollView scrollView;
@@ -74,6 +76,8 @@ public class BusLineFragment extends BaseFragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
+		parent = (MainActivity) super.parent;
+		
 		contentView = inflater.inflate(R.layout.busline, null);
 
 		scrollView = (ScrollView) contentView.findViewById(R.id.scrollView);

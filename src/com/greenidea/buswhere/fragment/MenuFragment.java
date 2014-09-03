@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.R.menu;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.greenidea.buswhere.R;
+import com.greenidea.buswhere.activity.AboutActivity;
 import com.greenidea.buswhere.activity.MainActivity;
+import com.greenidea.buswhere.activity.MultiLineStationActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 
 public class MenuFragment extends BaseFragment
@@ -39,19 +42,19 @@ public class MenuFragment extends BaseFragment
 		bottomContainer = (LinearLayout) menuView.findViewById(R.id.bottomContainer);
 
 	    Menu menu = new Menu();
-	    menu.fragId = 0;
+	    menu.intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
 	    menu.iconId = R.drawable.line;
 	    menu.nameId = R.string.menu_line;	     
 	    menuList.add(menu);
 	    
 	    menu = new Menu();
-	    menu.fragId = 2;
+	    menu.intent = new Intent(getActivity().getApplicationContext(), MultiLineStationActivity.class);
 	    menu.iconId = R.drawable.station;
 	    menu.nameId = R.string.menu_station;	     
 	    menuList.add(menu);
 	    
 	    menu = new Menu();
-	    menu.fragId = 3;
+	    menu.intent = new Intent(getActivity().getApplicationContext(), AboutActivity.class);
 	    menu.iconId = R.drawable.ic_action_about;
 	    menu.nameId = R.string.menu_about;
 	    menu.isBottomMenu = true;
@@ -72,7 +75,7 @@ public class MenuFragment extends BaseFragment
 				{
 					parent.showContent();
 	
-					parent.showFragment(((Menu) v.getTag()).fragId);
+					parent.startActivity(((Menu) v.getTag()).intent);
 				}
 			});
 		    
@@ -100,7 +103,7 @@ public class MenuFragment extends BaseFragment
     {
     	int nameId;
     	int iconId;
-    	int fragId;
+    	Intent intent;
     	
     	boolean isBottomMenu = false;
     }

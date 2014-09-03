@@ -630,4 +630,20 @@ public class Util
 
 		return cursor.getCount() > 0;
 	}
+	
+	public boolean deleteMultiLineStation(OneLineStation station)
+	{
+		SQLiteDatabase db = helper.getWritableDatabase();
+		
+		//删除
+		int rows = db.delete(Constants.TABLENAME_MULTI_LINE_STATION, 
+				OneLineStation.LINEID + "=? and " + 
+				OneLineStation.STATIONID + "=? and " + 
+				FavStationBean.DIRECTION + "=?" , new String[]{station.getLineId(), station.getStationId(), station.getDirection()});
+		
+		//保存本记录
+		db.close();
+		helper.close();
+		return rows != 0;
+	}
 }

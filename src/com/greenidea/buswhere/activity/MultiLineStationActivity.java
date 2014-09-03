@@ -1,4 +1,4 @@
-package com.greenidea.buswhere.fragment;
+package com.greenidea.buswhere.activity;
 
 import java.util.List;
 import java.util.Map;
@@ -17,18 +17,17 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.activity.StationAddActivity;
+import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.ui.MultiLineStationView;
 import com.greenidea.buswhere.util.Util;
 
 
-public class StationFragment extends BaseFragment implements OnClickListener
+public class MultiLineStationActivity extends BaseActivity implements OnClickListener
 {
 	public static final int FRAGMENT_INDEX = 2;
 
-	private RelativeLayout root;
 	private LinearLayout scroll;
 	
 	private TextView empty;
@@ -39,19 +38,22 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	public OneLineStation selectedStation;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState) 
 	{
-		root =  (RelativeLayout) inflater.inflate(R.layout.stationfragment, null);
-		scroll = (LinearLayout) root.findViewById(R.id.container);
-		empty = (TextView) root.findViewById(R.id.empty);
+		super.onCreate(savedInstanceState);
 		
-		parent.getSupportActionBar().setTitle(R.string.menu_station);
-		parent.getSupportActionBar().setSubtitle(null);
+		setContentView(R.layout.stationfragment);
+		
+		scroll = (LinearLayout) findViewById(R.id.container);
+		empty = (TextView) findViewById(R.id.empty);
+		
+		getSupportActionBar().setTitle(R.string.menu_station);
+		getSupportActionBar().setSubtitle(null);
         
-		Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
+		Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(this).queryMultiLineStations();
 		if(!multiLineStations.isEmpty())
 		{
-			MultiLineStationView view = new MultiLineStationView(parent);
+			MultiLineStationView view = new MultiLineStationView(this);
 			view.setStations(multiLineStations);
 			scroll.addView(view);
 		}
@@ -60,7 +62,6 @@ public class StationFragment extends BaseFragment implements OnClickListener
 			empty.setVisibility(View.VISIBLE);
 		}
 
-		return root;
 	}
 
 	@Override
@@ -77,13 +78,14 @@ public class StationFragment extends BaseFragment implements OnClickListener
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		inflater.inflate(R.menu.station_menu, menu);
+		getSupportMenuInflater().inflate(R.menu.station_menu, menu);
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
-	public void onPrepareOptionsMenu(Menu menu)
+	public boolean onPrepareOptionsMenu(Menu menu)
 	{
 		if(null == selectedStation)
 		{
@@ -93,6 +95,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		{
 			menu.findItem(R.id.deleteStation).setVisible(true);
 		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 	
 	@Override
@@ -101,7 +104,7 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		switch (item.getItemId())
 		{
 		case R.id.addStation:
-			Intent intent = new Intent(parent, StationAddActivity.class);
+			Intent intent = new Intent(this, StationAddActivity.class);
 			startActivityForResult(intent, 1001);
 			break;
 
@@ -119,10 +122,10 @@ public class StationFragment extends BaseFragment implements OnClickListener
 		{
 			scroll.removeAllViews();
 			
-			Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(parent).queryMultiLineStations();
+			Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(this).queryMultiLineStations();
 			if(!multiLineStations.isEmpty())
 			{
-				MultiLineStationView view = new MultiLineStationView(parent);
+				MultiLineStationView view = new MultiLineStationView(this);
 				view.setStations(multiLineStations);
 				scroll.addView(view);
 			}
