@@ -3,34 +3,32 @@ package com.greenidea.buswhere.activity;
 import java.util.List;
 import java.util.Map;
 
-import android.content.Intent;
+import android.app.Instrumentation;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
-import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.OneLineStation;
+import com.greenidea.buswhere.fragment.MultiLineStationAddFragment;
 import com.greenidea.buswhere.ui.MultiLineStationView;
 import com.greenidea.buswhere.util.Util;
 
 
-public class MultiLineStationActivity extends BaseActivity implements OnClickListener
+public class MultiLineStationActivity extends BaseActivity
 {
 	public static final int FRAGMENT_INDEX = 2;
 
 	private LinearLayout scroll;
 	
-	private TextView empty;
+	private MultiLineStationAddFragment multiLineStationAddFragment;
 	
 	/**
 	 * 选中的车站
@@ -42,14 +40,10 @@ public class MultiLineStationActivity extends BaseActivity implements OnClickLis
 	{
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.stationfragment);
+		setContentView(R.layout.multi_line_station_activity);
 		
 		scroll = (LinearLayout) findViewById(R.id.container);
-		empty = (TextView) findViewById(R.id.empty);
 		
-		getSupportActionBar().setTitle(R.string.menu_station);
-		getSupportActionBar().setSubtitle(null);
-        
 		Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(this).queryMultiLineStations();
 		if(!multiLineStations.isEmpty())
 		{
@@ -57,11 +51,6 @@ public class MultiLineStationActivity extends BaseActivity implements OnClickLis
 			view.setStations(multiLineStations);
 			scroll.addView(view);
 		}
-		else
-		{
-			empty.setVisibility(View.VISIBLE);
-		}
-
 	}
 
 	@Override
@@ -71,68 +60,53 @@ public class MultiLineStationActivity extends BaseActivity implements OnClickLis
 		super.onDestroy();
 	}
 
-	@Override
-	public void onClick(View v)
-	{
-		OneLineStation bean = (OneLineStation) v.getTag();
-	}
 
+	public void resetTitle()
+	{
+		getSupportActionBar().setTitle(R.string.menu_station);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		getSupportMenuInflater().inflate(R.menu.station_menu, menu);
-		return super.onCreateOptionsMenu(menu);
+		getSupportMenuInflater().inflate(R.menu.multi_line_station_menu, menu);
+		return true;
 	}
 
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu)
-	{
-		if(null == selectedStation)
-		{
-			menu.findItem(R.id.deleteStation).setVisible(false);
-		}
-		else
-		{
-			menu.findItem(R.id.deleteStation).setVisible(true);
-		}
-		return super.onPrepareOptionsMenu(menu);
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
-		case R.id.addStation:
-			Intent intent = new Intent(this, StationAddActivity.class);
-			startActivityForResult(intent, 1001);
-			break;
-
+		case R.id.add:
+			if(null == multiLineStationAddFragment)
+			{
+				multiLineStationAddFragment = new MultiLineStationAddFragment();
+			}
+			getSupportFragmentManager()
+			.beginTransaction()
+			.setCustomAnimations(R.anim.slide_in, R.anim.slide_in)
+			.replace(R.id.content_frame, multiLineStationAddFragment)
+			.addToBackStack(null)
+			.commit();
+			return true;
 		default:
 			break;
 		}
 		
-		return true;
+		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data)
+	public void refreshStations()
 	{
-		if(requestCode == 1001 && 1 == resultCode)
+		scroll.removeAllViews();
+		Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(this).queryMultiLineStations();
+		if(!multiLineStations.isEmpty())
 		{
-			scroll.removeAllViews();
-			
-			Map<String, List<OneLineStation>> multiLineStations = Util.getInstance(this).queryMultiLineStations();
-			if(!multiLineStations.isEmpty())
-			{
-				MultiLineStationView view = new MultiLineStationView(this);
-				view.setStations(multiLineStations);
-				scroll.addView(view);
-			}
-
-			empty.setVisibility(View.GONE);
+			MultiLineStationView view = new MultiLineStationView(this);
+			view.setStations(multiLineStations);
+			scroll.addView(view);
 		}
 	}
-
 	
 }

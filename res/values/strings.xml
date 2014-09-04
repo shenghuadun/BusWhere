@@ -9,9 +9,11 @@
     <string name="fav">常用车站：</string>
     
     
-    <string name="menu_line">公交线路查询</string>
-    <string name="menu_station">车站多线路查询</string>
+    <string name="menu_line">公交查询</string>
+    <string name="menu_station">多线查询</string>
     <string name="menu_about">关于</string>
+    
+    <string name="pushmsg">通知</string>
     
     <string name="title_station_add">添加车站</string>
 </resources>

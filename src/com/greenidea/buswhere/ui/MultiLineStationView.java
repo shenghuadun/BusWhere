@@ -79,42 +79,24 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		this.addView(slideToDeleteListView);
 	}
 	
-	private Handler loadingHandler = new Handler()
-	{
-		@Override
-		public void handleMessage(Message msg)
-		{
-			ImageView loading = ((ImageView)msg.obj);
-			switch (msg.what)
-			{
-			case 1:
-				loading.setVisibility(View.VISIBLE);
-				loading.setAnimation(animation);
-				animation.start();
-				break;
-			case 0:
-				loading.clearAnimation();
-				loading.setVisibility(View.GONE);
-			default:
-				break;
-			}
-		}
-	};
-	
-
 	private class BusLocatingThread extends Thread
 	{
+		
 		private Context context;
 		private List<OneLineStation> stations ;
 		private List<LineItemView> itemViews;
-		private ImageView loading;
-		
-		public BusLocatingThread(Context context, List<OneLineStation> stations, List<LineItemView> itemViews, ImageView loading)
+		private int stationIndex;
+
+		public BusLocatingThread(Context context, 
+				List<OneLineStation> stations,
+				List<LineItemView> itemViews, 
+				int stationIndex)
 		{
+				
 			this.context = context;
 			this.stations = stations;
 			this.itemViews = itemViews;
-			this.loading = loading;
+			this.stationIndex = stationIndex;
 		}
 
 		@Override
@@ -141,7 +123,11 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 
 	        	if(null == positions)
 	        	{
-	        		Toast.makeText(getContext(), "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
+	        		Toast.makeText(context, "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
+	        		Message msg = networkFailHandler.obtainMessage();
+					msg.what = stationIndex+1;
+					networkFailHandler.sendMessageDelayed(msg, 500);
+					
 	        		break;
 	        	}
 				Map param = new HashMap();
@@ -154,15 +140,19 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 				index++;
 			}
 
-			Message msg = loadingHandler.obtainMessage();
-			msg.what = 0;
-			msg.obj = loading;
-			loadingHandler.sendMessage(msg);
-
 			Looper.loop();
 		}
 		
 	}
+
+
+	private Handler networkFailHandler = new Handler()
+	{
+        public void handleMessage(android.os.Message msg) 
+        {  
+        	deleteLines(slideToDeleteListView, msg.what);
+        }
+	};
 
 	private Handler positionHandler = new Handler()
 	{
@@ -185,8 +175,8 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		nameView.setTextSize(Util.dip2px(14, getResources()));
 
 		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		int margin = Util.dip2px(20, getResources());
-		lp.setMargins(margin, 0, margin, 0);
+		int margin1 = Util.dip2px(20, getResources());
+		lp.setMargins(margin1, 0, margin1, 0);
 		nameView.setLayoutParams(lp);
 		nameView.setText(stationName);
 		stationNameLayout.addView(nameView);
@@ -213,7 +203,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		//本项已经展开
 		if(index < size -1 && !slideToDeleteListView.helper.isItemDeletable(index + 1))
 		{
-			slideToDeleteListView.helper.removeViewAt(index + 1);
+			deleteLines(slideToDeleteListView, index+1);
 		}
 		
 		List<OneLineStation> stations = (List<OneLineStation>) view.getTag();
@@ -225,7 +215,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 	}
 
 	@Override
-	public void onItemSelected(SlideToDeleteListView slideToDeleteListView, int index, View view)
+	public void onItemSelected(final SlideToDeleteListView slideToDeleteListView, int index, View view)
 	{
 		List<OneLineStation> stations = (List<OneLineStation>) view.getTag();
 		
@@ -240,15 +230,29 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			}
 			else
 			{
-				slideToDeleteListView.helper.removeViewAt(index+1);
-				slideToDeleteListView.helper.resetPressState();
+				deleteLines(slideToDeleteListView, index+1);
 			}
 		}
 		else
 		{
 			showLines(slideToDeleteListView, index, stations);
 		}
-		
+
+		//清除选中样式
+		slideToDeleteListView.postDelayed(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				MultiLineStationView.this.resetPressState(slideToDeleteListView);
+			}
+		}, 500);
+	}
+	
+	private void resetPressState(SlideToDeleteListView slideToDeleteListView)
+	{
+		slideToDeleteListView.helper.resetPressState();
 	}
 
 	/**
@@ -271,31 +275,25 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			lineItemLayout.addView(item);
 		}
 		
-		SlideToDeleteListView.LayoutParams layoutParams = 
-				new SlideToDeleteListView.LayoutParams(
-						SlideToDeleteListView.LayoutParams.MATCH_PARENT,
-						SlideToDeleteListView.LayoutParams.WRAP_CONTENT);
-		layoutParams.setMargins(Util.dip2px(30, getResources()), 0, 0, 0);
-		lineItemLayout.setLayoutParams(layoutParams);
-		
 		slideToDeleteListView.helper.addNormalView(lineItemLayout, index+1);
 		
-		ImageView loading = new ImageView(getContext());
-		loading.setId(10000);
-		loading.setImageResource(R.drawable.rotate);
-		RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		lp.addRule(RelativeLayout.CENTER_VERTICAL);
-		loading.setLayoutParams(lp);
-		loading.setVisibility(View.INVISIBLE);
-		
-		BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, loading);
+		BusLocatingThread thread = new BusLocatingThread(getContext(),stations, itemViews, index);
 		thread.start();
-
-		Message msg = loadingHandler.obtainMessage();
-		msg.what = 1;
-		msg.obj = loading;
-		loadingHandler.sendMessage(msg);
+	}
+	
+	/**
+	 * 删除index项
+	 * @param slideToDeleteListView
+	 * @param index
+	 */
+	private synchronized void deleteLines(SlideToDeleteListView slideToDeleteListView, int index)
+	{
+		//TODO 是路线而不是车站名，规避没有网络时快速点击多个站点index不再准确的问题
+		if(slideToDeleteListView.helper.getChildCount() > index
+				&& !slideToDeleteListView.helper.isItemDeletable(index))
+		{
+			slideToDeleteListView.helper.removeViewAt(index);
+		}
 	}
 	
 	private static class LineItemView extends LinearLayout
@@ -329,6 +327,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			default:
 				break;
 			}
+			resetInfo(index);
 		}
 		public void hideNoBus(int index)
 		{
@@ -343,6 +342,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			default:
 				break;
 			}
+			resetInfo(index);
 		}
 		
 		private void resetInfo(int index)
@@ -388,25 +388,25 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		{
 			hideNoBus(1);
 			hideNoBus(2);
-			if(null == positions || positions.isEmpty())
+			if(positions.isEmpty())
 			{
         		showNoBus(1);
         		showNoBus(2);
 			}
 			else if(positions.size() == 1)
 			{
-				time1.setText(positions.get(0).getWhen());
+				time1.setText(positions.get(0).getWhen() + "前");
 				station1.setText(positions.get(0).getStationName());
 				num1.setText(positions.get(0).getStationNum() + "站");
         		showNoBus(2);
 			}
 			else if(positions.size() == 2)
 			{
-				time1.setText(positions.get(0).getWhen());
+				time1.setText(positions.get(0).getWhen() + "前");
 				station1.setText(positions.get(0).getStationName());
 				num1.setText(positions.get(0).getStationNum() + "站");
 				
-				time2.setText(positions.get(1).getWhen());
+				time2.setText(positions.get(1).getWhen() + "前");
 				station2.setText(positions.get(1).getStationName());
 				num2.setText(positions.get(1).getStationNum() + "站");
 			}

@@ -3,12 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
+    <Space 
+        android:id="@+id/space"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"/>
     <TextView
         android:id="@+id/lineName"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/space"
         android:layout_centerVertical="true"
-        android:text="世园专线7路"
+        android:text=""
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 	    
@@ -30,26 +35,27 @@
             android:text="" />
        
         <TextView
-            android:id="@+id/station1"
+            android:id="@+id/time1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 	        android:layout_marginLeft="10dp"
 	    	android:layout_toRightOf="@id/num1"
-	    	android:layout_toLeftOf="@+id/time1"
+	    	android:layout_toLeftOf="@+id/station1"
             android:layout_alignBottom="@id/num1"
             android:singleLine="true"
             android:textSize="18sp"
-			android:textColor="@color/stationPrimary"	  
-            android:text="" />
+			android:textColor="@color/timePrimary"	  
+            android:text="查询中..." />
         
 	    <TextView
-	        android:id="@id/time1"
+	        android:id="@id/station1"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="5dp"
+	        android:layout_marginRight="2dp"
 	    	android:layout_alignParentRight="true"
             android:layout_alignBottom="@id/num1"
-			android:textColor="@color/timePrimary"	  
+			android:textColor="@color/stationPrimary"	  
 	        android:text="" />
         
 	    <TextView
@@ -58,7 +64,7 @@
 	        android:layout_height="match_parent"
 	        android:layout_alignLeft="@id/num1"
             android:layout_alignBottom="@id/num1"
-            android:background="#fff"
+            android:textSize="18sp"
 			android:visibility="gone"  
 			android:textColor="@color/timeSecondary"	  
 	        android:text="尚未发车" />
@@ -90,26 +96,27 @@
             android:text="" />
         
         <TextView
-            android:id="@+id/station2"
+            android:id="@+id/time2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 	        android:layout_marginLeft="10dp"
 	    	android:layout_toRightOf="@id/num2"
-	    	android:layout_toLeftOf="@+id/time2"
+	    	android:layout_toLeftOf="@+id/station2"
             android:layout_alignBottom="@id/num2"
             android:singleLine="true"
             android:textSize="18sp"
-            android:textColor="@color/stationSecondary"
-            android:text="" />
+            android:textColor="@color/timeSecondary"
+            android:text="查询中..." />
         
 	    <TextView
-	        android:id="@id/time2"
+	        android:id="@id/station2"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="5dp"
 	    	android:layout_alignParentRight="true"
             android:layout_alignBottom="@id/num2"
-			android:textColor="@color/timeSecondary"	
+	        android:layout_marginRight="2dp"
+			android:textColor="@color/stationSecondary"	
 	        android:text="" />
 	    
 	    <TextView
@@ -118,7 +125,7 @@
 	        android:layout_height="match_parent"
 	        android:layout_alignLeft="@id/num2"
             android:layout_alignBottom="@id/num2"
-            android:background="#fff"
+            android:textSize="18sp"
 			android:visibility="gone"  
 			android:textColor="@color/timeSecondary"	  
 	        android:text="尚未发车" />

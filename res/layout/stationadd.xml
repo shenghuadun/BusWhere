@@ -36,9 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 	    android:layout_below="@id/inputContainer"
-		android:layout_marginTop="5dp"
         android:fadingEdge="none"
-        android:background="#fafafa"
         android:scrollbarStyle="outsideOverlay">
         <LinearLayout
             android:layout_width="match_parent"

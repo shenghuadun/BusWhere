@@ -63,6 +63,7 @@ public class BusLineFragment extends BaseFragment
 		super.onDestroy();
 		
     	currentStation = null;
+    	parent.resetTitle();
 		Log.d(TAG, "onDestroy");
 	}
 

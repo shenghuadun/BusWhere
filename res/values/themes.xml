@@ -15,7 +15,10 @@
         
         <item name="android:backgroundSplit">@color/actionbar</item>
         <item name="backgroundSplit">@color/actionbar</item>
+        
     
+        <item name="android:titleTextStyle">@style/TitleTextStyle</item>
+        <item name="titleTextStyle">@style/TitleTextStyle</item>
     <!--         -->  
     <!-- TabHost中的每一个Tab 通常继承 parent="@style/Widget"
         <item name="android:actionBarTabStyle">@style/xxx_light_actionbar_tab</item>  
@@ -25,7 +28,7 @@
         <item name="actionBarTabBarStyle">@style/xxx_light_actionbar_tabhost</item>  -->   
     <!-- Tab中的Text
         <item name="android:actionBarTabTextStyle">@style/xxx_light_actionbar_tabtab_text</item>   
-        <item name="actionBarTabTextStyle">@style/xxx_light_actionbar_tabtab_text</item>  -->     
+        <item name="actionBarTabTextStyle">@style/xxx_light_actionbar_tabtab_text</item>     -->  
     <!-- 整体的Actionbar  通常继承 parent="@style/Widget.Sherlock.Light.ActionBar.Solid"
         <item name="android:actionBarStyle">@style/xxx_light_actionbar</item>  
         <item name="actionBarStyle">@style/xxx_light_actionbar</item>  -->  
@@ -36,5 +39,11 @@
         <item name="android:actionButtonStyle">@style/xxx_light_actionbar_item</item>  
         <item name="actionButtonStyle">@style/xxx_light_actionbar_item</item>   -->  
         
+    </style>
+    
+    
+    <style name="TitleTextStyle"
+           parent="@style/TextAppearance.Sherlock.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/title</item>
     </style>
 </resources>

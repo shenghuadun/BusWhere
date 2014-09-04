@@ -1,4 +1,4 @@
-package com.greenidea.buswhere.activity;
+package com.greenidea.buswhere.fragment;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,17 +10,20 @@ import android.os.Message;
 import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gigi.buslocation.bean.BusStation;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.base.BaseActivity;
+import com.greenidea.buswhere.activity.MultiLineStationActivity;
+import com.greenidea.buswhere.base.BaseFragment;
 import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.component.AlertDialogFragment;
 import com.greenidea.buswhere.component.AlertDialogFragment.OnUserSelectListener;
@@ -29,8 +32,9 @@ import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.ui.BusLineView;
 import com.greenidea.buswhere.util.Util;
 
-public class StationAddActivity extends BaseActivity implements OnHintClickListener, OnUserSelectListener
+public class MultiLineStationAddFragment extends BaseFragment implements OnHintClickListener, OnUserSelectListener
 {
+	View root;
 	//输入框及按钮
 	private EditText lineNumInput;
 	private ImageView btnSearch;
@@ -42,17 +46,38 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 	private BusLineView busLineView;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+	}
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		((MultiLineStationActivity)parent).resetTitle();
+	}
 
-		setTitle("添加车站");
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
+	{
+		Log.d(this.getClass().getName(), "onCreateView");
 		
-		setContentView(R.layout.stationadd);
+		parent.getSupportActionBar().setTitle("添加车站");
+		
+		root = inflater.inflate(R.layout.stationadd, null);
+		
+		return root;
+	}
+	
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
+
 		findViews();
 		setListeners();
 	}
-	
 	private void findViews()
 	{
 		lineNumInput = (EditText)findViewById(R.id.lineNum);
@@ -60,7 +85,7 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 		
 		hintList = (ListView)findViewById(R.id.hintList);
 
-		hintAdapter = new HintAdapter(this, this);
+		hintAdapter = new HintAdapter(this, parent);
 		hintList.setAdapter(hintAdapter);
 		
 		busLineView = (BusLineView) findViewById(R.id.busLineView);
@@ -110,8 +135,9 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
         {  
         	BusStation stationClicked = (BusStation)msg.obj;
         	
-        	AlertDialogFragment fragment = new AlertDialogFragment("添加" + stationClicked.getStationName(), StationAddActivity.this, stationClicked);
-        	fragment.show(getSupportFragmentManager(), "");
+        	AlertDialogFragment fragment = new AlertDialogFragment("添加" + stationClicked.getStationName(), 
+        			MultiLineStationAddFragment.this, stationClicked);
+        	fragment.show(parent.getSupportFragmentManager(), "");
         }
 	};
 	
@@ -131,7 +157,7 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 
 	private void queryBus(String lineId)
 	{
-		showProcess();
+		parent.showProcess();
 		
 		new Thread(new QueryStationsRunner(lineId)).start();		
 	}
@@ -181,10 +207,10 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 		{
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 			
-			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
+			List<BusStation> result = Util.getInstance(parent.getApplicationContext()).getBusStations(lineId, "1");
 			if(null != result)
 			{
-				result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
+				result.addAll(Util.getInstance(parent.getApplicationContext()).getBusStations(lineId, "0"));
 			}
 			
 			Message msg = lineStationInfoHandler.obtainMessage();
@@ -208,19 +234,19 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 
 			if(busStations == null)
 			{
-        		Toast.makeText(StationAddActivity.this, "网络不给力哦亲~", Toast.LENGTH_LONG).show();
-        		hideProcess();
+        		Toast.makeText(parent, "网络不给力哦亲~", Toast.LENGTH_LONG).show();
+        		parent.hideProcess();
         		return;
         	}
 			else if(busStations.isEmpty())
 			{
-        		Toast.makeText(StationAddActivity.this, "未查询到本路车", Toast.LENGTH_LONG).show();
-        		hideProcess();
+        		Toast.makeText(parent, "未查询到本路车", Toast.LENGTH_LONG).show();
+        		parent.hideProcess();
         		return;
         	}
 
     		busLineView.setStations(busStations);
-    		hideProcess();
+    		parent.hideProcess();
         }
 	};
 
@@ -239,29 +265,28 @@ public class StationAddActivity extends BaseActivity implements OnHintClickListe
 		s.setStationId(station.getStationId());
 		s.setStationName(station.getStationName());
 		s.setLineId(station.getLineId());
-		s.setLineName(Util.getInstance(this).getLineNameById(station.getLineId()));
+		s.setLineName(Util.getInstance(parent.getApplicationContext()).getLineNameById(station.getLineId()));
 		s.setSegmentId(station.getSegmentId());
 		s.setDirection(station.getDirection());
 		s.setTime("" + System.currentTimeMillis() );
 		
-		Util util = Util.getInstance(this);
+		Util util = Util.getInstance(parent.getApplicationContext());
 		if(!util.isMultiLineStationExists(s))
 		{
 			boolean saveResult = util.saveMultiLineStation(s);
 			if(saveResult)
 			{
-				Toast.makeText(this, "添加成功", Toast.LENGTH_SHORT).show();
-				setResult(1);
-				finish();
+				Toast.makeText(parent, "添加成功", Toast.LENGTH_SHORT).show();
+				((MultiLineStationActivity)parent).refreshStations();
 			}
 			else
 			{
-				Toast.makeText(this, "添加失败", Toast.LENGTH_SHORT).show();
+				Toast.makeText(parent, "添加失败", Toast.LENGTH_SHORT).show();
 			}
 		}
 		else
 		{
-			Toast.makeText(this, "已经添加过了", Toast.LENGTH_SHORT).show();
+			Toast.makeText(parent, "已经添加过了", Toast.LENGTH_SHORT).show();
 		}
 	}
 

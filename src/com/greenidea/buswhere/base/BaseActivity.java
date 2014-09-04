@@ -2,11 +2,8 @@ package com.greenidea.buswhere.base;
 
 import android.R.anim;
 import android.app.Dialog;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -15,11 +12,9 @@ import android.widget.ImageView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.greenidea.buswhere.R;
-import com.greenidea.buswhere.fragment.MainFragment;
 import com.greenidea.buswhere.fragment.MenuFragment;
 import com.greenidea.buswhere.util.Util;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.CanvasTransformer;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class BaseActivity extends SlidingFragmentActivity {
@@ -65,15 +60,15 @@ public class BaseActivity extends SlidingFragmentActivity {
 		.commit();
 	}
 
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		switch (item.getItemId()) {
-//		case android.R.id.home:
-//			toggle();
-//			return true;
-//		}
-//		return super.onOptionsItemSelected(item);
-//	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			toggle();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,27 +78,6 @@ public class BaseActivity extends SlidingFragmentActivity {
 	
 	Dialog dialog;
 	
-//	private Handler adHandler = new Handler()
-//	{
-//        public void handleMessage(Message msg) 
-//        {  
-//        	//广告设置
-//    		final GigiLayout adsMogoView = (GigiLayout) findViewById(R.id.adsMogoView);
-//    		if(null != adsMogoView)
-//    		{
-//    			adsMogoView.setVisibility(View.INVISIBLE);
-//    			adsMogoView.postDelayed(new Runnable()
-//    			{
-//    				
-//    				@Override
-//    				public void run()
-//    				{
-//    					adsMogoView.setVisibility(View.VISIBLE);				
-//    				}
-//    			}, 4000);
-//    		}
-//        }
-//	};
 	
 	public void showProcess()
 	{

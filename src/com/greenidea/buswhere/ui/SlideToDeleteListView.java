@@ -437,7 +437,7 @@ public class SlideToDeleteListView extends ScrollView
 	private ItemView.OnItemTouchListener onItemTouchListener = new ItemView.OnItemTouchListener()
 	{
 		@Override
-		public void onItemTouch(ItemView itemView, boolean isSelect)
+		public void onItemTouch(final ItemView itemView, boolean isSelect)
 		{
 			if(isSelect)
 			{
@@ -445,7 +445,15 @@ public class SlideToDeleteListView extends ScrollView
 				{
 					onItemEventListener.onItemSelected(SlideToDeleteListView.this, itemView.index, itemView.content.getChildAt(0));
 				}
-				
+				itemView.container.postDelayed(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						itemView.hideDelBtn();
+					}
+				}, 200);
 				itemView.content.setBackgroundColor(SlideToDeleteListView.selectedColor);
 			}
 			
@@ -818,6 +826,9 @@ public class SlideToDeleteListView extends ScrollView
 				isSelect = isSelect && down_x - ev.getX() > -5;
 				//未长距离滑动
 				isSelect = isSelect && !isScrolling;
+				
+				//删除按钮完全露出来了
+				isSelect = isSelect || this.getScrollX() == HOverScrollView.this.delBtnWidth_PX;
 				
 				onItemTouchListener.onItemTouch(parent, isSelect);
 				

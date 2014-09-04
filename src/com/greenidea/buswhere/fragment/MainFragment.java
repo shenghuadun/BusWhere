@@ -307,7 +307,8 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		result.setOrientation(LinearLayout.HORIZONTAL);
 //		result.setBackgroundResource(R.drawable.hisviewblock);
 		
-		LayoutParams p = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		SlideToDeleteListView.LayoutParams p = new SlideToDeleteListView.LayoutParams
+				(SlideToDeleteListView.LayoutParams.MATCH_PARENT, SlideToDeleteListView.LayoutParams.WRAP_CONTENT);
 		result.setLayoutParams(p);
 		
 		TextView textView = (TextView)parent.getLayoutInflater().inflate(R.layout.block, null);
@@ -317,7 +318,7 @@ public class MainFragment extends BaseFragment implements OnItemEventListener
 		textView.setTextSize(16);
 
 		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-		params.setMargins(30, 0, 30, 0);
+		params.setMargins(30, 30, 30, 30);
 		textView.setLayoutParams(params);
 		textView.setBackgroundColor(Color.TRANSPARENT);
 		textView.setTextColor(getResources().getColor(R.color.textColor));
