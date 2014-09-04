@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#F2F2F2" >
+
+    <RelativeLayout
+        android:id="@+id/bd_fb_top_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/baidu_fb_topbar_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onClick" >
+
+        <TextView
+            android:id="@+id/bd_fb_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/bd_fb_feedback"
+            android:textColor="#333333"
+            android:textSize="22sp" />
+
+        <ImageView
+            android:id="@+id/bd_fb_btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:paddingLeft="16dp"
+            android:src="@drawable/baidu_fb_top_back" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bd_fb_bottom_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/home_tab_bar_height"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/baidu_fb_bottombar_bg"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp" >
+
+        <Button
+            android:id="@+id/bd_fb_btn_send"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/baidu_fb_btn_send"
+            android:text="@string/bd_fb_send"
+            android:textColor="#4d5256"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/bd_fb_et_sendmessage"
+            android:layout_width="fill_parent"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/bd_fb_btn_send"
+            android:background="@drawable/baidu_fb_edittext_bg"
+            android:hint="@string/bd_fb_input_content"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:singleLine="true"
+            android:textColor="#4d5256"
+            android:textColorHint="#999999"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/bd_fb_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/bd_fb_bottom_layout"
+        android:layout_below="@id/bd_fb_top_layout"
+        android:cacheColorHint="#0000"
+        android:background="@drawable/baidu_fb_main_bg"
+        android:divider="@null"
+        android:dividerHeight="5dp"
+        android:paddingTop="32dp"
+        android:scrollbarStyle="outsideOverlay" />
+
+</RelativeLayout>

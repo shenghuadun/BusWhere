@@ -20,7 +20,7 @@ import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
-import com.greenidea.baidupush.Utils;
+import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.FavStationBean;

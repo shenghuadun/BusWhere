@@ -143,7 +143,7 @@
 
 
 <!-- 百度推送 -->
-        <receiver android:name="com.greenidea.baidupush.MyPushMessageReceiver">
+        <receiver android:name="com.greenidea.baidu.push.MyPushMessageReceiver">
             <intent-filter>
                 <!-- 接收push消息 -->
                 <action android:name="com.baidu.android.pushservice.action.MESSAGE" />
@@ -185,6 +185,15 @@
 		<!-- 在百度开发者中心查询应用的API Key -->
         <meta-data android:name="api_key" android:value="RIafrI5enenVzIGMVH3h3yij" />
 <!-- 百度推送结束 -->
+<!-- 百度反馈开始 -->
+<!-- Feedback的receiver声明 -->
+		<receiver android:name="com.baidu.feedback.demo.MyFeedbackReceiver">
+		  <intent-filter>
+			  <!-- 接收feedback消息 -->
+			  <action android:name="com.baidu.android.pushservice.action.FB_MESSAGE" />
+		  </intent-filter>
+		</receiver>
+<!-- 百度反馈结束 -->
 
     </application>
 

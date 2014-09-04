@@ -1,4 +1,4 @@
-package com.greenidea.baidupush;
+package com.greenidea.baidu.push;
 
 import java.util.List;
 

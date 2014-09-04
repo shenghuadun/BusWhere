@@ -33,6 +33,10 @@
 -keep class com.baidu.mobads.** {
   public protected *;
 }
+-libraryjars libs/feedback-1.0.jar
+-dontwarn com.baidu.**
+
+
 
 #芒果
 -dontwarn
