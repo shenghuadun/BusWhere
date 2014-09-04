@@ -15,6 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.baidu.android.feedback.FeedbackManager;
+import com.baidu.android.feedback.ui.FeedbackActivity;
+import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.AboutActivity;
 import com.greenidea.buswhere.activity.MainActivity;
@@ -51,6 +54,13 @@ public class MenuFragment extends BaseFragment
 	    menu.nameId = R.string.menu_station;	     
 	    menuList.add(menu);
 	    
+	    //意见反馈
+	    menu = new Menu();
+	    menu.iconId = R.drawable.ic_action_about;
+	    menu.nameId = R.string.feedback;
+	    menu.isBottomMenu = true;
+	    menuList.add(menu);
+	    
 	    menu = new Menu();
 	    menu.intent = new Intent(getActivity().getApplicationContext(), AboutActivity.class);
 	    menu.iconId = R.drawable.ic_action_about;
@@ -72,9 +82,23 @@ public class MenuFragment extends BaseFragment
 				public void onClick(View v)
 				{
 					parent.showContent();
-	
-					parent.startActivity(((Menu) v.getTag()).intent);
-				}
+					Intent intent = ((Menu) v.getTag()).intent;
+					if(null != intent)
+					{
+						parent.startActivity(intent);
+					}
+					//意见反馈
+					else
+					{
+						FeedbackManager fm = FeedbackManager.getInstance(parent);
+				        fm.register(Utils.getMetaValue(parent, "api_key"));
+				        FeedbackManager.getInstance(parent).setUserInfo(
+				                "亲，您",
+				                "青岛");
+				        FeedbackManager.getInstance(parent).startFeedbackActivity();
+					}
+			    }
+
 			});
 		    
 
@@ -96,7 +120,7 @@ public class MenuFragment extends BaseFragment
 		
 		return menuView;
 	}
-	
+
     class Menu
     {
     	int nameId;
