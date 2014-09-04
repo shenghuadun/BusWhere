@@ -5,7 +5,7 @@
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="16" />
+        android:targetSdkVersion="15" />
 
     
     <uses-permission android:name="android.permission.INTERNET" />
@@ -210,6 +210,27 @@
             </intent-filter>
         </receiver>
 <!-- 百度反馈结束 -->
+
+<!-- MOGO自动配置积分墙 （开始） -->
+	<activity
+		android:name="net.cavas.show.MainLoadCavasActivity"
+		android:configChanges="orientation|keyboardHidden" >
+	</activity>
+	<activity
+		android:name="net.cavas.show.MainLoadCavasDetailActivity"
+		android:configChanges="orientation|keyboardHidden" >
+	</activity>
+	<!-- 注册Service，应用下载所需 -->
+	<service android:name="net.cavas.show.MonitorService" >
+	</service>
+	
+	<!-- 万普积分墙 v2.0.7 (开始) -->
+	<activity android:name="cn.waps.extend.AppWall"
+	android:configChanges="keyboardHidden|orientation" />
+	<meta-data android:name="APP_PID" android:value="nearme" />
+	<!-- 万普积分墙 v2.0.7 (结束) -->
+<!-- MOGO自动配置积分墙 （结束） -->
+
 
     </application>
 

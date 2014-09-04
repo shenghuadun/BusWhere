@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.adsmogo.offers.MogoOffer;
 import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.gigi.buslocation.bean.BusLine;
@@ -59,6 +60,15 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
 		
 		setupBaiduPush();
+		
+		MogoOffer.init(this, "95645d068efe4d55854960e0d10f3978");
+		//设置顺序展示模式下，选择积分墙入口的弹出框标题；
+		MogoOffer.setOfferListTitle("精品应用下载");
+		//设置顺序展示模式下，选择积分墙入口的弹出框入口前缀；
+		MogoOffer.setOfferEntranceMsg("精品应用下载");
+		//设置是否显示芒果积分墙积分显示；
+		//（此处只能够设置芒果积分墙， 其他单一积分墙需要到各个平台网站设置）
+		MogoOffer.setMogoOfferScoreVisible(false);
 	}
 	
 	private void setupBaiduPush()
@@ -434,6 +444,13 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 	public void onHintItemClicked(String lineId)
 	{
 		queryBus(lineId, null, null);	
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		MogoOffer.clear(this);
+		super.onDestroy();
 	}
 	
 }

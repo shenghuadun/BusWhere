@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.adsmogo.offers.MogoOffer;
 import com.baidu.android.feedback.FeedbackManager;
 import com.baidu.android.feedback.ui.FeedbackActivity;
 import com.greenidea.baidu.push.Utils;
@@ -54,8 +55,17 @@ public class MenuFragment extends BaseFragment
 	    menu.nameId = R.string.menu_station;	     
 	    menuList.add(menu);
 	    
+	    //精品应用下载
+	    menu = new Menu();
+	    menu.type = Menu.TYPE_APP;
+	    menu.iconId = R.drawable.ic_action_about;
+	    menu.nameId = R.string.apps;
+	    menu.isBottomMenu = true;
+	    menuList.add(menu);
+	    
 	    //意见反馈
 	    menu = new Menu();
+	    menu.type = Menu.TYPE_FEEDBACK;
 	    menu.iconId = R.drawable.ic_action_about;
 	    menu.nameId = R.string.feedback;
 	    menu.isBottomMenu = true;
@@ -82,20 +92,28 @@ public class MenuFragment extends BaseFragment
 				public void onClick(View v)
 				{
 					parent.showContent();
-					Intent intent = ((Menu) v.getTag()).intent;
-					if(null != intent)
+					Menu menu =  ((Menu) v.getTag());
+					
+					switch (menu.type)
 					{
+					case Menu.TYPE_ACTIVITY:
+						Intent intent = menu.intent;
 						parent.startActivity(intent);
-					}
-					//意见反馈
-					else
-					{
+						break;
+					case Menu.TYPE_FEEDBACK:
 						FeedbackManager fm = FeedbackManager.getInstance(parent);
 				        fm.register(Utils.getMetaValue(parent, "api_key"));
 				        FeedbackManager.getInstance(parent).setUserInfo(
 				                "亲，您",
 				                "青岛");
 				        FeedbackManager.getInstance(parent).startFeedbackActivity();
+						break;
+					case Menu.TYPE_APP:
+						MogoOffer.showOffer(parent);
+						break;
+
+					default:
+						break;
 					}
 			    }
 
@@ -123,10 +141,15 @@ public class MenuFragment extends BaseFragment
 
     class Menu
     {
+    	int type = TYPE_ACTIVITY;
     	int nameId;
     	int iconId;
     	Intent intent;
     	
     	boolean isBottomMenu = false;
+    	
+    	static final int TYPE_ACTIVITY = -1;
+    	static final int TYPE_APP = 0;
+    	static final int TYPE_FEEDBACK = 1;
     }
 }
