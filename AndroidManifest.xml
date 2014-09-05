@@ -227,7 +227,7 @@
 	<!-- 万普积分墙 v2.0.7 (开始) -->
 	<activity android:name="cn.waps.extend.AppWall"
 	android:configChanges="keyboardHidden|orientation" />
-	<meta-data android:name="APP_PID" android:value="nearme" />
+	<meta-data android:name="APP_PID" android:value="360" />
 	<!-- 万普积分墙 v2.0.7 (结束) -->
 <!-- MOGO自动配置积分墙 （结束） -->
 
