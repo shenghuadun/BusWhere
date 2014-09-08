@@ -359,6 +359,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 						&& fsb.getDirection().equals(bean.getDirection()))
 				{
 					favStations.remove(fsb);
+					break;
 				}
 			}
 			

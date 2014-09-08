@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.adsmogo.offers.MogoOffer;
 import com.baidu.android.feedback.FeedbackManager;
-import com.baidu.android.feedback.ui.FeedbackActivity;
 import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.AboutActivity;
@@ -84,6 +83,7 @@ public class MenuFragment extends BaseFragment
 		    convertView.setTag(m);
 		    ((ImageView)convertView.findViewById(R.id.icon)).setImageResource(m.iconId);
 		    ((TextView)convertView.findViewById(R.id.menuName)).setText(m.nameId);
+		    ((TextView)convertView.findViewById(R.id.menuName)).setTextColor(Color.WHITE);
 		    
 		    convertView.setOnClickListener(new OnClickListener()
 			{
