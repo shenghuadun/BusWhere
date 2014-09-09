@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,8 @@ public class BusLineFragment extends BaseFragment
 	private ScrollView scrollView;
 	private BusLineView busLineView;
 	
+	private ImageView group;
+	private TextView groupName;
 	private TextView downAvilableTime;
 	private TextView upAvilableTime;
 	
@@ -84,6 +87,8 @@ public class BusLineFragment extends BaseFragment
 		scrollView = (ScrollView) contentView.findViewById(R.id.scrollView);
 		busLineView = (BusLineView) contentView.findViewById(R.id.busLineView);
 
+		group = (ImageView) contentView.findViewById(R.id.group);
+		groupName = (TextView) contentView.findViewById(R.id.groupName);
 		downAvilableTime = (TextView) contentView.findViewById(R.id.downAvilableTime);
 		upAvilableTime = (TextView) contentView.findViewById(R.id.upAvilableTime);
 		
@@ -352,6 +357,17 @@ public class BusLineFragment extends BaseFragment
 		if(null != upAvilableTime)
 		{
 			upAvilableTime.setText(currentLine.getUpAvilableTime());
+		}
+
+		if(currentLine.getGroupName().equals("gj"))
+		{
+			group.setImageResource(R.drawable.gj);
+			groupName.setText("青岛公交");
+		}
+		else
+		{
+			group.setImageResource(R.drawable.jy);
+			groupName.setText("青岛交运");
 		}
 	}
 }

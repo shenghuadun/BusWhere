@@ -4,8 +4,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="15" />
+        android:minSdkVersion="7"/>
 
     
     <uses-permission android:name="android.permission.INTERNET" />
@@ -46,7 +45,10 @@
 	<!-- 多盟所需权限，无此权限多盟将无法展示广告--> 
 	<uses-permission android:name="android.permission.VIBRATE" /> 
     
-	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  
+	<!-- 易传媒 --> 
+	<uses-permission android:name="android.permission.READ_CALENDAR"/> 
+	<uses-permission android:name="android.permission.WRITE_CALENDAR"/> 
 	
 	
 	<!-- 百度推送 --> 
@@ -116,6 +118,19 @@
         </activity>
         <meta-data android:name="BaiduMobAd_APP_ID" android:value="f8a1fa59"/>
         <meta-data android:name="BaiduMobAd_APP_SEC" android:value="f8a1fa59"/>
+        
+        <!-- 易传媒-->
+        <activity android:label="@string/app_name"          
+		  android:theme="@android:style/Theme.Translucent" 
+		  android:configChanges="orientation|keyboard|keyboardHidden|screenSize" 
+		  android:name="com.adchina.android.ads.views.AdBrowserView"> 
+		</activity> 
+		<receiver 
+		  android:name="com.adchina.android.ads.views.AdCompleteReceiver"> 
+		       <intent-filter>   
+		             <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/> 
+		       </intent-filter>   
+		</receiver> 
         
         <!-- 有米 -->
         <activity

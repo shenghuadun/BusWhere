@@ -181,7 +181,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		nameView.setText(stationName);
 		stationNameLayout.addView(nameView);
 		
-		ImageButton refresh = new ImageButton(getContext());
+		ImageView refresh = new ImageView(getContext());
 		refresh.setImageResource(R.drawable.ic_action_collapse);
 		lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 		margin1 = Util.dip2px(20, getResources());
@@ -189,8 +189,8 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 		lp.addRule(RelativeLayout.CENTER_VERTICAL);
 		refresh.setLayoutParams(lp);
-		stationNameLayout.addView(refresh);
 		refresh.setId(ID_BTN_REFRESH);
+		stationNameLayout.addView(refresh);
 		
 //		ImageView loading = new ImageView(getContext());
 //		loading.setId(10000);
@@ -225,28 +225,6 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		}
 	}
 	
-	private class RefreshListener implements View.OnClickListener
-	{
-		Context context;
-		List<OneLineStation> stations;
-		List<LineItemView> itemViews;
-		int index;
-		public RefreshListener(Context context, List<OneLineStation> stations, List<LineItemView> itemViews, int index)
-		{
-			this.context = context;
-			this.stations = stations;
-			this.itemViews = itemViews;
-			this.index = index;
-		}
-
-		@Override
-		public void onClick(View v)
-		{
-			BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, index);
-			thread.start();			
-		}
-	}
-	
 	@Override
 	public void onItemSelected(final SlideToDeleteListView slideToDeleteListView, int index, View view)
 	{
@@ -272,10 +250,8 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		else
 		{
 			List<LineItemView> itemViews = showLines(slideToDeleteListView, index, stations);
-			
-			view.findViewById(ID_BTN_REFRESH).setVisibility(View.VISIBLE);
-			view.findViewById(ID_BTN_REFRESH).setOnClickListener(
-					new RefreshListener(getContext(), stations, itemViews, index));
+
+			((ImageView)view.findViewById(ID_BTN_REFRESH)).setImageResource(R.drawable.ic_action_expand);
 		}
 
 		//清除选中样式

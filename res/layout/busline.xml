@@ -16,38 +16,53 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
             
-	        <RelativeLayout
+	        <LinearLayout
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-	            android:paddingLeft="20dp"
-	            android:orientation="horizontal" >
+	            android:paddingLeft="20dp">
             
-				<ImageView
-				    android:id="@+id/group"
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:layout_centerVertical="true"
-            		android:paddingRight="10dp"
-				    android:src="@drawable/gj" />
-	                
-	            <TextView
-	                android:id="@+id/downAvilableTime"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:textColor="@color/workTime"
-	                android:layout_toRightOf="@id/group"
-	                android:text="TextView" />
-
-	            <TextView
-	                android:id="@+id/upAvilableTime"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:textColor="@color/workTime"
-	                android:layout_toRightOf="@id/group"
-	                android:layout_below="@id/downAvilableTime"
-	                android:text="TextView" />
-           </RelativeLayout>
+		        <RelativeLayout
+				    android:id="@+id/groupContainer"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content">
+					<ImageView
+					    android:id="@+id/group"
+					    android:layout_width="wrap_content"
+					    android:layout_height="wrap_content"
+					    android:layout_centerHorizontal="true"
+					    android:src="@drawable/gj" />
+					
+		            <TextView
+		                android:id="@+id/groupName"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:layout_below="@id/group"
+		                android:text="TextView" />
+	            </RelativeLayout>
+	            
+		        <LinearLayout
+		            android:layout_width="wrap_content"
+		            android:layout_height="match_parent"
+		            android:paddingLeft="10dp"
+		            android:orientation="vertical">
+		            <TextView
+		                android:id="@+id/downAvilableTime"
+		                android:layout_width="wrap_content"
+		                android:layout_height="match_parent"
+		                android:layout_weight="1"
+		                android:textColor="@color/workTime"
+		                android:text="TextView" />
+	
+		            <TextView
+		                android:id="@+id/upAvilableTime"
+		                android:layout_width="wrap_content"
+		                android:layout_height="match_parent"
+		                android:textColor="@color/workTime"
+		                android:layout_weight="1"
+		                android:text="TextView" />
+	           </LinearLayout>
+           </LinearLayout>
 	
             <com.greenidea.buswhere.ui.BusLineView
                 android:id="@+id/busLineView"
