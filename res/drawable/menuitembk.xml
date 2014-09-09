@@ -4,7 +4,7 @@
         <color android:color="#ffc641"/>
     </item>
     <item >
-        <color android:color="#282828"/>
+        <color android:color="@color/menuBack"/>
     </item>
 
 </selector>

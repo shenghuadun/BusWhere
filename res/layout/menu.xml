@@ -7,10 +7,12 @@
     <ImageView
         android:id="@+id/menu_top"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-		android:background="@drawable/menu_top">
+        android:scaleType="fitStart"
+        android:src="@drawable/menu_top" >
+
     </ImageView>
 
     <LinearLayout
@@ -18,12 +20,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/menu_top"
+        android:layout_above="@+id/bottomContainer"
         android:orientation="vertical" >
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/bottomContainer"
+        android:id="@id/bottomContainer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

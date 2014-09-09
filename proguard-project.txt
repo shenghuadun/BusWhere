@@ -49,6 +49,10 @@
 -keep public class android.admore.mobile.lite.** {*;} 
 -keep public class android.admore.mobile.lite.inner.** {*;} 
 
+-dontwarn
+-libraryjars /libs/AdsMOGO_Offer_Android_SDK_1.0.8.jar
+-keep public class net.cavas.show.** {*;} 
+
 
 # for smartmad ad sdk 
 -keeppackagenames  cn.smartmad.ads.android 

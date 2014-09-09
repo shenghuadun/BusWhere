@@ -9,11 +9,12 @@
     <string name="fav">常用车站：</string>
     
     
-    <string name="menu_line">公交查询</string>
-    <string name="menu_station">多线查询</string>
+    <string name="menu_line">普通查询</string>
+    <string name="menu_station">高级查询</string>
     <string name="menu_about">关于</string>
     
-    <string name="apps">精品应用下载</string>
+    <string name="share">分享给好友</string> 
+    <string name="apps">精品应用下载</string> 
     <string name="feedback">意见与建议</string>
     <string name="pushmsg">通知</string>
     

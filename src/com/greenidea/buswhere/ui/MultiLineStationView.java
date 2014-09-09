@@ -10,7 +10,6 @@ import org.htmlparser.util.ParserException;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.AttributeSet;
@@ -18,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -33,9 +33,13 @@ import com.greenidea.buswhere.util.Util;
 
 public class MultiLineStationView extends LinearLayout implements OnItemEventListener
 {
+	private static final int ID_BTN_REFRESH = 10001; 
+	
 	private Map<String, List<OneLineStation>> stations;
 	private Animation animation;
 	private SlideToDeleteListView slideToDeleteListView;
+	
+	private Util busUtil;
 	
 	public void init(Context context)
 	{
@@ -43,6 +47,8 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		animation = AnimationUtils.loadAnimation(context, R.anim.rotate);
 
 		slideToDeleteListView = new SlideToDeleteListView(getContext());
+		
+		busUtil = Util.getInstance(context); 
 	}
 
 	public MultiLineStationView(Context context, AttributeSet attrs)
@@ -103,9 +109,6 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		public void run()
 		{
 			Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-		
-			Looper.prepare();
-			Util busUtil = Util.getInstance(context);
 			
 			int index = 0;
 			for(OneLineStation station : stations)
@@ -123,7 +126,6 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 
 	        	if(null == positions)
 	        	{
-	        		Toast.makeText(context, "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
 	        		Message msg = networkFailHandler.obtainMessage();
 					msg.what = stationIndex+1;
 					networkFailHandler.sendMessageDelayed(msg, 500);
@@ -139,10 +141,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 				
 				index++;
 			}
-
-			Looper.loop();
 		}
-		
 	}
 
 
@@ -150,6 +149,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 	{
         public void handleMessage(android.os.Message msg) 
         {  
+        	Toast.makeText(MultiLineStationView.this.getContext(), "网络不给力哦亲~", Toast.LENGTH_SHORT).show();
         	deleteLines(slideToDeleteListView, msg.what);
         }
 	};
@@ -181,16 +181,27 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		nameView.setText(stationName);
 		stationNameLayout.addView(nameView);
 		
-		ImageView loading = new ImageView(getContext());
-		loading.setId(10000);
-		loading.setImageResource(R.drawable.rotate);
-		RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		rlp.addRule(RelativeLayout.CENTER_VERTICAL);
-		loading.setLayoutParams(rlp);
-		loading.setVisibility(View.INVISIBLE);
+		ImageButton refresh = new ImageButton(getContext());
+		refresh.setImageResource(R.drawable.ic_action_collapse);
+		lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		margin1 = Util.dip2px(20, getResources());
+		lp.setMargins(margin1, 0, margin1, 0);
+		lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		lp.addRule(RelativeLayout.CENTER_VERTICAL);
+		refresh.setLayoutParams(lp);
+		stationNameLayout.addView(refresh);
+		refresh.setId(ID_BTN_REFRESH);
 		
-		stationNameLayout.addView(loading);
+//		ImageView loading = new ImageView(getContext());
+//		loading.setId(10000);
+//		loading.setImageResource(R.drawable.rotate);
+//		RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//		rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//		rlp.addRule(RelativeLayout.CENTER_VERTICAL);
+//		loading.setLayoutParams(rlp);
+//		loading.setVisibility(View.INVISIBLE);
+//		
+//		stationNameLayout.addView(loading);
 		stationNameLayout.setTag(entry.getValue());
 		
 		slideToDeleteListView.helper.addDeletableView(stationNameLayout);
@@ -213,7 +224,29 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			util.deleteMultiLineStation(station);
 		}
 	}
+	
+	private class RefreshListener implements View.OnClickListener
+	{
+		Context context;
+		List<OneLineStation> stations;
+		List<LineItemView> itemViews;
+		int index;
+		public RefreshListener(Context context, List<OneLineStation> stations, List<LineItemView> itemViews, int index)
+		{
+			this.context = context;
+			this.stations = stations;
+			this.itemViews = itemViews;
+			this.index = index;
+		}
 
+		@Override
+		public void onClick(View v)
+		{
+			BusLocatingThread thread = new BusLocatingThread(getContext(), stations, itemViews, index);
+			thread.start();			
+		}
+	}
+	
 	@Override
 	public void onItemSelected(final SlideToDeleteListView slideToDeleteListView, int index, View view)
 	{
@@ -226,16 +259,23 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 			//下一项是可删的，表示本项还未展开
 			if(slideToDeleteListView.helper.isItemDeletable(index + 1))
 			{
-				showLines(slideToDeleteListView, index, stations);
+				List<LineItemView> itemViews = showLines(slideToDeleteListView, index, stations);
+				
+				((ImageView)view.findViewById(ID_BTN_REFRESH)).setImageResource(R.drawable.ic_action_expand);
 			}
 			else
 			{
 				deleteLines(slideToDeleteListView, index+1);
+				((ImageView)view.findViewById(ID_BTN_REFRESH)).setImageResource(R.drawable.ic_action_collapse);
 			}
 		}
 		else
 		{
-			showLines(slideToDeleteListView, index, stations);
+			List<LineItemView> itemViews = showLines(slideToDeleteListView, index, stations);
+			
+			view.findViewById(ID_BTN_REFRESH).setVisibility(View.VISIBLE);
+			view.findViewById(ID_BTN_REFRESH).setOnClickListener(
+					new RefreshListener(getContext(), stations, itemViews, index));
 		}
 
 		//清除选中样式
@@ -261,7 +301,7 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 	 * @param index
 	 * @param stations
 	 */
-	private void showLines(SlideToDeleteListView slideToDeleteListView, int index, List<OneLineStation> stations)
+	private List<LineItemView> showLines(SlideToDeleteListView slideToDeleteListView, int index, List<OneLineStation> stations)
 	{
 		LinearLayout lineItemLayout = new LinearLayout(getContext());
 		lineItemLayout.setOrientation(LinearLayout.VERTICAL);
@@ -279,6 +319,8 @@ public class MultiLineStationView extends LinearLayout implements OnItemEventLis
 		
 		BusLocatingThread thread = new BusLocatingThread(getContext(),stations, itemViews, index);
 		thread.start();
+		
+		return itemViews;
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package com.greenidea.buswhere.fragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import com.greenidea.buswhere.activity.AboutActivity;
 import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.activity.MultiLineStationActivity;
 import com.greenidea.buswhere.base.BaseFragment;
+import com.greenidea.share.WeixinShareUtil;
 
 public class MenuFragment extends BaseFragment
 {
@@ -44,37 +46,51 @@ public class MenuFragment extends BaseFragment
 
 	    Menu menu = new Menu();
 	    menu.intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
-	    menu.iconId = R.drawable.line;
+	    menu.iconId = R.drawable.ic_action_forward;
 	    menu.nameId = R.string.menu_line;	     
 	    menuList.add(menu);
 	    
 	    menu = new Menu();
 	    menu.intent = new Intent(getActivity().getApplicationContext(), MultiLineStationActivity.class);
-	    menu.iconId = R.drawable.station;
+	    menu.iconId = R.drawable.ic_action_split;
 	    menu.nameId = R.string.menu_station;	     
 	    menuList.add(menu);
+
+//	    //一键分享
+//	    menu = new Menu();
+//	    menu.type = Menu.TYPE_SHARE;
+//	    Intent shareInt = new Intent(Intent.ACTION_SEND);
+//		shareInt.setType("text/plain");
+//		shareInt.putExtra(Intent.EXTRA_SUBJECT, "U社区");
+//		shareInt.putExtra(Intent.EXTRA_TEXT, "我在使用【青岛公交实时查询】软件查公交车实时位置，再也不用在车站傻等了，你也快来试试吧！下载地址是：http://apk.hiapk.com/appdown/com.tgj.ju.jiji");
+//		shareInt.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//		menu.intent = shareInt;
+//	    menu.iconId = R.drawable.ic_action_about;
+//	    menu.nameId = R.string.share;
+//	    menu.isBottomMenu = true;
+//	    menuList.add(menu);
 	    
 	    //精品应用下载
 	    menu = new Menu();
 	    menu.type = Menu.TYPE_APP;
-	    menu.iconId = R.drawable.ic_action_about;
+	    menu.iconId = R.drawable.ic_action_download;
 	    menu.nameId = R.string.apps;
-	    menu.isBottomMenu = true;
+//	    menu.isBottomMenu = true;
 	    menuList.add(menu);
 	    
 	    //意见反馈
 	    menu = new Menu();
 	    menu.type = Menu.TYPE_FEEDBACK;
-	    menu.iconId = R.drawable.ic_action_about;
+	    menu.iconId = R.drawable.ic_action_send_now;
 	    menu.nameId = R.string.feedback;
-	    menu.isBottomMenu = true;
+//	    menu.isBottomMenu = true;
 	    menuList.add(menu);
 	    
 	    menu = new Menu();
 	    menu.intent = new Intent(getActivity().getApplicationContext(), AboutActivity.class);
 	    menu.iconId = R.drawable.ic_action_about;
 	    menu.nameId = R.string.menu_about;
-	    menu.isBottomMenu = true;
+//	    menu.isBottomMenu = true;
 	    menuList.add(menu);
 	    
 	    for(Menu m : menuList)
@@ -111,6 +127,10 @@ public class MenuFragment extends BaseFragment
 					case Menu.TYPE_APP:
 						MogoOffer.showOffer(parent);
 						break;
+					case Menu.TYPE_SHARE:
+						intent = menu.intent;
+						parent.startActivity(intent);
+						break;
 
 					default:
 						break;
@@ -121,8 +141,8 @@ public class MenuFragment extends BaseFragment
 		    
 
 		    ImageView divider = new ImageView(parent);
-		    divider.setBackgroundColor(Color.parseColor("#ebebeb"));
-		    divider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, parent.dip2px(1)));
+		    divider.setBackgroundColor(Color.parseColor("#999999"));
+		    divider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, 1));
 		    
 		    if(m.isBottomMenu)
 		    {
@@ -131,8 +151,8 @@ public class MenuFragment extends BaseFragment
 		    }
 		    else
 		    {
-		    	topContainer.addView(convertView);
 		    	topContainer.addView(divider);
+		    	topContainer.addView(convertView);
 		    }
 	    }
 		
@@ -151,5 +171,6 @@ public class MenuFragment extends BaseFragment
     	static final int TYPE_ACTIVITY = -1;
     	static final int TYPE_APP = 0;
     	static final int TYPE_FEEDBACK = 1;
+    	static final int TYPE_SHARE = 2;
     }
 }
