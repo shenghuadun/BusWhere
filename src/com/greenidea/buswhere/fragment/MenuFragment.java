@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.adsmogo.offers.MogoOffer;
 import com.baidu.android.feedback.FeedbackManager;
+import com.baidu.mobads.IconsAd;
 import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.AboutActivity;

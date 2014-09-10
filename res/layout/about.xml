@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/imageView1"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:text="@string/app_name"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -30,7 +31,7 @@
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
         android:textColor="#999"
-        android:text="version 1.0" />
+        android:text="v1.0" />
 
     <TextView
         android:id="@+id/contact"

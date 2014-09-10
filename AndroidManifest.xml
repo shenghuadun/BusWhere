@@ -9,46 +9,22 @@
     
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!--
-    读取手机基本信息权限READ_PHONE_STATE，用于精确统计用户的机型等信息(必须)，mogo
-	会使用该权限
-    -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <!--
-    读取网络信息权限ACCESS_NETWORK_STATE，用于识别gprs网络的接入点的情况(必须)，
-	mogo会使用该权限
-    -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!--
-    获取用户地理信息权限，用于帮助精确统计开发者的程序发布之后的用户分布情况 ，mogo会
-	使用该权限
-    -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
-
-    <!--
-    读写sd 卡的权限，用于缓存广告所用到的图片，节省流量，并可获得更好的用户体验 ，mogo
-	会使用该权限
-    -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- 获得当前wifi的状态，微云广告平台需要此权限，mogo会使用该权限 -->
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> 
-	 
-	<!-- 按效果付费功能需要的权限,mogo会使用该权限 --> 
 	<uses-permission android:name="android.permission.GET_TASKS" /> 
-	 
-	<!-- 多盟所需权限，无此权限多盟将无法展示广告--> 
 	<uses-permission android:name="android.permission.VIBRATE" /> 
-    
 	<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  
-	<!-- 易传媒 --> 
 	<uses-permission android:name="android.permission.READ_CALENDAR"/> 
 	<uses-permission android:name="android.permission.WRITE_CALENDAR"/> 
+	<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+	<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+	<uses-permission android:name="android.permission.VIBRATE"/>
 	
 	
 	<!-- 百度推送 --> 
@@ -120,17 +96,24 @@
         <meta-data android:name="BaiduMobAd_APP_SEC" android:value="f8a1fa59"/>
         
         <!-- 易传媒-->
-        <activity android:label="@string/app_name"          
-		  android:theme="@android:style/Theme.Translucent" 
-		  android:configChanges="orientation|keyboard|keyboardHidden|screenSize" 
-		  android:name="com.adchina.android.ads.views.AdBrowserView"> 
-		</activity> 
-		<receiver 
-		  android:name="com.adchina.android.ads.views.AdCompleteReceiver"> 
-		       <intent-filter>   
-		             <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/> 
-		       </intent-filter>   
-		</receiver> 
+		<activity android:label="@string/app_name" 
+		    android:theme="@android:style/Theme.Translucent"
+			android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+			android:name="com.adchina.android.ads.views.AdBrowserView">
+		</activity>
+		
+        <!-- for the type of downloadAd need -->
+        <receiver android:name="com.adchina.android.ads.views.AdCompleteReceiver">
+            <intent-filter>  
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            </intent-filter>  
+        </receiver> 
+        
+        <!-- 多盟 -->
+        <activity 
+            android:name="cn.domob.android.ads.DomobActivity" 
+            android:theme="@android:style/Theme.Translucent">
+        </activity>
         
         <!-- 有米 -->
         <activity
@@ -153,10 +136,7 @@
 		        <data android:scheme="package" />
 		    </intent-filter>
 		</receiver>
-		<receiver
-		    android:name="net.youmi.android.offers.OffersReceiver"
-		    android:exported="false" >
-		</receiver>
+		
 <!-- 广告结束 -->
 
 
@@ -239,12 +219,19 @@
 	<service android:name="net.cavas.show.MonitorService" >
 	</service>
 	
-	<!-- 万普积分墙 v2.0.7 (开始) -->
+	<!-- 万普积分墙 v2.0.7 (开始) 
 	<activity android:name="cn.waps.extend.AppWall"
 	android:configChanges="keyboardHidden|orientation"
     android:launchMode="singleInstance" />
 	<meta-data android:name="APP_PID" android:value="360" />
-	<!-- 万普积分墙 v2.0.7 (结束) -->
+	 万普积分墙 v2.0.7 (结束) -->
+		
+	<!-- 万普及积分墙所需Activity -->
+	<activity android:configChanges="keyboardHidden|orientation"
+	android:name="com.adsmogo.offers.adapters.WanpuAdView" />
+	
+	<!-- 米迪积分墙所需Activity -->
+	<activity android:name="net.miidi.ad.wall.AdWallActivity" />
 <!-- MOGO自动配置积分墙 （结束） -->
 
 

@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -35,6 +38,7 @@ import com.greenidea.buswhere.util.Util;
 
 public class MainActivity extends BaseActivity implements OnHintClickListener
 {
+	private boolean isFirstIn;
 	private MainFragment mainFragment;
 	private BusLineFragment busLineFragment;
 
@@ -46,7 +50,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-
+		
 		if(!getPreferences(Context.MODE_PRIVATE).getBoolean("initiallizedDB", false))
 		{
 			showProcess();
@@ -56,6 +60,22 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		}
 
 		setContentView(R.layout.main);
+
+		isFirstIn = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("isFirstIn_MainActivity", true);
+		if(isFirstIn)
+		{
+			findViewById(R.id.guide).setVisibility(View.VISIBLE);
+			findViewById(R.id.guide).setOnClickListener(new OnClickListener()
+			{
+				
+				@Override
+				public void onClick(View v)
+				{
+					findViewById(R.id.guide).setVisibility(View.GONE);
+				}
+			});
+			PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("isFirstIn_MainActivity", false).commit();
+		}
 
 		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
 		

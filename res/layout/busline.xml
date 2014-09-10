@@ -83,4 +83,10 @@
 	    android:orientation="horizontal"
 	    android:layout_alignParentBottom="true"/>
 	
+    <ImageView
+        android:id="@+id/guide_busline"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@drawable/busline_guide" />
 </RelativeLayout>

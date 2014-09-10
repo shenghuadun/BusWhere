@@ -21,7 +21,7 @@ public class AboutActivity extends BaseActivity
 		try
 		{
 			pinfo = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
-			((TextView)findViewById(R.id.version)).setText("version " + pinfo.versionName);
+			((TextView)findViewById(R.id.version)).setText("v " + pinfo.versionName);
 		}
 		catch (NameNotFoundException e)
 		{

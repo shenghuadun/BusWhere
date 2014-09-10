@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.gigi.buslocation.bean.BusStation;
@@ -244,7 +245,7 @@ public class MultiLineStationAddFragment extends BaseFragment implements OnHintC
         		parent.hideProcess();
         		return;
         	}
-
+			((ScrollView)root.findViewById(R.id.scrollView)).smoothScrollTo(0, 0);
     		busLineView.setStations(busStations);
     		parent.hideProcess();
         }

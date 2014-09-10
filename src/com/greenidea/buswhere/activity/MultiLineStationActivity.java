@@ -5,6 +5,7 @@ import java.util.Map;
 
 import android.app.Instrumentation;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,6 +31,8 @@ public class MultiLineStationActivity extends BaseActivity
 	
 	private MultiLineStationAddFragment multiLineStationAddFragment;
 	
+	private boolean isFirstIn;
+	
 	/**
 	 * 选中的车站
 	 */
@@ -50,6 +53,13 @@ public class MultiLineStationActivity extends BaseActivity
 			MultiLineStationView view = new MultiLineStationView(this);
 			view.setStations(multiLineStations);
 			scroll.addView(view);
+		}
+		
+		isFirstIn = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("isFirstIn_MultiLineStationActivity", true);
+		if(isFirstIn)
+		{
+			findViewById(R.id.guide).setVisibility(View.VISIBLE);
+			PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("isFirstIn_MultiLineStationActivity", false).commit();
 		}
 	}
 
@@ -89,6 +99,11 @@ public class MultiLineStationActivity extends BaseActivity
 			.replace(R.id.content_frame, multiLineStationAddFragment)
 			.addToBackStack(null)
 			.commit();
+			
+			if(isFirstIn)
+			{
+				findViewById(R.id.guide).setVisibility(View.GONE);
+			}
 			return true;
 		default:
 			break;

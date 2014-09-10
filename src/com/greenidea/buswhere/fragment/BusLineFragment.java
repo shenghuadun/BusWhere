@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -34,6 +36,7 @@ import com.greenidea.buswhere.util.Util;
 
 public class BusLineFragment extends BaseFragment
 {
+	private boolean isFirstIn;
 	private static final String TAG = "BusLineFragment";
 	public static final int FRAGMENT_INDEX = 1;
 	
@@ -209,6 +212,24 @@ public class BusLineFragment extends BaseFragment
 		
 		parent.getSupportActionBar().setTitle(line.getLineName());
         parent.getSupportActionBar().setSubtitle(line.getPrice());
+        
+
+		isFirstIn = PreferenceManager.getDefaultSharedPreferences(parent).getBoolean("isFirstIn_BusLineFragment", true);
+		if(isFirstIn)
+		{
+			findViewById(R.id.guide_busline).setVisibility(View.VISIBLE);
+			findViewById(R.id.guide_busline).setOnClickListener(new OnClickListener()
+			{
+				
+				@Override
+				public void onClick(View v)
+				{
+					findViewById(R.id.guide_busline).setVisibility(View.GONE);
+				}
+			});
+			PreferenceManager.getDefaultSharedPreferences(parent).edit().putBoolean("isFirstIn_BusLineFragment", false).commit();
+		}
+		
 	}
 
 	public List<BusStation> getStations()

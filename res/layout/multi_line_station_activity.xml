@@ -42,9 +42,10 @@
 
     
     <ImageView
-        android:id="@+id/imageView1"
+        android:id="@+id/guide"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:background="@drawable/multi_station_guide" />
     
 </RelativeLayout>
