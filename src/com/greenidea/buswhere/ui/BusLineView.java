@@ -407,7 +407,7 @@ public class BusLineView extends View implements OnTouchListener
 					for(int i=0; i<item.positionInfoList.size(); i++)
 					{
 						BusPosition pos = item.positionInfoList.get(i);
-						canvas.drawText(pos.getWhen(), d2p(STATION_WIDTH + 10) / 2,
+						canvas.drawText(pos.getWhen(), d2p(STATION_WIDTH) / 2,
 								stationViewItems.get(i).rect.bottom	- d2p(STATION_HEIGHT/2 -25 - i*12),
 								paintStationTime);
 					}
