@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.greenidea.av.GreenideaLayout;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.OneLineStation;
@@ -61,6 +62,10 @@ public class MultiLineStationActivity extends BaseActivity
 			findViewById(R.id.guide).setVisibility(View.VISIBLE);
 			PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("isFirstIn_MultiLineStationActivity", false).commit();
 		}
+		
+
+		//下载确认
+		((GreenideaLayout)findViewById(R.id.adsMogoView)).downloadIsShowDialog=true;
 	}
 
 	@Override

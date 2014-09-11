@@ -24,6 +24,7 @@ import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
+import com.greenidea.av.GreenideaLayout;
 import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
@@ -89,6 +90,9 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		//设置是否显示芒果积分墙积分显示；
 		//（此处只能够设置芒果积分墙， 其他单一积分墙需要到各个平台网站设置）
 		MogoOffer.setMogoOfferScoreVisible(false);
+		
+		//下载确认
+		((GreenideaLayout)findViewById(R.id.adsMogoView)).downloadIsShowDialog=true;
 	}
 	
 	private void setupBaiduPush()
@@ -471,6 +475,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 	protected void onDestroy()
 	{
 		MogoOffer.clear(this);
+		GreenideaLayout.clear();
 		super.onDestroy();
 	}
 	
