@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -126,6 +127,28 @@ public class MultiLineStationActivity extends BaseActivity
 			MultiLineStationView view = new MultiLineStationView(this);
 			view.setStations(multiLineStations);
 			scroll.addView(view);
+		}
+	}
+	
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			if(!getSlidingMenu().isMenuShowing())
+			{
+				showMenu();
+			}
+			else
+			{
+				finish();
+			}
+			return true;
+		}
+		else
+		{
+			return super.onKeyUp(keyCode, event);
 		}
 	}
 	

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.greenidea.buswhere.R;
@@ -76,5 +77,27 @@ public class PushMessageActivity extends BaseActivity
 		titleView = (TextView) findViewById(R.id.title);
 		contentView = (TextView) findViewById(R.id.content);
 		urlView = (TextView) findViewById(R.id.url);
+	}
+	
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			if(!getSlidingMenu().isMenuShowing())
+			{
+				showMenu();
+			}
+			else
+			{
+				finish();
+			}
+			return true;
+		}
+		else
+		{
+			return super.onKeyUp(keyCode, event);
+		}
 	}
 }

@@ -3,6 +3,7 @@ package com.greenidea.buswhere.activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.widget.TextView;
 
 import com.greenidea.buswhere.R;
@@ -27,6 +28,28 @@ public class AboutActivity extends BaseActivity
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			if(!getSlidingMenu().isMenuShowing())
+			{
+				showMenu();
+			}
+			else
+			{
+				finish();
+			}
+			return true;
+		}
+		else
+		{
+			return super.onKeyUp(keyCode, event);
 		}
 	}
 }
