@@ -2,8 +2,10 @@ package com.greenidea.buswhere.base;
 
 import android.R.anim;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -113,6 +115,32 @@ public class BaseActivity extends SlidingFragmentActivity {
 		}
 	};
 
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			if(!getSlidingMenu().isMenuShowing())
+			{
+				showMenu();
+			}
+			else
+			{
+				//退出应用
+				Intent intent = new Intent(Intent.ACTION_MAIN);  
+                intent.addCategory(Intent.CATEGORY_HOME);  
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
+                startActivity(intent);  
+                android.os.Process.killProcess(android.os.Process.myPid());
+			}
+			return true;
+		}
+		else
+		{
+			return super.onKeyUp(keyCode, event);
+		}
+	}
+	
 	public int dip2px(float dipValue)
 	{
 		return Util.dip2px(dipValue, getResources());

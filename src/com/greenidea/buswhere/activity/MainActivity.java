@@ -161,20 +161,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 			//当前显示的已经是mainFragment
 			else
 			{
-				boolean consumed = mainFragment.onBackPressed();
-
-				if(!consumed)
-				{
-					if(!getSlidingMenu().isMenuShowing())
-					{
-						showMenu();
-					}
-					else
-					{
-						finish();
-					}
-				}
-				return true;
+				return super.onKeyUp(keyCode, event);
 			}
 		}
 		else
