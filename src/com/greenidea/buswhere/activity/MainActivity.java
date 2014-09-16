@@ -24,7 +24,6 @@ import com.baidu.android.pushservice.PushConstants;
 import com.baidu.android.pushservice.PushManager;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
-import com.greenidea.av.GreenideaLayout;
 import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
@@ -90,9 +89,6 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		//设置是否显示芒果积分墙积分显示；
 		//（此处只能够设置芒果积分墙， 其他单一积分墙需要到各个平台网站设置）
 		MogoOffer.setMogoOfferScoreVisible(false);
-		
-		//下载确认
-		((GreenideaLayout)findViewById(R.id.adsMogoView)).downloadIsShowDialog=true;
 	}
 	
 	private void setupBaiduPush()
@@ -161,7 +157,20 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 			//当前显示的已经是mainFragment
 			else
 			{
-				return super.onKeyUp(keyCode, event);
+				boolean consumed = mainFragment.onBackPressed();
+
+				if(!consumed)
+				{
+					if(!getSlidingMenu().isMenuShowing())
+					{
+						showMenu();
+					}
+					else
+					{
+						finish();
+					}
+				}
+				return true;
 			}
 		}
 		else
@@ -433,16 +442,47 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 			
 			BusLine line = Util.getInstance(getApplicationContext()).getBusLine(lineId);
 			
-			List<BusStation> result = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
-			if(null != result)
+			List<BusStation> downList = Util.getInstance(getApplicationContext()).getBusStations(lineId, "1");
+			List<BusStation> upList = Util.getInstance(getApplicationContext()).getBusStations(lineId, "0");
+
+			if(null != downList)
 			{
-				result.addAll(Util.getInstance(getApplicationContext()).getBusStations(lineId, "0"));
+				downList.addAll(upList);
+			}
+			
+
+			//数据库中没有的情况
+			if(null == line)
+			{
+				String startStation = "";
+				String endStation = "";
+				if(!downList.isEmpty())
+				{
+					startStation = downList.get(0).getStationName();
+				}
+				if(!upList.isEmpty())
+				{
+					endStation = upList.get(0).getStationName();
+				}
+				
+				line = new BusLine();
+				line.setLineId(lineId);
+				line.setLineName(lineId + "路");
+				line.setMainStationsDesc("");
+				line.setPrice("");
+				line.setSearchKey(lineId);
+				line.setTotalLength("");
+				line.setUpAvilableTime(endStation + ":未知服务时间");
+				line.setUpDesc(endStation);
+				line.setDownAvilableTime(startStation + ":未知服务时间");
+				line.setDownDesc(startStation);
+				line.setGroupName("gj");
 			}
 			
 			Message msg = lineStationInfoHandler.obtainMessage();
 			
 			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("stationList", result);
+			m.put("stationList", downList);
 			m.put("stationId", stationId); 
 			m.put("direction", direction);
 			m.put("line", line);
@@ -462,7 +502,6 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 	protected void onDestroy()
 	{
 		MogoOffer.clear(this);
-		GreenideaLayout.clear();
 		super.onDestroy();
 	}
 	

@@ -338,7 +338,7 @@ public class Util
 
 	public BusLine getBusLine(String lineId)
 	{
-		BusLine result = new BusLine();
+		BusLine result = null;
 	
 		//查询数据库中有没有
 		SQLiteDatabase db = helper.getWritableDatabase();
@@ -352,7 +352,7 @@ public class Util
 		for (int i = 0; i < cursor.getCount(); i++)
 		{
 			cursor.moveToNext();
-			
+			result = new BusLine();
 			result.setLineId(cursor.getString(cursor.getColumnIndex(BusLine.LINEID)));
 			result.setLineName(cursor.getString(cursor.getColumnIndex(BusLine.LINENAME)));
 			result.setMainStationsDesc(cursor.getString(cursor.getColumnIndex(BusLine.MAINSTATIONSDESC)));
