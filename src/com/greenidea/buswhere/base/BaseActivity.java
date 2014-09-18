@@ -21,9 +21,10 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 public class BaseActivity extends SlidingFragmentActivity {
 
-//	protected ListFragment mFrag;
 	private MenuFragment menuFragment;
 
+	protected boolean exitOnBackPressed = true;
+	
 	public BaseActivity() {
 	}
 
@@ -120,20 +121,28 @@ public class BaseActivity extends SlidingFragmentActivity {
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
-			if(!getSlidingMenu().isMenuShowing())
+			if(exitOnBackPressed)
 			{
-				showMenu();
+				if(!getSlidingMenu().isMenuShowing())
+				{
+					showMenu();
+				}
+				else
+				{
+					//退出应用
+					Intent intent = new Intent(Intent.ACTION_MAIN);  
+	                intent.addCategory(Intent.CATEGORY_HOME);  
+	                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
+	                startActivity(intent);  
+	                android.os.Process.killProcess(android.os.Process.myPid());
+				}
+				return true;
 			}
 			else
 			{
-				//退出应用
-				Intent intent = new Intent(Intent.ACTION_MAIN);  
-                intent.addCategory(Intent.CATEGORY_HOME);  
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  
-                startActivity(intent);  
-                android.os.Process.killProcess(android.os.Process.myPid());
+				exitOnBackPressed = true;
+				return super.onKeyUp(keyCode, event);
 			}
-			return true;
 		}
 		else
 		{

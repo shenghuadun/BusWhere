@@ -136,15 +136,20 @@ public class MultiLineStationActivity extends BaseActivity
 	{
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
-			if(!getSlidingMenu().isMenuShowing())
+			if(((FrameLayout)findViewById(R.id.content_frame)).getChildCount() != 0 )
+			{
+				exitOnBackPressed = false;
+				return super.onKeyUp(keyCode, event);
+			}
+			else if(!getSlidingMenu().isMenuShowing())
 			{
 				showMenu();
+				return true;
 			}
 			else
 			{
-				finish();
+				return super.onKeyUp(keyCode, event);
 			}
-			return true;
 		}
 		else
 		{

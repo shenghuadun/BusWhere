@@ -151,7 +151,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 					mainFragment.prepareFavStations();
 					mainFragment.prepareHisStations();
 				}
-				
+				exitOnBackPressed = false;
 				return super.onKeyUp(keyCode, event);
 			}
 			//当前显示的已经是mainFragment
@@ -161,14 +161,7 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 
 				if(!consumed)
 				{
-					if(!getSlidingMenu().isMenuShowing())
-					{
-						showMenu();
-					}
-					else
-					{
-						finish();
-					}
+					return super.onKeyUp(keyCode, event);
 				}
 				return true;
 			}
