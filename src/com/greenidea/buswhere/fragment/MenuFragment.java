@@ -1,6 +1,5 @@
 package com.greenidea.buswhere.fragment;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.adsmogo.offers.MogoOffer;
-import com.baidu.android.feedback.FeedbackManager;
-import com.baidu.mobads.IconsAd;
-import com.greenidea.baidu.push.Utils;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.activity.AboutActivity;
 import com.greenidea.buswhere.activity.MainActivity;
 import com.greenidea.buswhere.activity.MultiLineStationActivity;
 import com.greenidea.buswhere.base.BaseFragment;
-import com.greenidea.share.WeixinShareUtil;
 
 public class MenuFragment extends BaseFragment
 {
@@ -72,20 +66,20 @@ public class MenuFragment extends BaseFragment
 //	    menuList.add(menu);
 	    
 	    //精品应用下载
-	    menu = new Menu();
-	    menu.type = Menu.TYPE_APP;
-	    menu.iconId = R.drawable.ic_action_download;
-	    menu.nameId = R.string.apps;
-//	    menu.isBottomMenu = true;
-	    menuList.add(menu);
+//	    menu = new Menu();
+//	    menu.type = Menu.TYPE_APP;
+//	    menu.iconId = R.drawable.ic_action_download;
+//	    menu.nameId = R.string.apps;
+////	    menu.isBottomMenu = true;
+//	    menuList.add(menu);
 	    
 	    //意见反馈
-	    menu = new Menu();
-	    menu.type = Menu.TYPE_FEEDBACK;
-	    menu.iconId = R.drawable.ic_action_send_now;
-	    menu.nameId = R.string.feedback;
-//	    menu.isBottomMenu = true;
-	    menuList.add(menu);
+//	    menu = new Menu();
+//	    menu.type = Menu.TYPE_FEEDBACK;
+//	    menu.iconId = R.drawable.ic_action_send_now;
+//	    menu.nameId = R.string.feedback;
+////	    menu.isBottomMenu = true;
+//	    menuList.add(menu);
 	    
 	    menu = new Menu();
 	    menu.intent = new Intent(getActivity().getApplicationContext(), AboutActivity.class);
@@ -116,17 +110,6 @@ public class MenuFragment extends BaseFragment
 					case Menu.TYPE_ACTIVITY:
 						Intent intent = menu.intent;
 						parent.startActivity(intent);
-						break;
-					case Menu.TYPE_FEEDBACK:
-						FeedbackManager fm = FeedbackManager.getInstance(parent);
-				        fm.register(Utils.getMetaValue(parent, "api_key"));
-				        FeedbackManager.getInstance(parent).setUserInfo(
-				                "亲，您",
-				                "青岛");
-				        FeedbackManager.getInstance(parent).startFeedbackActivity();
-						break;
-					case Menu.TYPE_APP:
-						MogoOffer.showOffer(parent);
 						break;
 					case Menu.TYPE_SHARE:
 						intent = menu.intent;

@@ -249,7 +249,20 @@ public class BusLineView extends View implements OnTouchListener
 		this.setLongClickable(true);
 		this.setOnTouchListener(this);
 //		this.setOnLongClickListener(this);
+		
+		postDelayed(pathEffectRunner, 500);
 	}
+	
+	private Runnable pathEffectRunner = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			phase-=1;
+			invalidate();
+			postDelayed(pathEffectRunner, 50);
+		}
+	};
 
 	public BusLineView(Context context, AttributeSet attrs)
 	{
@@ -359,7 +372,7 @@ public class BusLineView extends View implements OnTouchListener
 
 		canvas.translate((canvas.getWidth() - 2 * d2p(BLOCK_PADDING) - STATIONS_PER_LINE * d2p(STATION_WIDTH)) / 2, 10);
 
-		boolean showDynamicPath = false;
+		boolean showDynamicPath = true;
 		
 		if (stationViewItems.size() > 0)
 		{
@@ -407,7 +420,7 @@ public class BusLineView extends View implements OnTouchListener
 					for(int i=0; i<item.positionInfoList.size(); i++)
 					{
 						BusPosition pos = item.positionInfoList.get(i);
-						canvas.drawText(pos.getWhen(), d2p(STATION_WIDTH) / 2,
+						canvas.drawText("(" + pos.getWhen() + "前)", d2p(STATION_WIDTH - 40) / 2 ,
 								stationViewItems.get(i).rect.bottom	- d2p(STATION_HEIGHT/2 -25 - i*12),
 								paintStationTime);
 					}
@@ -449,8 +462,6 @@ public class BusLineView extends View implements OnTouchListener
 			paintLineUnpassedDynamic.setPathEffect(new PathDashPathEffect(arrowPath, d2p(10), phase, PathDashPathEffect.Style.MORPH));
 			canvas.drawPath(pathLineUnpassed, paintLineUnpassedDynamic);
 
-			//phase-=1;
-
 			// 5.车辆当前位置和目标站点
 			for (int i = 0; i < stationViewItems.size(); i++)
 			{
@@ -488,19 +499,7 @@ public class BusLineView extends View implements OnTouchListener
 
 		canvas.restore();
 
-		if(showDynamicPath)
-		{
-			postDelayed(new Runnable()
-			{
-				
-				@Override
-				public void run()
-				{
-					invalidate();
-				}
-			}, 200);
-		}
-		 Log.d("", "刷新");
+		Log.d("", "刷新");
 	}
 
 	/**

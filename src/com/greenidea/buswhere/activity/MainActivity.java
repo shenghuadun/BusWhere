@@ -19,12 +19,9 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
-import com.adsmogo.offers.MogoOffer;
-import com.baidu.android.pushservice.PushConstants;
-import com.baidu.android.pushservice.PushManager;
 import com.gigi.buslocation.bean.BusLine;
 import com.gigi.buslocation.bean.BusStation;
-import com.greenidea.baidu.push.Utils;
+import com.greenidea.av.GreenideaLayout;
 import com.greenidea.buswhere.R;
 import com.greenidea.buswhere.base.BaseActivity;
 import com.greenidea.buswhere.bean.FavStationBean;
@@ -35,12 +32,15 @@ import com.greenidea.buswhere.interfaces.OnHintClickListener;
 import com.greenidea.buswhere.util.BusDBHelper;
 import com.greenidea.buswhere.util.Constants;
 import com.greenidea.buswhere.util.Util;
+import com.greenidea.util.GreenideaLayoutPosition;
+import com.greenidea.util.GreenideaSize;
 
 public class MainActivity extends BaseActivity implements OnHintClickListener
 {
 	private boolean isFirstIn;
 	private MainFragment mainFragment;
 	private BusLineFragment busLineFragment;
+	private GreenideaLayout adsView;
 
 	private List<FavStationBean> favStations = new ArrayList<FavStationBean>();
 	
@@ -79,34 +79,9 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 
 		mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.mainFragment);
 		
-		setupBaiduPush();
-		
-		MogoOffer.init(this, "95645d068efe4d55854960e0d10f3978");
-		//设置顺序展示模式下，选择积分墙入口的弹出框标题；
-		MogoOffer.setOfferListTitle("精品应用下载");
-		//设置顺序展示模式下，选择积分墙入口的弹出框入口前缀；
-		MogoOffer.setOfferEntranceMsg("精品应用下载");
-		//设置是否显示芒果积分墙积分显示；
-		//（此处只能够设置芒果积分墙， 其他单一积分墙需要到各个平台网站设置）
-		MogoOffer.setMogoOfferScoreVisible(false);
+		adsShowHandler.sendEmptyMessageDelayed(0, 5000);
 	}
 	
-	private void setupBaiduPush()
-	{
-		// Push: 以apikey的方式登录，一般放在主Activity的onCreate中。
-        // 这里把apikey存放于manifest文件中，只是一种存放方式，
-        // 您可以用自定义常量等其它方式实现，来替换参数中的Utils.getMetaValue(PushDemoActivity.this,
-        // "api_key")
-        // 通过share preference实现的绑定标志开关，如果已经成功绑定，就取消这次绑定
-        if (!Utils.hasBind(getApplicationContext())) {
-            PushManager.startWork(getApplicationContext(),
-                    PushConstants.LOGIN_TYPE_API_KEY,
-                    Utils.getMetaValue(this, "api_key"));
-            // Push: 如果想基于地理位置推送，可以打开支持地理位置的推送的开关
-            // PushManager.enableLbs(getApplicationContext());
-        }
-	}
-
 	public void queryHisAndFav()
 	{
 		//历史记录和收藏
@@ -131,6 +106,19 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 		return result;
 	}
 
+	private Handler adsShowHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			adsView = new GreenideaLayout(MainActivity.this, "95645d068efe4d55854960e0d10f3978", GreenideaLayoutPosition.CENTER_BOTTOM, GreenideaSize.AdsMoGoBanner, false);
+
+			//下载确认
+			adsView.downloadIsShowDialog=true;
+		}
+		
+	};
+	
 	public void resetTitle()
 	{
 		getSupportActionBar().setTitle(R.string.app_name);
@@ -494,7 +482,10 @@ public class MainActivity extends BaseActivity implements OnHintClickListener
 	@Override
 	protected void onDestroy()
 	{
-		MogoOffer.clear(this);
+		if (adsView != null) 
+		{
+			adsView.clearThread();
+		}
 		super.onDestroy();
 	}
 	

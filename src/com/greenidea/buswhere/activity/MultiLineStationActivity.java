@@ -3,15 +3,13 @@ package com.greenidea.buswhere.activity;
 import java.util.List;
 import java.util.Map;
 
-import android.app.Instrumentation;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.actionbarsherlock.view.Menu;
@@ -23,6 +21,8 @@ import com.greenidea.buswhere.bean.OneLineStation;
 import com.greenidea.buswhere.fragment.MultiLineStationAddFragment;
 import com.greenidea.buswhere.ui.MultiLineStationView;
 import com.greenidea.buswhere.util.Util;
+import com.greenidea.util.GreenideaLayoutPosition;
+import com.greenidea.util.GreenideaSize;
 
 
 public class MultiLineStationActivity extends BaseActivity
@@ -34,7 +34,8 @@ public class MultiLineStationActivity extends BaseActivity
 	private MultiLineStationAddFragment multiLineStationAddFragment;
 	
 	private boolean isFirstIn;
-	
+
+	private GreenideaLayout adsView;
 	/**
 	 * 选中的车站
 	 */
@@ -63,19 +64,34 @@ public class MultiLineStationActivity extends BaseActivity
 			findViewById(R.id.guide).setVisibility(View.VISIBLE);
 			PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("isFirstIn_MultiLineStationActivity", false).commit();
 		}
-		
 
-		//下载确认
-		((GreenideaLayout)findViewById(R.id.adsMogoView)).downloadIsShowDialog=true;
+		adsShowHandler.sendEmptyMessageDelayed(0, 5000);
 	}
 
 	@Override
 	public void onDestroy()
 	{
+		if (adsView != null) 
+		{
+			adsView.clearThread();
+		}
     	selectedStation = null;
 		super.onDestroy();
 	}
 
+
+	private Handler adsShowHandler = new Handler()
+	{
+		@Override
+		public void handleMessage(Message msg)
+		{
+			adsView = new GreenideaLayout(MultiLineStationActivity.this, "95645d068efe4d55854960e0d10f3978", GreenideaLayoutPosition.CENTER_BOTTOM, GreenideaSize.AdsMoGoBanner, false);
+
+			//下载确认
+			adsView.downloadIsShowDialog=true;
+		}
+		
+	};
 
 	public void resetTitle()
 	{
