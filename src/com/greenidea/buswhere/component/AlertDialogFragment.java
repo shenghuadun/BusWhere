@@ -1,16 +1,21 @@
 package com.greenidea.buswhere.component;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+@SuppressLint("ValidFragment")
 public class AlertDialogFragment extends DialogFragment
 {
 	String msg;
 	OnUserSelectListener listener; 
 	Object obj;
+	public AlertDialogFragment()
+	{}
+	
 	public AlertDialogFragment(String msg, OnUserSelectListener listener, Object obj)
 	{
 		this.msg = msg;
